@@ -78,24 +78,24 @@ function draw() {
   ctx.clearRect(0, 0, W, H);
 
   // Órbita
-  ctx.strokeStyle = "rgba(0, 229, 255, 0.3)";
+  ctx.strokeStyle = "#84cd97";
   ctx.lineWidth = 2;
   ctx.beginPath();
   ctx.arc(CX, CY, ORBIT, 0, Math.PI * 2);
   ctx.stroke();
 
   // Núcleo
-  ctx.fillStyle = "#ff3d81";
-  ctx.shadowColor = "#ff3d81";
-  ctx.shadowBlur = 25;
+  ctx.fillStyle = "#2c633a";
+  ctx.shadowColor = "#2c633a";
+  ctx.shadowBlur = 12;
   ctx.beginPath();
   ctx.arc(CX, CY, 28, 0, Math.PI * 2);
   ctx.fill();
 
   // Jugador
   if (angle !== undefined) {
-    ctx.fillStyle = "#00e5ff";
-    ctx.shadowColor = "#00e5ff";
+    ctx.fillStyle = "#46b463";
+    ctx.shadowColor = "#46b463";
     ctx.beginPath();
     ctx.arc(CX + Math.cos(angle) * ORBIT, CY + Math.sin(angle) * ORBIT, PLAYER_R, 0, Math.PI * 2);
     ctx.fill();
@@ -103,25 +103,25 @@ function draw() {
   ctx.shadowBlur = 0;
 
   // Meteoritos
-  ctx.fillStyle = "#c9c9e0";
+  ctx.fillStyle = "#0c180f";
   for (const r of rocks || []) {
     ctx.beginPath();
     ctx.arc(r.x, r.y, r.r, 0, Math.PI * 2);
     ctx.fill();
   }
 
-  ctx.fillStyle = "#e8e8f5";
+  ctx.fillStyle = "#0c180f";
   ctx.textAlign = "center";
-  ctx.font = "bold 28px Segoe UI, sans-serif";
+  ctx.font = "bold 28px Inter, system-ui, sans-serif";
   if (state === "playing") {
     ctx.fillText(Math.floor(score), CX, 50);
   } else if (state === "menu") {
     ctx.fillText("ORBIT DODGE", CX, 80);
-    ctx.font = "18px Segoe UI, sans-serif";
+    ctx.font = "18px Inter, system-ui, sans-serif";
     ctx.fillText("Pulsa Espacio o toca para empezar", CX, H - 60);
   } else {
     ctx.fillText(`Game over · ${Math.floor(score)}`, CX, 80);
-    ctx.font = "18px Segoe UI, sans-serif";
+    ctx.font = "18px Inter, system-ui, sans-serif";
     ctx.fillText("Pulsa Espacio o toca para reintentar", CX, H - 60);
   }
 }
