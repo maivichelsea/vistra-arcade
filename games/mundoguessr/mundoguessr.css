@@ -84,6 +84,7 @@ body.playing { overflow: hidden; }
 .menu .panel > .muted { margin-top: -.25rem; }
 
 .names { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: .75rem; }
+.names[hidden] { display: none; }
 .names label { display: flex; align-items: center; gap: .5rem; }
 .names input {
   font: inherit;
@@ -252,3 +253,45 @@ body.playing { overflow: hidden; }
   .guess-map { height: 160px; }
   .float-left { bottom: auto; top: 3.75rem; }
 }
+
+/* ---------- Desafíos ---------- */
+.challenge-panel { margin-top: 1rem; }
+.challenge-panel h2 { font-size: 1.2rem; }
+
+.challenge-panel textarea,
+.challenge-output textarea,
+.row input {
+  font: inherit;
+  color: var(--text);
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: .5rem .65rem;
+}
+.challenge-panel textarea,
+.challenge-output textarea {
+  width: 100%;
+  margin-top: .75rem;
+  resize: vertical;
+  font-size: .85rem;
+  word-break: break-all;
+}
+.challenge-panel textarea:focus,
+.challenge-output textarea:focus,
+.row input:focus { outline: 2px solid var(--accent-text); outline-offset: 1px; }
+
+.row { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; margin-top: .6rem; }
+.row input { flex: 1 1 10rem; min-width: 0; }
+
+.challenge-status { min-height: 1.3em; margin-top: .4rem; font-size: .9rem; font-weight: 600; color: var(--primary-text); }
+.challenge-status.error { color: var(--danger); }
+
+.challenge-box {
+  text-align: left;
+  margin: 0 0 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+.challenge-box[hidden], .challenge-output[hidden] { display: none; }
+.challenge-box h3 { font-size: 1rem; font-weight: 800; color: var(--primary-text); }
+.challenge-box .muted { margin-top: .2rem; }

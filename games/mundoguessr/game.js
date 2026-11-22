@@ -49,6 +49,91 @@ function formatDistance(km) {
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 const cssColor = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
+// ---------- Código de desafío ----------
+// El código guarda los 5 lugares, el tiempo por turno, el nombre de quien reta y sus respuestas.
+// Formato: MG1-<datos en base64url>.<suma de control>. Así se puede pegar el mensaje entero de WhatsApp.
+const CHALLENGE_RE = /MG1-([A-Za-z0-9_-]+)\.([0-9a-z]{7})/;
+const round5 = (n) => Math.round(n * 1e5) / 1e5;
+
+function toBase64Url(text) {
+  let bin = "";
+  new TextEncoder().encode(text).forEach((b) => { bin += String.fromCharCode(b); });
+  return btoa(bin).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+function fromBase64Url(data) {
+  const b64 = data.replace(/-/g, "+").replace(/_/g, "/").padEnd(Math.ceil(data.length / 4) * 4, "=");
+  return new TextDecoder().decode(Uint8Array.from(atob(b64), (c) => c.charCodeAt(0)));
+}
+
+// Suma de control (FNV-1a) para detectar códigos copiados a medias.
+function checksum(text) {
+  let h = 0x811c9dc5;
+  for (let i = 0; i < text.length; i++) {
+    h ^= text.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return (h >>> 0).toString(36).padStart(7, "0");
+}
+
+function encodeChallenge(name) {
+  const payload = {
+    v: 1,
+    n: name,
+    t: game.timeLimit,
+    r: game.rounds.map((r) => {
+      const { guess, points } = r.guesses[0];
+      return [
+        r.location.pano, round5(r.location.lat), round5(r.location.lng), Math.round(r.heading), r.location.country,
+        guess ? round5(guess.lat) : null, guess ? round5(guess.lng) : null, points,
+      ];
+    }),
+  };
+  const data = toBase64Url(JSON.stringify(payload));
+  return `MG1-${data}.${checksum(data)}`;
+}
+
+function decodeChallenge(text) {
+  const match = String(text).replace(/\s+/g, "").match(CHALLENGE_RE);
+  if (!match) {
+    throw new Error(/MG1-/.test(text)
+      ? "El código está incompleto o mal copiado."
+      : "No encuentro un código de desafío. Debe empezar por MG1-.");
+  }
+  const [, data, sum] = match;
+  if (checksum(data) !== sum) throw new Error("El código está incompleto o mal copiado.");
+
+  let payload;
+  try { payload = JSON.parse(fromBase64Url(data)); } catch { throw new Error("El código no es válido."); }
+  const isNum = (n) => typeof n === "number" && Number.isFinite(n);
+  const okRow = (r) => Array.isArray(r) && typeof r[0] === "string" && r[0] && isNum(r[1]) && isNum(r[2]) && isNum(r[3])
+    && (r[5] === null || (isNum(r[5]) && isNum(r[6])))
+    && Number.isInteger(r[7]) && r[7] >= 0 && r[7] <= MAX_POINTS;
+  if (payload?.v !== 1 || !Array.isArray(payload.r) || payload.r.length !== ROUNDS || !payload.r.every(okRow)) {
+    throw new Error("El código no es válido.");
+  }
+
+  const rounds = payload.r.map(([pano, lat, lng, heading, country, glat, glng, points]) => {
+    const guess = glat === null ? null : { lat: glat, lng: glng };
+    return {
+      location: { pano, lat, lng, country: String(country || "").slice(0, 40) },
+      heading,
+      opponent: { guess, km: guess ? distanceKm(guess, { lat, lng }) : null, points },
+    };
+  });
+  return {
+    name: String(payload.n || "").trim().slice(0, 16) || "Tu amigo",
+    time: [0, 30, 60, 120].includes(payload.t) ? payload.t : 0,
+    rounds,
+    total: rounds.reduce((sum, r) => sum + r.opponent.points, 0),
+  };
+}
+
+function challengeMessage(code, total) {
+  return `¡Te reto en MundoGuessr! Saqué ${fmt(total)} puntos en 5 rondas. ` +
+    `Abre MundoGuessr, ve a "Desafío de un amigo" y pega este mensaje:\n${code}`;
+}
+
 // ---------- Estado ----------
 let playerCount = 1;
 let timeLimit = 0;
@@ -56,6 +141,7 @@ let game = null;
 let sv, panorama, guessMap, resultMap, guessMarker;
 let resultOverlays = [];
 let timerId = null;
+const NAME_KEY = "mundoguessr-name";
 
 // ---------- Menú ----------
 function buildMenu() {
@@ -120,6 +206,7 @@ function loadGoogleMaps() {
     sv = new google.maps.StreetViewService();
     $("play").disabled = false;
     $("play-hint").textContent = "";
+    checkChallengeInput();
   };
 
   const script = document.createElement("script");
@@ -170,10 +257,18 @@ function ensureGoogleObjects() {
 
 // ---------- Partida ----------
 const isDuel = () => game.players.length === 2;
+const isChallenge = () => Boolean(game.challenge);
 
-function startGame() {
+function myName() {
+  return localStorage.getItem(NAME_KEY) || "Tú";
+}
+
+function startGame(challenge = null) {
+  const names = challenge ? [myName(), challenge.name] : playerNames();
   game = {
-    players: playerNames().map((name) => ({ name, score: 0 })),
+    challenge,           // si se juega un desafío: lugares y respuestas del rival
+    timeLimit: challenge ? challenge.time : timeLimit,
+    players: names.map((name) => ({ name, score: 0 })),
     rounds: [],          // [{ location, heading, guesses: [{ guess, km, points }] }]
     used: new Set(),
     current: null,
@@ -196,6 +291,13 @@ async function startRound() {
   $("loading-text").textContent = "Buscando un lugar…";
   $("loading").hidden = false;
   updateHud();
+
+  if (game.challenge) {
+    const planned = game.challenge.rounds[game.rounds.length];
+    game.current = { location: planned.location, heading: planned.heading, guesses: [] };
+    beginTurn();
+    return;
+  }
 
   let location;
   try {
@@ -224,7 +326,7 @@ async function beginTurn() {
 
   const { location, heading } = game.current;
   // El botón "Estoy listo" responde desde que aparece, aunque el lugar aún esté cargando.
-  const ready = isDuel() ? showHandoff() : null;
+  const ready = isDuel() && !isChallenge() ? showHandoff() : null;
   panorama.setPano(location.pano);
   panorama.setPov({ heading, pitch: 0 });
   panorama.setZoom(0);
@@ -237,7 +339,7 @@ async function beginTurn() {
     if (game !== thisGame) return;
   }
   game.roundActive = true;
-  if (timeLimit) startTimer(timeLimit);
+  if (game.timeLimit) startTimer(game.timeLimit);
 }
 
 // Pantalla de "pasa el turno": tapa el panorama hasta que el jugador está listo.
@@ -277,7 +379,9 @@ function updateHud() {
   const player = game.players[game.turn];
   const hudPlayer = $("hud-player");
   hudPlayer.replaceChildren();
-  if (isDuel()) {
+  if (isChallenge()) {
+    hudPlayer.textContent = `⚔️ Desafío de ${game.players[1].name}`;
+  } else if (isDuel()) {
     const dot = document.createElement("span");
     dot.className = `dot${game.turn === 1 ? " p2" : ""}`;
     hudPlayer.append(dot, ` ${player.name}`);
@@ -360,8 +464,13 @@ function submitGuess(timedOut = false) {
   game.current.guesses.push({ guess, km, points });
   game.players[game.turn].score += points;
 
-  // En 2 jugadores, el segundo juega el mismo lugar sin ver la respuesta del primero.
-  if (game.turn < game.players.length - 1) {
+  if (isChallenge()) {
+    // La respuesta del rival ya viene en el código.
+    const { opponent } = game.challenge.rounds[game.rounds.length];
+    game.current.guesses.push(opponent);
+    game.players[1].score += opponent.points;
+  } else if (game.turn < game.players.length - 1) {
+    // En 2 jugadores, el segundo juega el mismo lugar sin ver la respuesta del primero.
     game.turn++;
     beginTurn();
     return;
@@ -540,6 +649,7 @@ function showRoundResult() {
   $("next-btn").textContent = isLast ? "Ver resultado final" : "Siguiente ronda";
   $("again-btn").hidden = true;
   $("menu-btn").hidden = true;
+  $("challenge-box").hidden = true;
 }
 
 function verdict(fraction) {
@@ -582,15 +692,76 @@ function showFinal() {
     );
   }
 
+  // Tras una partida de 1 jugador se puede retar a un amigo con los mismos lugares.
+  $("challenge-box").hidden = isDuel();
+  $("challenge-output").hidden = true;
+  $("challenge-name").value = localStorage.getItem(NAME_KEY) || "";
+
   fitResult(game.rounds);
   $("result-link").hidden = true;
   $("next-btn").hidden = true;
-  $("again-btn").hidden = false;
+  $("again-btn").hidden = isChallenge(); // un desafío no se repite
   $("menu-btn").hidden = false;
 }
 
+// ---------- Crear y aceptar desafíos ----------
+function saveName(input) {
+  const name = input.value.trim().slice(0, 16);
+  if (name) localStorage.setItem(NAME_KEY, name);
+  return name;
+}
+
+$("challenge-create").addEventListener("click", () => {
+  const name = saveName($("challenge-name")) || "Tu amigo";
+  const message = challengeMessage(encodeChallenge(name), game.players[0].score);
+  $("challenge-code").value = message;
+  $("challenge-whatsapp").href = `https://wa.me/?text=${encodeURIComponent(message)}`;
+  $("challenge-copy").textContent = "Copiar mensaje";
+  $("challenge-output").hidden = false;
+});
+
+$("challenge-copy").addEventListener("click", async () => {
+  const area = $("challenge-code");
+  try {
+    await navigator.clipboard.writeText(area.value);
+  } catch {
+    area.select();
+    document.execCommand("copy");
+  }
+  $("challenge-copy").textContent = "¡Copiado!";
+});
+
+let acceptedChallenge = null;
+
+function checkChallengeInput() {
+  const text = $("challenge-input").value.trim();
+  const status = $("challenge-status");
+  acceptedChallenge = null;
+  status.classList.remove("error");
+  if (!text) {
+    status.textContent = "";
+  } else {
+    try {
+      acceptedChallenge = decodeChallenge(text);
+      status.textContent = `${acceptedChallenge.name} te reta con ${fmt(acceptedChallenge.total)} puntos` +
+        (acceptedChallenge.time ? ` (${acceptedChallenge.time} s por ronda)` : "") + ". ¿Puedes superarle?";
+    } catch (err) {
+      status.textContent = err.message;
+      status.classList.add("error");
+    }
+  }
+  $("challenge-play").disabled = !acceptedChallenge || !sv;
+}
+
+$("challenge-input").addEventListener("input", checkChallengeInput);
+$("challenge-play").addEventListener("click", () => {
+  if (!acceptedChallenge) return;
+  saveName($("challenge-my-name"));
+  startGame(acceptedChallenge);
+});
+
 // ---------- Eventos ----------
-$("play").addEventListener("click", startGame);
+$("play").addEventListener("click", () => startGame());
 $("guess-btn").addEventListener("click", () => submitGuess());
 $("back-start").addEventListener("click", () => {
   if (game?.current) panorama.setPano(game.current.location.pano);
@@ -600,7 +771,7 @@ $("next-btn").addEventListener("click", () => {
   goTo("game");
   startRound();
 });
-$("again-btn").addEventListener("click", startGame);
+$("again-btn").addEventListener("click", () => startGame());
 $("menu-btn").addEventListener("click", () => {
   game = null;
   goTo("menu");
@@ -615,4 +786,5 @@ addEventListener("keydown", (e) => {
 
 // ---------- Arranque ----------
 buildMenu();
+$("challenge-my-name").value = localStorage.getItem(NAME_KEY) || "";
 loadGoogleMaps();
