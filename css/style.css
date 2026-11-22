@@ -1,16 +1,49 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap");
 
-/* Paleta: realtimecolors.com/?colors=0c180f-eef6f0-2c633a-84cd97-46b463 */
+/*
+  Paleta: realtimecolors.com/?colors=050315-fbfbfe-2f27ce-dedcff-433bff
+  El modo claro u oscuro sigue la preferencia del sistema (prefers-color-scheme).
+*/
 :root {
-  --text: #0c180f;
-  --background: #eef6f0;
-  --primary: #2c633a;
-  --secondary: #84cd97;
-  --accent: #46b463;
+  color-scheme: light dark;
 
+  /* Paleta base (modo claro) */
+  --text: #050315;
+  --background: #fbfbfe;
+  --primary: #2f27ce;
+  --secondary: #dedcff;
+  --accent: #433bff;
+
+  /* Tokens derivados */
+  --primary-text: #2f27ce;     /* primario usado como color de texto */
+  --accent-text: #433bff;
+  --on-primary: #ffffff;
   --panel: #ffffff;
-  --border: #cfe3d5;
-  --muted: #4a5d4f;
+  --border: #e4e2f7;
+  --muted: #5b5878;
+  --danger: #c0362c;
+  --shadow: rgba(47, 39, 206, .15);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Paleta base (modo oscuro de la misma paleta) */
+    --text: #ebe9fc;
+    --background: #010104;
+    --primary: #3a31d8;
+    --secondary: #020024;
+    --accent: #0600c2;
+
+    /* En fondo oscuro, los textos en color usan tonos más claros para que se lean bien. */
+    --primary-text: #9b96ff;
+    --accent-text: #7b74ff;
+    --on-primary: #ffffff;
+    --panel: #0b0a1f;
+    --border: #25224d;
+    --muted: #a6a3c8;
+    --danger: #ff7b72;
+    --shadow: rgba(0, 0, 0, .5);
+  }
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -29,9 +62,9 @@ body {
   font-size: clamp(2.5rem, 8vw, 5rem);
   font-weight: 800;
   letter-spacing: .3rem;
-  color: var(--primary);
+  color: var(--primary-text);
 }
-.hero h1 span { color: var(--accent); }
+.hero h1 span { color: var(--accent-text); }
 .hero p { color: var(--muted); margin-top: .5rem; }
 
 .grid {
@@ -56,10 +89,10 @@ body {
 }
 a.card:hover {
   transform: translateY(-4px);
-  border-color: var(--accent);
-  box-shadow: 0 8px 24px rgba(44, 99, 58, .15);
+  border-color: var(--accent-text);
+  box-shadow: 0 8px 24px var(--shadow);
 }
-.card h2 { font-size: 1.2rem; font-weight: 600; margin: .75rem 0 .25rem; color: var(--primary); }
+.card h2 { font-size: 1.2rem; font-weight: 600; margin: .75rem 0 .25rem; color: var(--primary-text); }
 .card p { color: var(--muted); font-size: .9rem; }
 .card.soon { opacity: .55; }
 
@@ -75,10 +108,14 @@ a.card:hover {
   background:
     linear-gradient(var(--panel) 2px, transparent 2px) 0 0 / 28px 28px,
     linear-gradient(90deg, var(--panel) 2px, transparent 2px) 0 0 / 28px 28px,
-    var(--secondary);
+    var(--cell-closed, var(--secondary));
 }
-.card-art.mines span { filter: drop-shadow(0 2px 4px rgba(12, 24, 15, .3)); }
+.card-art.mines span { filter: drop-shadow(0 2px 4px var(--shadow)); }
 
-code { color: var(--primary); font-weight: 600; }
+@media (prefers-color-scheme: dark) {
+  .card-art.mines { --cell-closed: #2b2675; }
+}
+
+code { color: var(--primary-text); font-weight: 600; }
 
 footer { text-align: center; color: var(--muted); padding: 2rem; font-size: .85rem; }
