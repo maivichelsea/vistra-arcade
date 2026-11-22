@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buscaminas · Vistra Arcade</title>
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="buscaminas.css">
+</head>
+<body>
+  <nav class="topbar">
+    <a href="../../">← Arcade</a>
+    <h1>Buscaminas</h1>
+    <span class="hint">F2: nuevo juego</span>
+  </nav>
+
+  <main class="layout">
+    <section class="panel game-panel">
+      <div class="levels" role="tablist" aria-label="Nivel">
+        <button class="level" data-level="beginner">Principiante</button>
+        <button class="level" data-level="intermediate">Intermedio</button>
+        <button class="level" data-level="expert">Experto</button>
+        <button class="level" data-level="custom">Personalizado</button>
+      </div>
+
+      <form id="custom-form" class="custom-form" novalidate hidden>
+        <label>Filas <input type="number" id="custom-rows" min="5" max="24" value="10"></label>
+        <label>Columnas <input type="number" id="custom-cols" min="5" max="30" value="10"></label>
+        <label>Minas <input type="number" id="custom-mines" min="1" value="15"></label>
+        <button type="submit" class="btn">Jugar</button>
+        <small id="custom-help"></small>
+      </form>
+
+      <div class="status">
+        <div class="counter" title="Minas restantes">💣 <span id="mines-left">0</span></div>
+        <button id="new-game" class="face" title="Nuevo juego (F2)">🙂</button>
+        <div class="counter" title="Tiempo">⏱ <span id="timer">0</span></div>
+      </div>
+
+      <div class="board-wrap">
+        <div id="board" class="board" aria-label="Tablero"></div>
+      </div>
+
+      <div class="below-board">
+        <button id="flag-mode" class="btn ghost" aria-pressed="false">🚩 Modo bandera: no</button>
+        <p id="message" class="message" aria-live="polite"></p>
+      </div>
+
+      <details class="help">
+        <summary>Cómo jugar</summary>
+        <ul>
+          <li><strong>Clic izquierdo:</strong> abre una casilla. El primer clic nunca es una mina.</li>
+          <li><strong>Clic derecho:</strong> pone o quita una bandera (en móvil usa el modo bandera).</li>
+          <li><strong>Clic en un número:</strong> si tiene alrededor tantas banderas como indica, abre el resto de vecinas.</li>
+          <li>Ganas al abrir todas las casillas sin mina. Cuanto menos tiempo, mejor récord.</li>
+        </ul>
+      </details>
+    </section>
+
+    <section class="panel records" aria-labelledby="records-title">
+      <h2 id="records-title">Mejores puntajes</h2>
+      <p class="records-note">Tus 10 mejores tiempos por nivel, guardados en este navegador.</p>
+      <div class="record-tabs" role="tablist">
+        <button class="record-tab" data-tab="beginner">Principiante</button>
+        <button class="record-tab" data-tab="intermediate">Intermedio</button>
+        <button class="record-tab" data-tab="expert">Experto</button>
+        <button class="record-tab" data-tab="custom">Personalizado</button>
+      </div>
+      <select id="custom-records" class="custom-records" hidden aria-label="Configuración personalizada"></select>
+      <table class="record-table">
+        <thead><tr><th>#</th><th>Tiempo</th><th>Fecha</th></tr></thead>
+        <tbody id="record-body"></tbody>
+      </table>
+      <button id="clear-records" class="btn ghost danger">Borrar récords de esta tabla</button>
+    </section>
+  </main>
+
+  <script src="game.js"></script>
+</body>
+</html>

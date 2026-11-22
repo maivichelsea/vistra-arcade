@@ -68,12 +68,16 @@ a.card:hover {
   border-radius: 8px;
   background: var(--background);
 }
-.card-art.orbit {
+.card-art.mines {
+  display: grid;
+  place-items: center;
+  font-size: 3rem;
   background:
-    radial-gradient(circle at 50% 50%, var(--primary) 0 12%, transparent 13%),
-    radial-gradient(circle at 50% 50%, transparent 0 34%, var(--secondary) 35% 37%, transparent 38%),
-    var(--background);
+    linear-gradient(var(--panel) 2px, transparent 2px) 0 0 / 28px 28px,
+    linear-gradient(90deg, var(--panel) 2px, transparent 2px) 0 0 / 28px 28px,
+    var(--secondary);
 }
+.card-art.mines span { filter: drop-shadow(0 2px 4px rgba(12, 24, 15, .3)); }
 
 code { color: var(--primary); font-weight: 600; }
 
