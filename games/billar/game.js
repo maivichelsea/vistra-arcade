@@ -42,12 +42,14 @@ const CUSHIONS = [
 // ---------- Física ----------
 // Escala: 1000 px de paño ≈ 2,54 m (mesa de 9 pies), así que 1 m ≈ 394 px.
 const MAX_SPEED = 2300;      // velocidad de la blanca a máxima potencia (≈ 5,8 m/s)
-const SLIDE_DECEL = 700;     // fricción de deslizamiento bola-paño (μ ≈ 0,18)
-const ROLL_DECEL = 90;       // resistencia a la rodadura (px/s²): a 1 m/s rueda ~3 m
+const SLIDE_DECEL = 600;     // fricción de deslizamiento bola-paño (μ ≈ 0,15, paño rápido)
+const ROLL_DECEL = 90;       // resistencia a la rodadura (px/s²)
 const DRAG = 0.18;           // pérdida extra proporcional a la velocidad (paño y aire)
 const BALL_RESTITUTION = 0.96;   // bolas de resina reales: 0,93–0,98
-const CUSHION_RESTITUTION = 0.8;   // a poca velocidad; baja con golpes fuertes
-const CUSHION_LOSS = 0.00007;      // cuánto baja el rebote por cada px/s de impacto
+// Rebote de banda casi constante, como la goma real (0,75–0,85). Antes bajaba mucho con los
+// golpes fuertes y el saque perdía tanta energía que casi nunca entraba ninguna bola.
+const CUSHION_RESTITUTION = 0.84;
+const CUSHION_LOSS = 0.00001;    // pequeña pérdida extra por cada px/s de impacto
 const BREAK_BOOST = 1.7;     // en la salida se golpea más fuerte (≈ 10 m/s a tope)
 const MAX_SPIN = 1.25;       // efecto máximo (taco a media bola del centro)
 const STEP = 1 / 480;        // paso fijo de simulación
