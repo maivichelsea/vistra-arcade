@@ -5,6 +5,18 @@ Minijuegos originales para el navegador, hechos con HTML, CSS y JavaScript sin d
 ## Juegos
 
 - **Buscaminas:** niveles Principiante (8×8, 10 minas), Intermedio (16×16, 40), Experto (16×30, 99) y Personalizado. Primer clic seguro y apertura de vecinas.
+- **MundoGuessr:** apareces en un lugar al azar con Google Street View y marcas en el mapa dónde crees que estás. Mapas: Mundo y 18 países. 5 rondas de hasta 5000 puntos y tiempo opcional.
+
+### Clave de Google Maps (MundoGuessr)
+
+MundoGuessr necesita una clave de Google Maps Platform con **Maps JavaScript API** activada.
+
+1. Copia `games/mundoguessr/config.example.js` como `games/mundoguessr/config.js`.
+2. Pega tu clave en `googleMapsApiKey`.
+
+`config.js` está en `.gitignore`: la clave no se sube a GitHub. Como el juego se abre directamente
+como archivo HTML, la clave no puede restringirse por sitio web; restríngela a Maps JavaScript API
+y pon un límite diario de uso y un presupuesto con alertas en Google Cloud.
 
 ## Ejecutar en local
 

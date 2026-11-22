@@ -3,3 +3,6 @@ node_modules/
 Thumbs.db
 .vscode/
 .claude/settings.local.json
+
+# Clave de Google Maps de MundoGuessr (no subir a GitHub)
+games/mundoguessr/config.js

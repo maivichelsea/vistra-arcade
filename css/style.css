@@ -111,6 +111,13 @@ a.card:hover {
     var(--cell-closed, var(--secondary));
 }
 .card-art.mines span { filter: drop-shadow(0 2px 4px var(--shadow)); }
+.card-art.globe {
+  display: grid;
+  place-items: center;
+  font-size: 3rem;
+  background: radial-gradient(circle at 50% 50%, var(--secondary) 0 38%, var(--background) 39%);
+}
+.card-art.globe span { filter: drop-shadow(0 2px 4px var(--shadow)); }
 
 @media (prefers-color-scheme: dark) {
   .card-art.mines { --cell-closed: #2b2675; }
