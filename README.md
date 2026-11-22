@@ -4,7 +4,7 @@ Minijuegos originales para el navegador, hechos con HTML, CSS y JavaScript sin d
 
 ## Juegos
 
-- **Buscaminas:** niveles Principiante (8×8, 10 minas), Intermedio (16×16, 40), Experto (16×30, 99) y Personalizado. Primer clic seguro, apertura de vecinas y top 10 de récords personales por nivel (guardados en el navegador).
+- **Buscaminas:** niveles Principiante (8×8, 10 minas), Intermedio (16×16, 40), Experto (16×30, 99) y Personalizado. Primer clic seguro y apertura de vecinas.
 
 ## Ejecutar en local
 

@@ -5,9 +5,7 @@ const LEVELS = {
   expert: { name: "Experto", rows: 16, cols: 30, mines: 99 },
 };
 const CUSTOM_LIMITS = { minRows: 5, maxRows: 24, minCols: 5, maxCols: 30 };
-const RECORDS_KEY = "vistra-buscaminas-records";
 const SETTINGS_KEY = "vistra-buscaminas-settings";
-const MAX_RECORDS = 10;
 
 const $ = (id) => document.getElementById(id);
 const boardEl = $("board");
@@ -47,15 +45,6 @@ function neighbors(i) {
     }
   }
   return out;
-}
-
-function recordKey(cfg = config) {
-  return cfg.level === "custom" ? `custom-${cfg.rows}x${cfg.cols}x${cfg.mines}` : cfg.level;
-}
-
-function describeCustomKey(key) {
-  const [rows, cols, mines] = key.replace("custom-", "").split("x");
-  return `${rows} × ${cols}, ${mines} minas`;
 }
 
 function maxCustomMines(rows, cols) {
@@ -154,12 +143,7 @@ function checkWin() {
   flags = config.mines;
   faceEl.textContent = "😎";
 
-  const position = saveRecord(recordKey(), time);
-  const secs = formatTime(time);
-  setMessage(position
-    ? `¡Ganaste en ${secs} s! Récord personal #${position}.`
-    : `¡Ganaste en ${secs} s!`);
-  showRecords(config.level, recordKey(), position);
+  setMessage(`¡Ganaste en ${formatTime(time)} s!`);
 }
 
 function lose(i) {
@@ -283,7 +267,6 @@ document.querySelectorAll(".level").forEach((btn) => {
       return;
     }
     newGame({ level, ...LEVELS[level] });
-    showRecords(level);
   });
 });
 
@@ -311,102 +294,6 @@ customForm.addEventListener("submit", (e) => {
   customMines.value = cfg.mines;
   updateCustomHelp();
   newGame({ level: "custom", ...cfg });
-  showRecords("custom", recordKey());
-});
-
-// ---------- Récords ----------
-const recordBody = $("record-body");
-const customRecordsEl = $("custom-records");
-let recordTab = "beginner";
-let customRecordKey = null;
-
-function loadRecords() {
-  try {
-    return JSON.parse(localStorage.getItem(RECORDS_KEY)) || {};
-  } catch {
-    return {};
-  }
-}
-
-function saveRecord(key, time) {
-  const all = loadRecords();
-  const entry = { time, date: new Date().toISOString() };
-  const list = [...(all[key] || []), entry].sort((a, b) => a.time - b.time).slice(0, MAX_RECORDS);
-  all[key] = list;
-  localStorage.setItem(RECORDS_KEY, JSON.stringify(all));
-  const index = list.indexOf(entry);
-  return index >= 0 ? index + 1 : 0;
-}
-
-function currentTableKey() {
-  return recordTab === "custom" ? customRecordKey : recordTab;
-}
-
-function showRecords(tab, customKey, highlight = 0) {
-  recordTab = tab;
-  if (tab === "custom" && customKey) customRecordKey = customKey;
-  renderRecords(highlight);
-}
-
-function renderRecords(highlight = 0) {
-  const all = loadRecords();
-  document.querySelectorAll(".record-tab").forEach((b) => b.classList.toggle("active", b.dataset.tab === recordTab));
-
-  // Selector de configuraciones personalizadas guardadas.
-  const customKeys = Object.keys(all).filter((k) => k.startsWith("custom-") && all[k].length);
-  customRecordsEl.hidden = recordTab !== "custom";
-  if (recordTab === "custom") {
-    if (customRecordKey && !customKeys.includes(customRecordKey)) customKeys.unshift(customRecordKey);
-    if (!customRecordKey) customRecordKey = customKeys[0] || null;
-    customRecordsEl.replaceChildren(...customKeys.map((k) => {
-      const opt = new Option(describeCustomKey(k), k);
-      opt.selected = k === customRecordKey;
-      return opt;
-    }));
-    customRecordsEl.hidden = customKeys.length === 0;
-  }
-
-  const key = currentTableKey();
-  const list = (key && all[key]) || [];
-  if (!list.length) {
-    const msg = recordTab === "custom" && !key
-      ? "Juega una partida personalizada para ver sus récords."
-      : "Aún no hay récords. ¡Gana una partida!";
-    recordBody.innerHTML = `<tr><td colspan="3" class="empty">${msg}</td></tr>`;
-    return;
-  }
-  recordBody.replaceChildren(...list.map((r, idx) => {
-    const tr = document.createElement("tr");
-    if (idx + 1 === highlight) tr.className = "new";
-    const date = new Date(r.date).toLocaleDateString("es", { day: "2-digit", month: "short", year: "numeric" });
-    for (const value of [idx + 1, `${formatTime(r.time)} s`, date]) {
-      const td = document.createElement("td");
-      td.textContent = value;
-      tr.append(td);
-    }
-    return tr;
-  }));
-}
-
-document.querySelectorAll(".record-tab").forEach((btn) => {
-  btn.addEventListener("click", () => showRecords(btn.dataset.tab));
-});
-
-customRecordsEl.addEventListener("change", () => {
-  customRecordKey = customRecordsEl.value;
-  renderRecords();
-});
-
-$("clear-records").addEventListener("click", () => {
-  const key = currentTableKey();
-  const all = loadRecords();
-  if (!key || !all[key]?.length) return;
-  const label = recordTab === "custom" ? describeCustomKey(key) : LEVELS[key].name;
-  if (!confirm(`¿Borrar los récords de ${label}? No se puede deshacer.`)) return;
-  delete all[key];
-  localStorage.setItem(RECORDS_KEY, JSON.stringify(all));
-  if (recordTab === "custom") customRecordKey = null;
-  renderRecords();
 });
 
 // ---------- Ajustes y arranque ----------
@@ -436,4 +323,6 @@ if (initial.level === "custom") {
 }
 selectLevelButton(initial.level);
 newGame(initial);
-showRecords(initial.level, initial.level === "custom" ? recordKey(initial) : null);
+
+// Limpia los récords que guardaban versiones anteriores del juego.
+localStorage.removeItem("vistra-buscaminas-records");
