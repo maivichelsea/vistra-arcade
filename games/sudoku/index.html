@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <title>Sudoku · Vistra Arcade</title>
+  <link rel="icon" href="../../img/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="sudoku.css">
+</head>
+<body class="arcade-bg">
+  <header class="site-nav game-nav">
+    <div class="container nav-inner">
+      <a class="brand" href="../../index.html" aria-label="Volver a Vistra Arcade">
+        <img class="brand-logo" src="../../img/logo.svg" alt="" width="36" height="36">
+        <span class="brand-text"><strong>VISTRA</strong><span>ARCADE</span></span>
+      </a>
+      <span class="nav-sep" aria-hidden="true"></span>
+      <div class="game-title">
+        <span class="eyebrow">Lógica</span>
+        <h1>Sudoku</h1>
+      </div>
+      <div class="nav-actions">
+        <span class="kbd-hint"><kbd>N</kbd> notas</span>
+        <a class="btn btn-ghost btn-sm" href="../../index.html#juegos">← Juegos</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container sudoku-main">
+    <section class="board-area">
+      <div class="levels" role="group" aria-label="Dificultad">
+        <button class="chip level" data-level="easy">Fácil</button>
+        <button class="chip level" data-level="medium">Medio</button>
+        <button class="chip level" data-level="hard">Difícil</button>
+        <button class="chip level" data-level="expert">Experto</button>
+      </div>
+
+      <div class="board-wrap">
+        <div id="board" class="board" role="grid" aria-label="Tablero de sudoku"></div>
+
+        <div id="loading" class="board-overlay" hidden>
+          <div class="spinner"></div>
+          <p>Generando sudoku…</p>
+        </div>
+
+        <div id="overlay" class="board-overlay" hidden>
+          <div class="panel overlay-card">
+            <h2 id="over-title"></h2>
+            <p id="over-text" class="muted"></p>
+            <button id="again-btn" class="btn btn-lg">Otro sudoku</button>
+          </div>
+        </div>
+      </div>
+      <p id="resume-note" class="resume-note" hidden>Partida recuperada: sigue donde lo dejaste.</p>
+    </section>
+
+    <aside class="panel side">
+      <div class="stats">
+        <div class="stat"><span>Nivel</span><strong id="level-name">Fácil</strong></div>
+        <div class="stat"><span>Tiempo</span><strong id="timer">0:00</strong></div>
+        <div class="stat"><span>Errores</span><strong id="mistakes">0</strong></div>
+        <div class="stat"><span>Casillas</span><strong id="filled">0/81</strong></div>
+      </div>
+
+      <div class="tools">
+        <button id="undo-btn" class="tool" type="button" title="Deshacer (Ctrl+Z)"><span>↶</span>Deshacer</button>
+        <button id="erase-btn" class="tool" type="button" title="Borrar (Supr)"><span>⌫</span>Borrar</button>
+        <button id="notes-btn" class="tool" type="button" aria-pressed="false" title="Notas (N)"><span>✎</span>Notas <small>No</small></button>
+        <button id="hint-btn" class="tool" type="button" title="Pista (H)"><span>💡</span>Pista <small>3</small></button>
+      </div>
+
+      <div class="numpad" role="group" aria-label="Números">
+        <button class="num" data-n="1" type="button">1<small></small></button>
+        <button class="num" data-n="2" type="button">2<small></small></button>
+        <button class="num" data-n="3" type="button">3<small></small></button>
+        <button class="num" data-n="4" type="button">4<small></small></button>
+        <button class="num" data-n="5" type="button">5<small></small></button>
+        <button class="num" data-n="6" type="button">6<small></small></button>
+        <button class="num" data-n="7" type="button">7<small></small></button>
+        <button class="num" data-n="8" type="button">8<small></small></button>
+        <button class="num" data-n="9" type="button">9<small></small></button>
+      </div>
+
+      <label class="toggle">
+        <input id="errors-toggle" type="checkbox" checked>
+        <span>Marcar errores en rojo</span>
+      </label>
+
+      <button id="new-btn" class="btn" type="button">Nuevo sudoku</button>
+
+      <details class="help">
+        <summary>Cómo jugar</summary>
+        <ul>
+          <li>Rellena cada fila, columna y caja de 3×3 con los números del 1 al 9, sin repetir.</li>
+          <li>Elige una casilla y pulsa un número (o escríbelo con el teclado). Las flechas mueven la selección.</li>
+          <li><strong>Notas:</strong> apunta los candidatos pequeños en una casilla. Al poner un número, se borra solo de las notas de su fila, columna y caja.</li>
+          <li><strong>Pista:</strong> rellena la casilla elegida (o una al azar). Hay un número limitado según la dificultad.</li>
+          <li>El juego se guarda solo: si cierras la página, al volver sigues donde lo dejaste.</li>
+        </ul>
+      </details>
+    </aside>
+  </main>
+
+  <script src="game.js"></script>
+</body>
+</html>

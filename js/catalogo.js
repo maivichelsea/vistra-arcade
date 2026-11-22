@@ -7,6 +7,16 @@
 // imagen: ilustración 16:9 (se recomienda SVG de 320×180 en img/juegos/).
 const VISTRA_JUEGOS = [
   {
+    id: "sudoku",
+    nombre: "Sudoku",
+    url: "games/sudoku/index.html",
+    imagen: "img/juegos/sudoku.svg",
+    categoria: "Lógica",
+    estado: "nuevo",
+    descripcion: "Rellena el tablero del 1 al 9 sin repetir. Cuatro dificultades, notas, pistas y guardado automático.",
+    etiquetas: ["1 jugador", "4 dificultades", "Funciona sin conexión"],
+  },
+  {
     id: "billar",
     nombre: "Billar",
     url: "games/billar/index.html",
@@ -62,6 +72,12 @@ const VISTRA_PROXIMOS = [
 
 // Novedades, de la más reciente a la más antigua. fecha en formato AAAA-MM-DD.
 const VISTRA_NOVEDADES = [
+  {
+    fecha: "2026-11-22",
+    juego: "sudoku",
+    titulo: "Nuevo juego: Sudoku",
+    texto: "Sudokus nuevos en cada partida, con solución única, notas, pistas y cuatro niveles de dificultad.",
+  },
   {
     fecha: "2026-11-22",
     juego: "billar",
