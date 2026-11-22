@@ -1,0 +1,183 @@
+/* Billar. Botones, chips, paneles y barra superior vienen de css/style.css. */
+:root {
+  --p1: #2f27ce;
+  --p2: #e8590c;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --p1: #9b96ff; --p2: #ffa94d; }
+}
+
+[hidden] { display: none !important; }
+.muted { color: var(--muted); }
+
+/* ---------- Menú ---------- */
+.menu { padding-block: clamp(1rem, 3vw, 2rem) 2.5rem; }
+.menu-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+.menu-card { padding: clamp(1.25rem, 3vw, 2rem); }
+.menu-card h2 { margin-top: .35rem; font-size: clamp(1.6rem, 3vw, 2.2rem); font-weight: 900; letter-spacing: -.02em; line-height: 1.1; }
+.menu-lead { margin-top: .5rem; color: var(--muted); max-width: 34rem; }
+.menu-card h3 {
+  margin: 1.5rem 0 .6rem;
+  font-size: .75rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.names { display: flex; flex-wrap: wrap; gap: .6rem; }
+.names label { display: flex; align-items: center; gap: .5rem; }
+.names .input { width: 12rem; }
+.menu-actions { margin-top: 1.75rem; }
+.menu-side { padding: 0; overflow: hidden; }
+.menu-art { display: block; width: 100%; height: auto; aspect-ratio: 16 / 9; object-fit: cover; }
+.menu-side .help { margin: 0; padding: 1rem 1.25rem 1.25rem; border-top: none; }
+
+.dot { display: inline-block; width: .85rem; height: .85rem; border-radius: 50%; flex: none; background: var(--p1); }
+.dot.p2 { background: var(--p2); }
+
+/* ---------- Partida ---------- */
+.game-screen { padding-block: 1rem 2rem; display: grid; gap: .85rem; }
+
+.scoreboard { display: grid; grid-template-columns: 1fr 1fr; gap: .85rem; }
+.player-card {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  padding: .7rem 1rem;
+  border-radius: var(--radius);
+  background: var(--panel);
+  border: 2px solid var(--border);
+  box-shadow: var(--card-shadow);
+  transition: border-color .25s, box-shadow .25s, transform .25s var(--ease);
+  min-width: 0;
+}
+.player-card.right { justify-content: flex-end; text-align: right; }
+.player-card.active { border-color: var(--p1); box-shadow: 0 0 0 4px color-mix(in srgb, var(--p1) 18%, transparent), var(--card-shadow); }
+#player-1.active { border-color: var(--p2); box-shadow: 0 0 0 4px color-mix(in srgb, var(--p2) 20%, transparent), var(--card-shadow); }
+.player-card.winner { border-color: var(--success); box-shadow: 0 0 0 4px var(--success-soft), var(--card-shadow); }
+.player-info { display: flex; flex-direction: column; min-width: 0; }
+.player-info strong { font-size: 1.05rem; font-weight: 900; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.player-group { font-size: .8rem; font-weight: 600; color: var(--muted); }
+.tray { display: flex; flex-wrap: wrap; gap: 3px; margin-left: auto; }
+.player-card.right .tray { margin-left: 0; margin-right: auto; }
+
+.mini-ball {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--ball);
+  color: #111;
+  font-size: .58rem;
+  font-weight: 900;
+  box-shadow: inset -2px -3px 4px rgba(0, 0, 0, .3);
+  position: relative;
+}
+.mini-ball::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  background: #fff;
+  z-index: 0;
+}
+.mini-ball { isolation: isolate; }
+.mini-ball::before { z-index: -1; }
+.mini-ball.stripe { background: linear-gradient(#f8f6ee 0 26%, var(--ball) 26% 74%, #f8f6ee 74%); }
+.mini-ball.potted { opacity: .22; filter: grayscale(1); }
+
+.message {
+  justify-self: center;
+  max-width: 100%;
+  padding: .45rem 1rem;
+  border-radius: 999px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  box-shadow: var(--card-shadow);
+  font-weight: 700;
+  font-size: .92rem;
+  text-align: center;
+}
+
+/* La mesa cabe en la ventana: se limita por ancho y por alto (barra, marcador y controles ocupan ~300px). */
+.table-wrap {
+  position: relative;
+  justify-self: center;
+  width: min(100%, calc((100vh - 300px) * 1084 / 584));
+  min-width: min(100%, 520px);
+}
+.table {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1084 / 584;
+  border-radius: 26px;
+  box-shadow: var(--card-shadow-hover);
+  touch-action: none;
+  cursor: crosshair;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  border-radius: 26px;
+  background: rgba(5, 3, 21, .55);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+.overlay-card { text-align: center; max-width: 440px; padding: 2rem; }
+.overlay-card h2 { font-size: 1.8rem; font-weight: 900; }
+.overlay-card p { margin-top: .4rem; }
+.overlay-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: .6rem; margin-top: 1.25rem; }
+
+/* Controles */
+.controls { display: flex; flex-wrap: wrap; align-items: center; gap: .85rem 1rem; padding: .85rem 1rem; }
+.controls-spacer { flex: 1; }
+.power { display: flex; align-items: center; gap: 1rem; flex: 1 1 260px; max-width: 420px; }
+.power-label { font-size: .85rem; font-weight: 700; color: var(--muted); white-space: nowrap; }
+.power-label strong { display: inline-block; min-width: 2.6em; color: var(--text); font-variant-numeric: tabular-nums; }
+.power-track {
+  position: relative;
+  flex: 1;
+  height: 14px;
+  border-radius: 999px;
+  background: var(--background);
+  border: 1px solid var(--border);
+}
+.power-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 60%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--success), #f5c518 55%, var(--arcade) 80%, var(--danger));
+}
+/* El control real es invisible y está encima de la barra de color. */
+.power-track input[type="range"] {
+  position: absolute;
+  inset: -8px 0;
+  width: 100%;
+  height: calc(100% + 16px);
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+.power-track:has(input:focus-visible) { outline: 3px solid var(--accent-text); outline-offset: 3px; }
+
+@media (max-width: 860px) {
+  .menu-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .scoreboard { grid-template-columns: 1fr 1fr; gap: .5rem; }
+  .player-card { padding: .5rem .65rem; gap: .5rem; flex-wrap: wrap; }
+  .tray { display: none; }
+  .table { border-radius: 14px; }
+  .power { max-width: none; }
+}

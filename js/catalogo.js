@@ -7,6 +7,16 @@
 // imagen: ilustración 16:9 (se recomienda SVG de 320×180 en img/juegos/).
 const VISTRA_JUEGOS = [
   {
+    id: "billar",
+    nombre: "Billar",
+    url: "games/billar/index.html",
+    imagen: "img/juegos/billar.svg",
+    categoria: "Deportes",
+    estado: "nuevo",
+    descripcion: "Bola 8 con física realista: elige tu grupo, mete tus bolas y cierra la partida con la 8.",
+    etiquetas: ["1 jugador vs CPU", "2 jugadores", "Funciona sin conexión"],
+  },
+  {
     id: "mundoguessr",
     nombre: "MundoGuessr",
     url: "games/mundoguessr/index.html",
@@ -52,6 +62,12 @@ const VISTRA_PROXIMOS = [
 
 // Novedades, de la más reciente a la más antigua. fecha en formato AAAA-MM-DD.
 const VISTRA_NOVEDADES = [
+  {
+    fecha: "2026-11-22",
+    juego: "billar",
+    titulo: "Nuevo juego: Billar",
+    texto: "Partidas de bola 8 contra el ordenador o con un amigo en el mismo PC.",
+  },
   {
     fecha: "2026-11-22",
     juego: "mundoguessr",

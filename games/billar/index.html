@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <title>Billar · Vistra Arcade</title>
+  <link rel="icon" href="../../img/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="billar.css">
+</head>
+<body class="arcade-bg">
+  <header class="site-nav game-nav">
+    <div class="container nav-inner">
+      <a class="brand" href="../../index.html" aria-label="Volver a Vistra Arcade">
+        <img class="brand-logo" src="../../img/logo.svg" alt="" width="36" height="36">
+        <span class="brand-text"><strong>VISTRA</strong><span>ARCADE</span></span>
+      </a>
+      <span class="nav-sep" aria-hidden="true"></span>
+      <div class="game-title">
+        <span class="eyebrow">Deportes</span>
+        <h1>Billar</h1>
+      </div>
+      <div class="nav-actions">
+        <a class="btn btn-ghost btn-sm" href="../../index.html#juegos">← Juegos</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Menú -->
+  <main id="screen-menu" class="container menu">
+    <div class="menu-grid">
+      <div class="panel menu-card">
+        <p class="eyebrow">Bola 8</p>
+        <h2>Nueva partida</h2>
+        <p class="menu-lead">Mete todas tus bolas —lisas o rayadas— y después la 8 para ganar.</p>
+
+        <h3>Modo</h3>
+        <div class="chip-group">
+          <label><input type="radio" name="mode" value="1" checked><span class="chip">🤖 1 jugador (contra la CPU)</span></label>
+          <label><input type="radio" name="mode" value="2"><span class="chip">👥 2 jugadores (mismo PC)</span></label>
+        </div>
+
+        <h3>Nombres</h3>
+        <div class="names">
+          <label><span class="dot p1"></span><input class="input" id="name-1" maxlength="16" placeholder="Tu nombre" aria-label="Nombre del jugador 1"></label>
+          <label id="p2-field" hidden><span class="dot p2"></span><input class="input" id="name-2" maxlength="16" placeholder="Jugador 2" aria-label="Nombre del jugador 2"></label>
+        </div>
+
+        <div class="menu-actions">
+          <button id="play" class="btn btn-lg">Jugar <span aria-hidden="true">▶</span></button>
+        </div>
+      </div>
+
+      <aside class="panel menu-side">
+        <img class="menu-art" src="../../img/juegos/billar.svg" alt="" width="320" height="180">
+        <details class="help" open>
+          <summary>Cómo jugar</summary>
+          <ul>
+            <li><strong>Apuntar:</strong> mueve el ratón sobre la mesa.</li>
+            <li><strong>Tirar:</strong> mantén pulsado y arrastra hacia atrás para cargar fuerza; suelta para tirar. También puedes usar la barra de fuerza y el botón <strong>Tirar</strong>.</li>
+            <li><strong>Teclado:</strong> ← → afinan la puntería (con Mayús, más fino), ↑ ↓ cambian la fuerza y Espacio tira.</li>
+            <li>La primera bola que metas tras la salida decide tu grupo: lisas (1–7) o rayadas (9–15).</li>
+            <li>Sigues tirando mientras metas bolas de tu grupo. Si haces falta, tu rival coloca la blanca donde quiera.</li>
+            <li><strong>Faltas:</strong> meter la blanca, no tocar ninguna bola o tocar primero una que no es tuya.</li>
+            <li>Si metes la 8 antes de terminar tu grupo, pierdes.</li>
+          </ul>
+        </details>
+      </aside>
+    </div>
+  </main>
+
+  <!-- Partida -->
+  <main id="screen-game" class="container game-screen" hidden>
+    <div class="scoreboard">
+      <div id="player-0" class="player-card">
+        <span class="dot p1"></span>
+        <div class="player-info">
+          <strong id="name-0-label">Jugador 1</strong>
+          <span id="group-0" class="player-group">Mesa abierta</span>
+        </div>
+        <div id="tray-0" class="tray"></div>
+      </div>
+      <div id="player-1" class="player-card right">
+        <div id="tray-1" class="tray"></div>
+        <div class="player-info">
+          <strong id="name-1-label">Jugador 2</strong>
+          <span id="group-1" class="player-group">Mesa abierta</span>
+        </div>
+        <span class="dot p2"></span>
+      </div>
+    </div>
+
+    <p id="message" class="message" aria-live="polite" hidden></p>
+
+    <div class="table-wrap">
+      <canvas id="table" class="table" aria-label="Mesa de billar"></canvas>
+
+      <div id="overlay" class="overlay" hidden>
+        <div class="panel overlay-card">
+          <h2 id="over-title"></h2>
+          <p id="over-text" class="muted"></p>
+          <div class="overlay-actions">
+            <button id="again-btn" class="btn btn-lg">Revancha</button>
+            <button id="overlay-menu-btn" class="btn btn-ghost btn-lg">Menú</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls panel">
+      <div class="power">
+        <span class="power-label">Fuerza <strong id="power-value">60%</strong></span>
+        <span class="power-track">
+          <span id="power-fill" class="power-fill"></span>
+          <input id="power" type="range" min="4" max="100" value="60" aria-label="Fuerza del tiro">
+        </span>
+      </div>
+      <button id="shoot-btn" class="btn">Tirar</button>
+      <span class="controls-spacer"></span>
+      <button id="restart-btn" class="btn btn-ghost btn-sm">↺ Nueva partida</button>
+      <button id="menu-btn" class="btn btn-ghost btn-sm">Menú</button>
+    </div>
+  </main>
+
+  <script src="game.js"></script>
+</body>
+</html>
