@@ -28,5 +28,18 @@ npx serve .
 
 ## Añadir un juego
 
+La portada se construye a partir de `js/catalogo.js`, así que no hace falta tocar el HTML:
+
 1. Crea una carpeta en `games/<nombre>/` con su `index.html`.
-2. Añade una tarjeta enlazándola en el `index.html` principal.
+2. Añade una ilustración 16:9 en `img/juegos/` (por ejemplo un SVG de 320×180).
+3. Añade una entrada en `VISTRA_JUEGOS` dentro de `js/catalogo.js` (nombre, enlace, imagen, categoría, estado, descripción y etiquetas).
+
+En el mismo archivo están `VISTRA_PROXIMOS` (próximos lanzamientos) y `VISTRA_NOVEDADES` (novedades).
+
+## Estructura
+
+- `index.html`, `css/home.css`, `js/home.js`: portada del arcade.
+- `js/catalogo.js`: juegos, próximos lanzamientos y novedades.
+- `css/style.css`: colores (modo claro y oscuro) y estilos compartidos con los juegos.
+- `img/`: logotipo e ilustraciones (SVG locales, sin depender de internet).
+- `games/`: cada juego en su carpeta.

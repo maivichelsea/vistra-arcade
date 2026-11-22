@@ -4,31 +4,147 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
-  <title>Vistra Arcade</title>
+  <meta name="description" content="Vistra Arcade: minijuegos originales para jugar en el navegador, sin instalar nada.">
+  <title>Vistra Arcade · Minijuegos en tu navegador</title>
+  <link rel="icon" href="img/logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/home.css">
 </head>
-<body>
-  <header class="hero">
-    <h1>VISTRA ARCADE</span></h1>
+<body class="home" id="top">
+  <a class="skip-link" href="#juegos">Saltar al catálogo</a>
+
+  <!-- 1. Navegación principal -->
+  <header class="site-nav">
+    <div class="container nav-inner">
+      <a class="brand" href="index.html" aria-label="Vistra Arcade, inicio">
+        <img class="brand-logo" src="img/logo.svg" alt="" width="36" height="36">
+        <span class="brand-text"><strong>VISTRA</strong><span>ARCADE</span></span>
+      </a>
+      <nav aria-label="Principal">
+        <ul class="nav-links">
+          <li><a href="#juegos">Juegos</a></li>
+          <li><a href="#proximamente">Próximamente</a></li>
+          <li><a href="#novedades">Novedades</a></li>
+        </ul>
+      </nav>
+      <a class="btn btn-primary nav-cta" href="#juegos">Jugar</a>
+    </div>
   </header>
 
-  <main class="grid">
-    <a class="card" href="games/buscaminas/index.html">
-      <div class="card-art mines" aria-hidden="true"><span>💣</span></div>
-      <h2>Buscaminas</h2>
-      <p>El clásico de lógica, con 4 niveles de dificultad.</p>
-    </a>
-    <a class="card" href="games/mundoguessr/index.html">
-      <div class="card-art globe" aria-hidden="true"><span>🌍</span></div>
-      <h2>MundoGuessr</h2>
-      <p>Aparece en algún lugar con Street View y adivina dónde estás.</p>
-    </a>
-    <div class="card soon">
-      <div class="card-art"></div>
-      <h2>Próximamente</h2>
-      <p>Añade tu juego en <code>games/</code>.</p>
-    </div>
+  <main>
+    <!-- 2. Bienvenida -->
+    <section class="hero container" aria-labelledby="hero-title">
+      <div class="hero-copy reveal">
+        <p class="eyebrow"><span class="pulse" aria-hidden="true"></span> Arcade de navegador</p>
+        <h1 id="hero-title">Bienvenido a <span>Vistra Arcade</span></h1>
+        <p class="lead">
+          Minijuegos originales para jugar al momento y sin instalar nada: retos de lógica,
+          viajes por el mundo y partidas para compartir con tus amigos.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary btn-lg" href="#juegos">Explorar juegos</a>
+          <a id="hero-featured" class="btn btn-ghost btn-lg" href="games/mundoguessr/index.html">Probar MundoGuessr <span aria-hidden="true">→</span></a>
+        </div>
+        <ul class="hero-stats">
+          <li><strong id="stat-games">2</strong><span>juegos disponibles</span></li>
+          <li><strong>0</strong><span>instalaciones</span></li>
+          <li><strong>2</strong><span>jugadores en el mismo PC</span></li>
+        </ul>
+      </div>
+
+      <div class="hero-visual reveal" aria-hidden="true">
+        <div class="hv-glow"></div>
+        <div class="hv-card hv-back"><img src="img/juegos/buscaminas.svg" alt="" width="320" height="180"></div>
+        <div class="hv-card hv-front"><img src="img/juegos/mundoguessr.svg" alt="" width="320" height="180"></div>
+        <div class="hv-chip hv-score"><span class="hv-dot"></span>+4.945 puntos</div>
+        <div class="hv-chip hv-win">🏆 ¡Ronda ganada!</div>
+        <span class="hv-pixel p1"></span><span class="hv-pixel p2"></span><span class="hv-pixel p3"></span>
+      </div>
+    </section>
+
+    <!-- 3. Catálogo -->
+    <section id="juegos" class="section container" aria-labelledby="juegos-title">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">Catálogo</p>
+          <h2 id="juegos-title">Juegos disponibles</h2>
+          <p class="section-lead">Elige un juego y empieza a jugar al instante.</p>
+        </div>
+        <div id="filters" class="filters" role="group" aria-label="Filtrar por categoría"></div>
+      </div>
+      <div id="game-grid" class="game-grid">
+        <noscript>
+          <p class="noscript">
+            Activa JavaScript para ver el catálogo completo. Mientras tanto:
+            <a href="games/mundoguessr/index.html">MundoGuessr</a> ·
+            <a href="games/buscaminas/index.html">Buscaminas</a>
+          </p>
+        </noscript>
+      </div>
+    </section>
+
+    <!-- 4. Próximos lanzamientos -->
+    <section id="proximamente" class="section container" aria-labelledby="proximos-title">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">En desarrollo</p>
+          <h2 id="proximos-title">Próximos lanzamientos</h2>
+          <p class="section-lead">Un adelanto de los juegos que llegarán pronto al arcade.</p>
+        </div>
+      </div>
+      <div id="upcoming-grid" class="upcoming-grid"></div>
+    </section>
+
+    <!-- 5. Novedades -->
+    <section id="novedades" class="section container" aria-labelledby="novedades-title">
+      <div class="section-head reveal">
+        <div>
+          <p class="eyebrow">Bitácora</p>
+          <h2 id="novedades-title">Novedades</h2>
+          <p class="section-lead">Lo último que ha llegado a Vistra Arcade.</p>
+        </div>
+      </div>
+      <ol id="news-list" class="news-list"></ol>
+    </section>
   </main>
 
+  <!-- 6. Pie de página -->
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="index.html" aria-label="Vistra Arcade, inicio">
+          <img class="brand-logo" src="img/logo.svg" alt="" width="32" height="32">
+          <span class="brand-text"><strong>VISTRA</strong><span>ARCADE</span></span>
+        </a>
+        <p>Minijuegos originales para el navegador, hechos con HTML, CSS y JavaScript.</p>
+      </div>
+      <nav class="footer-col" aria-label="Juegos">
+        <h2>Juegos</h2>
+        <ul id="footer-games"></ul>
+      </nav>
+      <nav class="footer-col" aria-label="Arcade">
+        <h2>Arcade</h2>
+        <ul>
+          <li><a href="#juegos">Catálogo</a></li>
+          <li><a href="#proximamente">Próximamente</a></li>
+          <li><a href="#novedades">Novedades</a></li>
+        </ul>
+      </nav>
+      <nav class="footer-col" aria-label="Proyecto">
+        <h2>Proyecto</h2>
+        <ul>
+          <li><a href="https://github.com/maivichelsea/vistra-arcade" target="_blank" rel="noopener">Código en GitHub</a></li>
+          <li><a href="#top" id="back-to-top">Volver arriba ↑</a></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="container footer-bottom">
+      <span>© <span id="year">2026</span> Vistra Arcade</span>
+      <span>Se adapta al modo claro u oscuro de tu sistema.</span>
+    </div>
+  </footer>
+
+  <script src="js/catalogo.js"></script>
+  <script src="js/home.js"></script>
 </body>
 </html>
