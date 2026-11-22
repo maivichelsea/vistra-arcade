@@ -5,69 +5,80 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
   <title>MundoGuessr · Vistra Arcade</title>
+  <link rel="icon" href="../../img/logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="../../css/style.css">
   <link rel="stylesheet" href="mundoguessr.css">
 </head>
-<body>
-  <nav class="topbar">
-    <a href="../../index.html">← Arcade</a>
-    <h1>MundoGuessr</h1>
-    <span class="topbar-spacer"></span>
-  </nav>
+<body class="arcade-bg">
+  <header class="site-nav game-nav">
+    <div class="container nav-inner">
+      <a class="brand" href="../../index.html" aria-label="Volver a Vistra Arcade">
+        <img class="brand-logo" src="../../img/logo.svg" alt="" width="36" height="36">
+        <span class="brand-text"><strong>VISTRA</strong><span>ARCADE</span></span>
+      </a>
+      <span class="nav-sep" aria-hidden="true"></span>
+      <div class="game-title">
+        <span class="eyebrow">Geografía</span>
+        <h1>MundoGuessr</h1>
+      </div>
+      <div class="nav-actions">
+        <a class="btn btn-ghost btn-sm" href="../../index.html#juegos">← Juegos</a>
+      </div>
+    </div>
+  </header>
 
   <!-- Menú -->
-  <section id="screen-menu" class="screen menu">
+  <section id="screen-menu" class="screen menu container">
     <div id="key-warning" class="notice" hidden></div>
 
-    <div class="panel">
-      <h2>Nueva partida</h2>
-      <p class="muted">🌍 Mapa del mundo · 5 rondas · hasta 5000 puntos por ronda</p>
-
-      <h3>Jugadores</h3>
-      <div class="segmented">
-        <label><input type="radio" name="players" value="1" checked><span>1 jugador</span></label>
-        <label><input type="radio" name="players" value="2"><span>2 jugadores (mismo PC)</span></label>
-      </div>
-      <div id="names" class="names" hidden>
-        <label><span class="dot p1"></span><input id="name-1" maxlength="16" placeholder="Jugador 1" aria-label="Nombre del jugador 1"></label>
-        <label><span class="dot p2"></span><input id="name-2" maxlength="16" placeholder="Jugador 2" aria-label="Nombre del jugador 2"></label>
-      </div>
-
-      <h3>Tiempo por turno</h3>
-      <div class="segmented">
-        <label><input type="radio" name="time" value="0" checked><span>Sin límite</span></label>
-        <label><input type="radio" name="time" value="30"><span>30 s</span></label>
-        <label><input type="radio" name="time" value="60"><span>1 min</span></label>
-        <label><input type="radio" name="time" value="120"><span>2 min</span></label>
-      </div>
-
-      <div class="menu-actions">
-        <button id="play" class="btn big" disabled>Jugar</button>
-        <span id="play-hint" class="muted"></span>
-      </div>
-
-      <details class="help">
-        <summary>Cómo jugar</summary>
-        <ul>
-          <li>Apareces en un lugar al azar en Street View. Puedes moverte, girar y hacer zoom.</li>
-          <li>Cuando creas saber dónde estás, marca el punto en el mapa de la esquina y pulsa <strong>Adivinar</strong>.</li>
-          <li>Cuanto más cerca, más puntos: hasta 5000 por ronda.</li>
-          <li>Si te pierdes, <strong>Volver al inicio</strong> te lleva al punto de partida.</li>
-          <li><strong>2 jugadores:</strong> los dos juegan el mismo lugar, por turnos en este PC. Mientras uno juega, el otro no mira. Gana quien sume más puntos.</li>
-          <li><strong>Desafío a distancia:</strong> al terminar una partida de 1 jugador, crea un código y mándaselo a un amigo. Él lo pega abajo y juega tus mismos 5 lugares.</li>
+    <div class="menu-grid">
+      <div class="panel menu-card">
+        <p class="eyebrow">Nueva partida</p>
+        <h2>¿Dónde estás?</h2>
+        <p class="menu-lead">Apareces en algún lugar del mundo con Street View. Explora, busca pistas y marca en el mapa dónde crees que estás.</p>
+        <ul class="menu-facts">
+          <li>🌍 Mapa del mundo</li>
+          <li>🎯 5 rondas</li>
+          <li>⭐ Hasta 5000 puntos por ronda</li>
         </ul>
-      </details>
-    </div>
 
-    <div class="panel challenge-panel">
-      <h2>⚔️ Desafío de un amigo</h2>
-      <p class="muted">¿Te mandaron un código? Pégalo aquí (o el mensaje completo de WhatsApp) para jugar los mismos 5 lugares y comparar puntos.</p>
-      <textarea id="challenge-input" rows="3" placeholder="Pega aquí el código MG1-… o el mensaje completo" aria-label="Código de desafío"></textarea>
-      <p id="challenge-status" class="challenge-status" aria-live="polite"></p>
-      <div class="row">
-        <input id="challenge-my-name" maxlength="16" placeholder="Tu nombre" aria-label="Tu nombre">
-        <button id="challenge-play" class="btn" disabled>Jugar desafío</button>
+        <h3>Jugadores</h3>
+        <div class="chip-group">
+          <label><input type="radio" name="players" value="1" checked><span class="chip">👤 1 jugador</span></label>
+          <label><input type="radio" name="players" value="2"><span class="chip">👥 2 jugadores (mismo PC)</span></label>
+        </div>
+        <div id="names" class="names" hidden>
+          <label><span class="dot p1"></span><input class="input" id="name-1" maxlength="16" placeholder="Jugador 1" aria-label="Nombre del jugador 1"></label>
+          <label><span class="dot p2"></span><input class="input" id="name-2" maxlength="16" placeholder="Jugador 2" aria-label="Nombre del jugador 2"></label>
+        </div>
+
+        <h3>Tiempo por turno</h3>
+        <div class="chip-group">
+          <label><input type="radio" name="time" value="0" checked><span class="chip">Sin límite</span></label>
+          <label><input type="radio" name="time" value="30"><span class="chip">30 s</span></label>
+          <label><input type="radio" name="time" value="60"><span class="chip">1 min</span></label>
+          <label><input type="radio" name="time" value="120"><span class="chip">2 min</span></label>
+        </div>
+
+        <div class="menu-actions">
+          <button id="play" class="btn btn-lg" disabled>Jugar <span aria-hidden="true">▶</span></button>
+          <span id="play-hint" class="muted"></span>
+        </div>
       </div>
+
+      <aside class="panel menu-side">
+        <img class="menu-art" src="../../img/juegos/mundoguessr.svg" alt="" width="320" height="180">
+        <details class="help" open>
+          <summary>Cómo jugar</summary>
+          <ul>
+            <li>Apareces en un lugar al azar en Street View. Puedes moverte, girar y hacer zoom.</li>
+            <li>Cuando creas saber dónde estás, marca el punto en el mapa de la esquina y pulsa <strong>Adivinar</strong>.</li>
+            <li>Cuanto más cerca, más puntos: hasta 5000 por ronda.</li>
+            <li>Si te pierdes, <strong>Volver al inicio</strong> te lleva al punto de partida.</li>
+            <li><strong>2 jugadores:</strong> los dos juegan el mismo lugar, por turnos en este PC. Mientras uno juega, el otro no mira. Gana quien sume más puntos.</li>
+          </ul>
+        </details>
+      </aside>
     </div>
   </section>
 
@@ -82,7 +93,7 @@
       <span id="hud-timer" class="timer" hidden></span>
     </div>
 
-    <button id="back-start" class="btn ghost float-left">↺ Volver al inicio</button>
+    <button id="back-start" class="btn ghost btn-sm float-left">↺ Volver al inicio</button>
 
     <div class="guess-box">
       <div id="guess-map" class="guess-map"></div>
@@ -100,7 +111,7 @@
         <span id="handoff-dot" class="dot big"></span>
         <h2 id="handoff-title"></h2>
         <p id="handoff-text" class="muted"></p>
-        <button id="handoff-btn" class="btn big">Estoy listo</button>
+        <button id="handoff-btn" class="btn btn-lg">Estoy listo</button>
       </div>
     </div>
   </section>
@@ -113,24 +124,6 @@
       <p id="result-detail"></p>
       <div id="result-bar-wrap" class="bar"><div id="result-bar"></div></div>
       <ol id="final-list" class="final-list" hidden></ol>
-
-      <!-- Retar a un amigo (tras una partida de 1 jugador) -->
-      <div id="challenge-box" class="challenge-box" hidden>
-        <h3>⚔️ Reta a un amigo</h3>
-        <p class="muted">Jugará estos mismos 5 lugares y comparará su puntuación con la tuya.</p>
-        <div class="row">
-          <input id="challenge-name" maxlength="16" placeholder="Tu nombre" aria-label="Tu nombre">
-          <button id="challenge-create" class="btn">Crear código</button>
-        </div>
-        <div id="challenge-output" class="challenge-output" hidden>
-          <textarea id="challenge-code" rows="4" readonly aria-label="Mensaje del desafío"></textarea>
-          <div class="row">
-            <button id="challenge-copy" class="btn">Copiar mensaje</button>
-            <a id="challenge-whatsapp" class="btn ghost" target="_blank" rel="noopener">Enviar por WhatsApp</a>
-          </div>
-        </div>
-      </div>
-
       <div class="result-actions">
         <a id="result-link" class="btn ghost" target="_blank" rel="noopener">Ver en Google Maps</a>
         <button id="next-btn" class="btn">Siguiente ronda</button>

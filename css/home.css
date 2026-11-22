@@ -1,133 +1,9 @@
 /* =========================================================
    Portada de Vistra Arcade
-   Usa los colores de css/style.css y añade la identidad arcade:
-   un acento naranja "de botón de recreativa", cuadrícula de fondo y brillos.
+   Colores, botones, barra de navegación y chips vienen de css/style.css.
    ========================================================= */
-.home {
-  --arcade: #e8590c;          /* acento secundario: botones de recreativa, estados */
-  --arcade-soft: #fff1e6;
-  --success: #1f9d55;
-  --success-soft: #e3f6ea;
-  --radius: 18px;
-  --radius-sm: 12px;
-  --container: 1160px;
-  --grid-line: rgba(47, 39, 206, .06);
-  --glow: rgba(67, 59, 255, .22);
-  --card-shadow: 0 1px 2px rgba(5, 3, 21, .05), 0 6px 20px rgba(47, 39, 206, .07);
-  --card-shadow-hover: 0 2px 4px rgba(5, 3, 21, .06), 0 18px 40px rgba(47, 39, 206, .18);
-  --ease: cubic-bezier(.2, .8, .2, 1);
-
-  display: block;
-  background:
-    radial-gradient(900px 480px at 85% -10%, var(--glow), transparent 70%),
-    radial-gradient(700px 420px at -10% 8%, rgba(232, 89, 12, .08), transparent 70%),
-    linear-gradient(var(--grid-line) 1px, transparent 1px) 0 0 / 44px 44px,
-    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) 0 0 / 44px 44px,
-    var(--background);
-  background-attachment: fixed, fixed, scroll, scroll, scroll;
-  line-height: 1.5;
-}
-
-@media (prefers-color-scheme: dark) {
-  .home {
-    --arcade: #ffa94d;
-    --arcade-soft: rgba(255, 169, 77, .12);
-    --success: #4fd18b;
-    --success-soft: rgba(79, 209, 139, .12);
-    --grid-line: rgba(155, 150, 255, .05);
-    --glow: rgba(58, 49, 216, .35);
-    --card-shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .35);
-    --card-shadow-hover: 0 2px 6px rgba(0, 0, 0, .5), 0 20px 44px rgba(58, 49, 216, .28);
-  }
-}
-
-.container {
-  width: 100%;
-  max-width: var(--container);
-  margin: 0 auto;
-  padding-inline: clamp(1rem, 4vw, 2rem);
-}
-
-.home a { color: inherit; }
-.home :focus-visible { outline: 3px solid var(--accent-text); outline-offset: 3px; border-radius: 8px; }
-
-.skip-link {
-  position: absolute;
-  left: 1rem;
-  top: -3rem;
-  z-index: 100;
-  padding: .5rem 1rem;
-  border-radius: 8px;
-  background: var(--primary);
-  color: var(--on-primary) !important;
-  font-weight: 700;
-  text-decoration: none;
-  transition: top .2s;
-}
-.skip-link:focus { top: .75rem; }
-
-/* ---------- Botones ---------- */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: .4rem;
-  font: inherit;
-  font-weight: 700;
-  font-size: .95rem;
-  line-height: 1;
-  padding: .7rem 1.15rem;
-  border-radius: 12px;
-  border: 1px solid transparent;
-  text-decoration: none;
-  cursor: pointer;
-  transition: transform .2s var(--ease), box-shadow .2s var(--ease), background-color .2s, border-color .2s;
-}
-.btn-lg { padding: .9rem 1.4rem; font-size: 1rem; }
-.btn-primary {
-  background: var(--primary);
-  color: var(--on-primary) !important;
-  box-shadow: 0 4px 0 #1a1546, 0 8px 18px var(--shadow);
-}
-.btn-primary:hover { background: var(--accent); transform: translateY(-2px); box-shadow: 0 6px 0 #1a1546, 0 12px 24px var(--shadow); }
-.btn-primary:active { transform: translateY(2px); box-shadow: 0 2px 0 #1a1546, 0 4px 10px var(--shadow); }
-.btn-ghost { background: var(--panel); color: var(--primary-text) !important; border-color: var(--border); }
-.btn-ghost:hover { border-color: var(--accent-text); transform: translateY(-2px); }
-
-/* ---------- 1. Navegación ---------- */
-.site-nav {
-  position: sticky;
-  top: 0;
-  z-index: 50;
-  background: color-mix(in srgb, var(--background) 82%, transparent);
-  backdrop-filter: saturate(160%) blur(12px);
-  -webkit-backdrop-filter: saturate(160%) blur(12px);
-  border-bottom: 1px solid transparent;
-  transition: border-color .2s, box-shadow .2s;
-}
-.site-nav.scrolled { border-bottom-color: var(--border); box-shadow: 0 6px 20px rgba(5, 3, 21, .06); }
-.nav-inner { display: flex; align-items: center; gap: 1.5rem; height: 68px; }
-
-.brand { display: inline-flex; align-items: center; gap: .6rem; text-decoration: none; }
-.brand-logo { display: block; border-radius: 10px; box-shadow: 0 4px 12px var(--shadow); }
-.brand-text { display: flex; flex-direction: column; line-height: 1; }
-.brand-text strong { font-size: 1.05rem; font-weight: 900; letter-spacing: .14em; color: var(--text); }
-.brand-text span { font-size: .68rem; font-weight: 800; letter-spacing: .42em; color: var(--arcade); margin-top: .2rem; }
-
-.site-nav nav { margin-left: auto; }
-.nav-links { display: flex; gap: .25rem; list-style: none; }
-.nav-links a {
-  display: block;
-  padding: .5rem .85rem;
-  border-radius: 10px;
-  font-weight: 600;
-  font-size: .95rem;
-  color: var(--muted);
-  text-decoration: none;
-  transition: color .2s, background-color .2s;
-}
-.nav-links a:hover { color: var(--text); background: var(--secondary); }
-.nav-links a.active { color: var(--primary-text); background: color-mix(in srgb, var(--secondary) 70%, transparent); }
+.home { display: block; line-height: 1.5; }
+.home a:not(.btn):not(.skip-link) { color: inherit; }
 .nav-cta { padding: .6rem 1.1rem; }
 
 /* ---------- 2. Bienvenida ---------- */
@@ -139,16 +15,6 @@
   padding-block: clamp(2.5rem, 6vw, 4.5rem) clamp(2rem, 4vw, 3rem);
 }
 
-.eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: .5rem;
-  font-size: .78rem;
-  font-weight: 800;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  color: var(--arcade);
-}
 .hero .eyebrow {
   padding: .35rem .8rem;
   border-radius: 999px;
@@ -266,20 +132,6 @@
 /* Filtros */
 .filters { display: flex; flex-wrap: wrap; gap: .4rem; }
 .filters[hidden] { display: none; }
-.chip {
-  font: inherit;
-  font-size: .88rem;
-  font-weight: 700;
-  padding: .45rem .95rem;
-  border-radius: 999px;
-  border: 1px solid var(--border);
-  background: var(--panel);
-  color: var(--muted);
-  cursor: pointer;
-  transition: background-color .2s, color .2s, border-color .2s;
-}
-.chip:hover { border-color: var(--accent-text); color: var(--text); }
-.chip[aria-pressed="true"] { background: var(--text); border-color: var(--text); color: var(--background); }
 
 /* ---------- 3. Tarjetas de juego ---------- */
 .game-grid {

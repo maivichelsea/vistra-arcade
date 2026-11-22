@@ -59,3 +59,274 @@ body {
 
 code { color: var(--primary-text); font-weight: 600; }
 
+
+/* =========================================================
+   Identidad arcade compartida (portada y juegos)
+   ========================================================= */
+:root {
+  --arcade: #e8590c;          /* acento de "botón de recreativa" */
+  --arcade-soft: #fff1e6;
+  --success: #1f9d55;
+  --success-soft: #e3f6ea;
+  --radius: 18px;
+  --radius-sm: 12px;
+  --container: 1160px;
+  --btn-depth: #1a1546;       /* sombra sólida bajo los botones principales */
+  --grid-line: rgba(47, 39, 206, .06);
+  --glow: rgba(67, 59, 255, .22);
+  --card-shadow: 0 1px 2px rgba(5, 3, 21, .05), 0 6px 20px rgba(47, 39, 206, .07);
+  --card-shadow-hover: 0 2px 4px rgba(5, 3, 21, .06), 0 18px 40px rgba(47, 39, 206, .18);
+  --ease: cubic-bezier(.2, .8, .2, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --arcade: #ffa94d;
+    --arcade-soft: rgba(255, 169, 77, .12);
+    --success: #4fd18b;
+    --success-soft: rgba(79, 209, 139, .12);
+    --btn-depth: #000000;
+    --grid-line: rgba(155, 150, 255, .05);
+    --glow: rgba(58, 49, 216, .35);
+    --card-shadow: 0 1px 2px rgba(0, 0, 0, .4), 0 8px 24px rgba(0, 0, 0, .35);
+    --card-shadow-hover: 0 2px 6px rgba(0, 0, 0, .5), 0 20px 44px rgba(58, 49, 216, .28);
+  }
+}
+
+/* Fondo con cuadrícula y brillos */
+.arcade-bg {
+  background:
+    radial-gradient(900px 480px at 85% -10%, var(--glow), transparent 70%),
+    radial-gradient(700px 420px at -10% 8%, rgba(232, 89, 12, .08), transparent 70%),
+    linear-gradient(var(--grid-line) 1px, transparent 1px) 0 0 / 44px 44px,
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) 0 0 / 44px 44px,
+    var(--background);
+  background-attachment: fixed, fixed, scroll, scroll, scroll;
+}
+
+.container {
+  width: 100%;
+  max-width: var(--container);
+  margin: 0 auto;
+  padding-inline: clamp(1rem, 4vw, 2rem);
+}
+
+:focus-visible { outline: 3px solid var(--accent-text); outline-offset: 3px; border-radius: 8px; }
+
+.skip-link {
+  position: absolute;
+  left: 1rem;
+  top: -3rem;
+  z-index: 100;
+  padding: .5rem 1rem;
+  border-radius: 8px;
+  background: var(--primary);
+  color: var(--on-primary);
+  font-weight: 700;
+  text-decoration: none;
+  transition: top .2s;
+}
+.skip-link:focus { top: .75rem; }
+
+/* ---------- Botones ---------- */
+/* .btn es el botón principal; .btn-ghost (o .btn.ghost) el secundario. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .4rem;
+  font: inherit;
+  font-weight: 700;
+  font-size: .95rem;
+  line-height: 1.1;
+  padding: .7rem 1.15rem;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  background: var(--primary);
+  color: var(--on-primary);
+  box-shadow: 0 4px 0 var(--btn-depth), 0 8px 18px var(--shadow);
+  text-decoration: none;
+  text-align: center;
+  cursor: pointer;
+  transition: transform .2s var(--ease), box-shadow .2s var(--ease), background-color .2s, border-color .2s, color .2s;
+}
+.btn:hover:not(:disabled) { background: var(--accent); transform: translateY(-2px); box-shadow: 0 6px 0 var(--btn-depth), 0 12px 24px var(--shadow); }
+.btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 2px 0 var(--btn-depth), 0 4px 10px var(--shadow); }
+.btn:disabled { opacity: .5; cursor: not-allowed; box-shadow: none; }
+.btn-primary { color: var(--on-primary); }
+.btn-ghost, .btn.ghost {
+  background: var(--panel);
+  color: var(--primary-text);
+  border-color: var(--border);
+  box-shadow: var(--card-shadow);
+}
+.btn-ghost:hover:not(:disabled), .btn.ghost:hover:not(:disabled) {
+  background: var(--panel);
+  border-color: var(--accent-text);
+  box-shadow: var(--card-shadow-hover);
+}
+.btn-ghost:active:not(:disabled), .btn.ghost:active:not(:disabled) { box-shadow: var(--card-shadow); }
+.btn-lg, .btn.big { padding: .9rem 1.4rem; font-size: 1rem; }
+.btn-sm { padding: .5rem .85rem; font-size: .88rem; border-radius: 10px; }
+
+/* ---------- Barra de navegación ---------- */
+.site-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: color-mix(in srgb, var(--background) 82%, transparent);
+  backdrop-filter: saturate(160%) blur(12px);
+  -webkit-backdrop-filter: saturate(160%) blur(12px);
+  border-bottom: 1px solid transparent;
+  transition: border-color .2s, box-shadow .2s;
+}
+.site-nav.scrolled { border-bottom-color: var(--border); box-shadow: 0 6px 20px rgba(5, 3, 21, .06); }
+.nav-inner { display: flex; align-items: center; gap: 1.5rem; height: 68px; }
+
+.brand { display: inline-flex; align-items: center; gap: .6rem; color: inherit; text-decoration: none; }
+.brand-logo { display: block; border-radius: 10px; box-shadow: 0 4px 12px var(--shadow); }
+.brand-text { display: flex; flex-direction: column; line-height: 1; }
+.brand-text strong { font-size: 1.05rem; font-weight: 900; letter-spacing: .14em; color: var(--text); }
+.brand-text span { font-size: .68rem; font-weight: 800; letter-spacing: .42em; color: var(--arcade); margin-top: .2rem; }
+
+.site-nav nav { margin-left: auto; }
+.nav-links { display: flex; gap: .25rem; list-style: none; }
+.nav-links a {
+  display: block;
+  padding: .5rem .85rem;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: .95rem;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color .2s, background-color .2s;
+}
+.nav-links a:hover { color: var(--text); background: var(--secondary); }
+.nav-links a.active { color: var(--primary-text); background: color-mix(in srgb, var(--secondary) 70%, transparent); }
+
+/* Barra de los juegos: logo del arcade · nombre del juego · acciones */
+.game-nav { border-bottom-color: var(--border); }
+.nav-sep { width: 1px; height: 32px; background: var(--border); flex: none; }
+.game-title { display: flex; flex-direction: column; min-width: 0; }
+.game-title .eyebrow { font-size: .68rem; }
+.game-title h1 {
+  font-size: 1.25rem;
+  font-weight: 900;
+  letter-spacing: -.01em;
+  line-height: 1.15;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.nav-actions { display: flex; align-items: center; gap: .75rem; margin-left: auto; }
+.kbd-hint { color: var(--muted); font-size: .85rem; white-space: nowrap; }
+kbd {
+  display: inline-block;
+  min-width: 1.6em;
+  padding: .1rem .4rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  border-bottom-width: 3px;
+  background: var(--panel);
+  color: var(--text);
+  font-family: inherit;
+  font-weight: 700;
+  font-size: .78rem;
+  line-height: 1.3;
+  text-align: center;
+}
+
+/* ---------- Etiquetas, chips y paneles ---------- */
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: .5rem;
+  font-size: .78rem;
+  font-weight: 800;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--arcade);
+}
+
+/* Botón de opción tipo "píldora" (filtros, niveles, opciones). */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  font: inherit;
+  font-size: .88rem;
+  font-weight: 700;
+  padding: .45rem .95rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  color: var(--muted);
+  cursor: pointer;
+  transition: background-color .2s, color .2s, border-color .2s, transform .2s var(--ease);
+}
+.chip:hover { border-color: var(--accent-text); color: var(--text); }
+.chip:active { transform: scale(.97); }
+.chip[aria-pressed="true"], .chip.active { background: var(--text); border-color: var(--text); color: var(--background); }
+
+/* Grupo de opciones con radio buttons dentro de .chip */
+.chip-group { display: flex; flex-wrap: wrap; gap: .4rem; }
+.chip-group input { position: absolute; opacity: 0; pointer-events: none; }
+.chip-group input:checked + .chip { background: var(--text); border-color: var(--text); color: var(--background); }
+.chip-group input:focus-visible + .chip { outline: 3px solid var(--accent-text); outline-offset: 2px; }
+
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--card-shadow);
+  padding: 1.25rem;
+}
+
+.input {
+  font: inherit;
+  color: var(--text);
+  background: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: .55rem .7rem;
+  transition: border-color .2s, box-shadow .2s;
+}
+.input:focus { outline: none; border-color: var(--accent-text); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent-text) 25%, transparent); }
+
+/* Bloque desplegable "Cómo jugar" */
+.help { margin-top: 1rem; border-top: 1px solid var(--border); padding-top: .85rem; color: var(--muted); font-size: .9rem; }
+.help summary {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--primary-text);
+  list-style: none;
+}
+.help summary::-webkit-details-marker { display: none; }
+.help summary::before {
+  content: "+";
+  display: grid;
+  place-items: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 6px;
+  background: var(--secondary);
+  color: var(--primary-text);
+  font-weight: 900;
+  transition: transform .2s var(--ease);
+}
+.help[open] summary::before { content: "–"; }
+.help ul { margin: .6rem 0 0 1.2rem; display: grid; gap: .3rem; }
+.help strong { color: var(--text); }
+
+@media (max-width: 640px) {
+  .nav-inner { gap: .75rem; }
+  .game-nav .brand-text, .game-nav .nav-sep, .kbd-hint { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}

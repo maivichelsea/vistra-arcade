@@ -5,7 +5,7 @@ Minijuegos originales para el navegador, hechos con HTML, CSS y JavaScript sin d
 ## Juegos
 
 - **Buscaminas:** niveles Principiante (8×8, 10 minas), Intermedio (16×16, 40), Experto (16×30, 99) y Personalizado. Primer clic seguro y apertura de vecinas.
-- **MundoGuessr:** apareces en un lugar al azar con Google Street View y marcas en el mapa dónde crees que estás. Mapa del mundo, 5 rondas de hasta 5000 puntos y tiempo opcional. Modo de 1 jugador o de 2 jugadores por turnos en el mismo PC. Desafío a distancia: al terminar una partida se crea un código que un amigo pega para jugar los mismos 5 lugares y comparar puntos.
+- **MundoGuessr:** apareces en un lugar al azar con Google Street View y marcas en el mapa dónde crees que estás. Mapa del mundo, 5 rondas de hasta 5000 puntos y tiempo opcional. Modo de 1 jugador o de 2 jugadores por turnos en el mismo PC.
 
 ### Clave de Google Maps (MundoGuessr)
 

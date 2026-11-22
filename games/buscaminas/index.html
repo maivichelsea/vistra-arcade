@@ -5,37 +5,56 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
   <title>Buscaminas · Vistra Arcade</title>
+  <link rel="icon" href="../../img/logo.svg" type="image/svg+xml">
   <link rel="stylesheet" href="../../css/style.css">
   <link rel="stylesheet" href="buscaminas.css">
 </head>
-<body>
-  <nav class="topbar">
-    <a href="../../index.html">← Arcade</a>
-    <h1>Buscaminas</h1>
-    <span class="hint">F2: nuevo juego</span>
-  </nav>
+<body class="arcade-bg">
+  <header class="site-nav game-nav">
+    <div class="container nav-inner">
+      <a class="brand" href="../../index.html" aria-label="Volver a Vistra Arcade">
+        <img class="brand-logo" src="../../img/logo.svg" alt="" width="36" height="36">
+        <span class="brand-text"><strong>VISTRA</strong><span>ARCADE</span></span>
+      </a>
+      <span class="nav-sep" aria-hidden="true"></span>
+      <div class="game-title">
+        <span class="eyebrow">Lógica</span>
+        <h1>Buscaminas</h1>
+      </div>
+      <div class="nav-actions">
+        <span class="kbd-hint"><kbd>F2</kbd> nuevo juego</span>
+        <a class="btn btn-ghost btn-sm" href="../../index.html#juegos">← Juegos</a>
+      </div>
+    </div>
+  </header>
 
-  <main class="layout">
+  <main class="container game-main">
     <section class="panel game-panel">
-      <div class="levels" role="tablist" aria-label="Nivel">
-        <button class="level" data-level="beginner">Principiante</button>
-        <button class="level" data-level="intermediate">Intermedio</button>
-        <button class="level" data-level="expert">Experto</button>
-        <button class="level" data-level="custom">Personalizado</button>
+      <div class="levels" role="group" aria-label="Nivel">
+        <button class="chip level" data-level="beginner">Principiante</button>
+        <button class="chip level" data-level="intermediate">Intermedio</button>
+        <button class="chip level" data-level="expert">Experto</button>
+        <button class="chip level" data-level="custom">Personalizado</button>
       </div>
 
       <form id="custom-form" class="custom-form" novalidate hidden>
-        <label>Filas <input type="number" id="custom-rows" min="5" max="24" value="10"></label>
-        <label>Columnas <input type="number" id="custom-cols" min="5" max="30" value="10"></label>
-        <label>Minas <input type="number" id="custom-mines" min="1" value="15"></label>
-        <button type="submit" class="btn">Jugar</button>
+        <label>Filas <input class="input" type="number" id="custom-rows" min="5" max="24" value="10"></label>
+        <label>Columnas <input class="input" type="number" id="custom-cols" min="5" max="30" value="10"></label>
+        <label>Minas <input class="input" type="number" id="custom-mines" min="1" value="15"></label>
+        <button type="submit" class="btn btn-sm">Jugar</button>
         <small id="custom-help"></small>
       </form>
 
       <div class="status">
-        <div class="counter" title="Minas restantes">💣 <span id="mines-left">0</span></div>
-        <button id="new-game" class="face" title="Nuevo juego (F2)">🙂</button>
-        <div class="counter" title="Tiempo">⏱ <span id="timer">0</span></div>
+        <div class="counter" title="Minas restantes">
+          <span class="counter-label">💣 Minas</span>
+          <span id="mines-left" class="counter-value">0</span>
+        </div>
+        <button id="new-game" class="face" title="Nuevo juego (F2)" aria-label="Nuevo juego">🙂</button>
+        <div class="counter" title="Tiempo">
+          <span class="counter-label">⏱ Tiempo</span>
+          <span id="timer" class="counter-value">0</span>
+        </div>
       </div>
 
       <div class="board-wrap">
@@ -43,7 +62,7 @@
       </div>
 
       <div class="below-board">
-        <button id="flag-mode" class="btn ghost" aria-pressed="false">🚩 Modo bandera: no</button>
+        <button id="flag-mode" class="btn ghost btn-sm" aria-pressed="false">🚩 Modo bandera: no</button>
         <p id="message" class="message" aria-live="polite"></p>
       </div>
 

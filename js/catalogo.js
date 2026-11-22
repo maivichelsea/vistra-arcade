@@ -14,7 +14,7 @@ const VISTRA_JUEGOS = [
     categoria: "Geografía",
     estado: "nuevo",
     descripcion: "Apareces en algún lugar del mundo con Street View. Explora, busca pistas y marca dónde crees que estás.",
-    etiquetas: ["1–2 jugadores", "Desafío a distancia", "Requiere internet"],
+    etiquetas: ["1–2 jugadores", "Requiere internet"],
   },
   {
     id: "buscaminas",
@@ -52,12 +52,6 @@ const VISTRA_PROXIMOS = [
 
 // Novedades, de la más reciente a la más antigua. fecha en formato AAAA-MM-DD.
 const VISTRA_NOVEDADES = [
-  {
-    fecha: "2026-11-22",
-    juego: "mundoguessr",
-    titulo: "Desafío a distancia en MundoGuessr",
-    texto: "Al terminar una partida, crea un código y mándaselo a un amigo: jugará tus mismos 5 lugares y comparará su puntuación con la tuya.",
-  },
   {
     fecha: "2026-11-22",
     juego: "mundoguessr",
