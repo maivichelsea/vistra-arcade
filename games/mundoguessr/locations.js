@@ -1,7 +1,7 @@
-// Países jugables de MundoGuessr.
-// Cada país tiene una lista de ciudades "semilla" [lat, lng]. En cada ronda se elige una
-// semilla al azar, se desplaza un punto aleatorio hasta `spread` km y se busca el panorama
-// de Street View oficial más cercano. Así los lugares caen dentro del país y con cobertura.
+// Zonas de donde salen los lugares del mapa Mundo de MundoGuessr.
+// En cada ronda se elige un país al azar y una de sus ciudades "semilla" [lat, lng]; se desplaza
+// un punto aleatorio hasta `spread` km y se busca el panorama oficial de Street View más cercano.
+// Así los lugares tienen cobertura y se sabe en qué país están.
 // Para añadir un país: copia un bloque, cambia id/nombre y pon sus ciudades.
 const MG_COUNTRIES = [
   {

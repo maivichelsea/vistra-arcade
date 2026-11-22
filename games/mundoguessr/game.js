@@ -1,8 +1,10 @@
 // MundoGuessr: aparece en un lugar con Street View y adivina dónde estás.
+// Modo de 1 jugador o de 2 jugadores por turnos en el mismo PC.
 const ROUNDS = 5;
 const MAX_POINTS = 5000;
 const WORLD_SIZE_KM = 20000;
 const PLACEHOLDER_KEY = "PEGA_AQUI_TU_CLAVE";
+const PLAYER_COLORS = ["--guess", "--guess-2"];
 
 const $ = (id) => document.getElementById(id);
 const screens = { menu: $("screen-menu"), game: $("screen-game"), result: $("screen-result") };
@@ -31,20 +33,11 @@ function offsetPoint([lat, lng], km) {
   return { lat: toDeg(p2), lng: ((toDeg(l2) + 540) % 360) - 180 };
 }
 
-// Tamaño aproximado del país (diagonal de sus ciudades) para escalar la puntuación.
-function countrySizeKm(country) {
-  const lats = country.seeds.map((s) => s[0]);
-  const lngs = country.seeds.map((s) => s[1]);
-  const sw = { lat: Math.min(...lats), lng: Math.min(...lngs) };
-  const ne = { lat: Math.max(...lats), lng: Math.max(...lngs) };
-  return Math.max(300, distanceKm(sw, ne) * 1.2);
-}
-
-// 5000 puntos si aciertas (menos de 50 m) y baja exponencialmente con la distancia,
-// relativa al tamaño del mapa: en Mundo, a 2000 km obtienes ~1840 puntos.
-function scoreFor(km, sizeKm) {
+// 5000 puntos si aciertas (menos de 50 m) y baja exponencialmente con la distancia:
+// a 100 km ~4750 puntos, a 2000 km ~1840, a 10000 km ~30.
+function scoreFor(km) {
   if (km < 0.05) return MAX_POINTS;
-  return Math.round(MAX_POINTS * Math.exp((-10 * km) / sizeKm));
+  return Math.round(MAX_POINTS * Math.exp((-10 * km) / WORLD_SIZE_KM));
 }
 
 function formatDistance(km) {
@@ -54,9 +47,10 @@ function formatDistance(km) {
 }
 
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+const cssColor = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
 // ---------- Estado ----------
-let selectedMap = "world";
+let playerCount = 1;
 let timeLimit = 0;
 let game = null;
 let sv, panorama, guessMap, resultMap, guessMarker;
@@ -65,36 +59,21 @@ let timerId = null;
 
 // ---------- Menú ----------
 function buildMenu() {
-  const items = [
-    { id: "world", name: "Mundo", sub: `${MG_COUNTRIES.length} países mezclados` },
-    ...MG_COUNTRIES.map((c) => ({ id: c.id, name: c.name, sub: `${c.seeds.length} zonas` })),
-  ];
-  $("map-list").replaceChildren(...items.map((item) => {
-    const b = document.createElement("button");
-    b.className = "map-option" + (item.id === "world" ? " world" : "");
-    b.dataset.id = item.id;
-    b.innerHTML = `<strong></strong><small></small>`;
-    b.querySelector("strong").textContent = item.id === "world" ? "🌍 Mundo" : item.name;
-    b.querySelector("small").textContent = item.sub;
-    b.addEventListener("click", () => selectMap(item.id));
-    return b;
-  }));
-  selectMap(selectedMap);
-
+  document.querySelectorAll('input[name="players"]').forEach((input) => {
+    input.addEventListener("change", () => {
+      playerCount = Number(input.value);
+      $("names").hidden = playerCount !== 2;
+      if (playerCount === 2) $("name-1").focus();
+    });
+  });
   document.querySelectorAll('input[name="time"]').forEach((input) => {
     input.addEventListener("change", () => { timeLimit = Number(input.value); });
   });
 }
 
-function selectMap(id) {
-  selectedMap = id;
-  document.querySelectorAll(".map-option").forEach((b) => b.classList.toggle("active", b.dataset.id === id));
-}
-
-function mapInfo(id) {
-  if (id === "world") return { id, name: "Mundo", sizeKm: WORLD_SIZE_KM, country: null };
-  const country = MG_COUNTRIES.find((c) => c.id === id);
-  return { id, name: country.name, sizeKm: countrySizeKm(country), country };
+function playerNames() {
+  if (playerCount === 1) return ["Tú"];
+  return [1, 2].map((i) => $(`name-${i}`).value.trim().slice(0, 16) || `Jugador ${i}`);
 }
 
 // ---------- Carga de Google Maps ----------
@@ -190,11 +169,19 @@ function ensureGoogleObjects() {
 }
 
 // ---------- Partida ----------
+const isDuel = () => game.players.length === 2;
+
 function startGame() {
-  game = { map: mapInfo(selectedMap), rounds: [], used: new Set(), current: null, roundActive: false };
+  game = {
+    players: playerNames().map((name) => ({ name, score: 0 })),
+    rounds: [],          // [{ location, heading, guesses: [{ guess, km, points }] }]
+    used: new Set(),
+    current: null,
+    turn: 0,
+    roundActive: false,
+  };
   goTo("game");
   ensureGoogleObjects();
-  $("hud-map").textContent = game.map.name;
   $("hud-rounds").textContent = ROUNDS;
   startRound();
 }
@@ -203,16 +190,16 @@ async function startRound() {
   const thisGame = game;
   stopTimer();
   game.roundActive = false;
-  $("hud-round").textContent = game.rounds.length + 1;
-  $("hud-score").textContent = fmt(totalScore());
+  game.turn = 0;
+  $("handoff").hidden = true;
   $("hud-timer").hidden = true;
   $("loading-text").textContent = "Buscando un lugar…";
   $("loading").hidden = false;
-  resetGuessMap();
+  updateHud();
 
   let location;
   try {
-    location = await findLocation(game.map);
+    location = await findLocation();
   } catch {
     $("loading-text").textContent = "No se encontró un lugar con Street View. Vuelve a intentarlo.";
     setTimeout(() => { if (game === thisGame) goTo("menu"); }, 2500);
@@ -221,15 +208,57 @@ async function startRound() {
   if (game !== thisGame) return; // se salió de la partida mientras buscaba
 
   game.used.add(location.pano);
-  game.current = { location };
-  panorama.setPano(location.pano);
-  panorama.setPov({ heading: Math.random() * 360, pitch: 0 });
-  panorama.setZoom(0);
-  await waitForPanorama();
+  // Los dos jugadores empiezan en el mismo punto y mirando hacia el mismo lado.
+  game.current = { location, heading: Math.random() * 360, guesses: [] };
+  beginTurn();
+}
 
+// Prepara el turno del jugador actual: mismo lugar de partida, mapa limpio.
+async function beginTurn() {
+  const thisGame = game;
+  stopTimer();
+  game.roundActive = false;
+  $("hud-timer").hidden = true;
+  resetGuessMap();
+  updateHud();
+
+  const { location, heading } = game.current;
+  // El botón "Estoy listo" responde desde que aparece, aunque el lugar aún esté cargando.
+  const ready = isDuel() ? showHandoff() : null;
+  panorama.setPano(location.pano);
+  panorama.setPov({ heading, pitch: 0 });
+  panorama.setZoom(0);
+  if (game.turn === 0) await waitForPanorama();
+  if (game !== thisGame) return;
   $("loading").hidden = true;
+
+  if (ready) {
+    await ready;
+    if (game !== thisGame) return;
+  }
   game.roundActive = true;
   if (timeLimit) startTimer(timeLimit);
+}
+
+// Pantalla de "pasa el turno": tapa el panorama hasta que el jugador está listo.
+function showHandoff() {
+  const player = game.players[game.turn];
+  const other = game.players[1 - game.turn];
+  $("handoff-dot").className = `dot big${game.turn === 1 ? " p2" : ""}`;
+  $("handoff-title").textContent = `Turno de ${player.name}`;
+  $("handoff-text").textContent = `Ronda ${game.rounds.length + 1} de ${ROUNDS}. ${other.name}, no mires la pantalla.`;
+  $("handoff").hidden = false;
+  return waitForReady();
+}
+
+function waitForReady() {
+  return new Promise((resolve) => {
+    $("handoff-btn").addEventListener("click", () => {
+      $("handoff").hidden = true;
+      resolve();
+    }, { once: true });
+    $("handoff-btn").focus();
+  });
 }
 
 function waitForPanorama() {
@@ -244,12 +273,27 @@ function waitForPanorama() {
   });
 }
 
+function updateHud() {
+  const player = game.players[game.turn];
+  const hudPlayer = $("hud-player");
+  hudPlayer.replaceChildren();
+  if (isDuel()) {
+    const dot = document.createElement("span");
+    dot.className = `dot${game.turn === 1 ? " p2" : ""}`;
+    hudPlayer.append(dot, ` ${player.name}`);
+  } else {
+    hudPlayer.textContent = "🌍 Mundo";
+  }
+  $("hud-round").textContent = game.rounds.length + 1;
+  $("hud-score").textContent = fmt(player.score);
+}
+
 // Busca un panorama oficial de Google, de exterior y con calles para moverse.
-async function findLocation(map) {
+async function findLocation() {
   const { StreetViewSource, StreetViewPreference } = google.maps;
   const source = StreetViewSource.GOOGLE ?? StreetViewSource.OUTDOOR;
   for (let attempt = 0; attempt < 30; attempt++) {
-    const country = map.country ?? pick(MG_COUNTRIES);
+    const country = pick(MG_COUNTRIES);
     const spread = attempt < 15 ? country.spread : country.spread / 3; // si falla, se acerca a la ciudad
     const point = offsetPoint(pick(country.seeds), Math.sqrt(Math.random()) * spread);
     try {
@@ -275,19 +319,15 @@ function resetGuessMap() {
   const btn = $("guess-btn");
   btn.disabled = true;
   btn.textContent = "Marca un punto en el mapa";
-  if (game.map.country) {
-    const bounds = new google.maps.LatLngBounds();
-    game.map.country.seeds.forEach(([lat, lng]) => bounds.extend({ lat, lng }));
-    guessMap.fitBounds(bounds, 10);
-  } else {
-    guessMap.setCenter({ lat: 20, lng: 0 });
-    guessMap.setZoom(1);
-  }
+  guessMap.setCenter({ lat: 20, lng: 0 });
+  guessMap.setZoom(1);
 }
 
 function placeGuess(latLng) {
   if (!game?.roundActive) return;
-  if (!guessMarker) guessMarker = new google.maps.Marker({ map: guessMap, icon: pin("--guess"), clickable: false });
+  if (!guessMarker) {
+    guessMarker = new google.maps.Marker({ map: guessMap, icon: pin(PLAYER_COLORS[game.turn]), clickable: false });
+  }
   guessMarker.setPosition(latLng);
   const btn = $("guess-btn");
   btn.disabled = false;
@@ -295,11 +335,10 @@ function placeGuess(latLng) {
 }
 
 function pin(cssVar, scale = 8) {
-  const color = getComputedStyle(document.documentElement).getPropertyValue(cssVar).trim();
   return {
     path: google.maps.SymbolPath.CIRCLE,
     scale,
-    fillColor: color,
+    fillColor: cssColor(cssVar),
     fillOpacity: 1,
     strokeColor: "#ffffff",
     strokeWeight: 2,
@@ -312,17 +351,24 @@ function submitGuess(timedOut = false) {
   game.roundActive = false;
   stopTimer();
 
-  const location = game.current.location;
+  const { location } = game.current;
   const guess = guessMarker
     ? { lat: guessMarker.getPosition().lat(), lng: guessMarker.getPosition().lng() }
     : null;
   const km = guess ? distanceKm(guess, location) : null;
-  const points = guess ? scoreFor(km, game.map.sizeKm) : 0;
-  game.rounds.push({ location, guess, km, points });
+  const points = guess ? scoreFor(km) : 0;
+  game.current.guesses.push({ guess, km, points });
+  game.players[game.turn].score += points;
+
+  // En 2 jugadores, el segundo juega el mismo lugar sin ver la respuesta del primero.
+  if (game.turn < game.players.length - 1) {
+    game.turn++;
+    beginTurn();
+    return;
+  }
+  game.rounds.push(game.current);
   showRoundResult();
 }
-
-const totalScore = () => (game ? game.rounds.reduce((sum, r) => sum + r.points, 0) : 0);
 
 // ---------- Cronómetro ----------
 function startTimer(seconds) {
@@ -351,41 +397,46 @@ function clearResultOverlays() {
 }
 
 function drawRound(round, label) {
-  const answer = new google.maps.Marker({
+  resultOverlays.push(new google.maps.Marker({
     map: resultMap,
     position: round.location,
     icon: pin("--answer", label ? 11 : 9),
     label: label ? { text: label, color: "#ffffff", fontWeight: "700", fontSize: "12px" } : null,
     title: "Lugar real",
-  });
-  resultOverlays.push(answer);
-  if (!round.guess) return;
+    zIndex: 10,
+  }));
 
-  const guess = new google.maps.Marker({ map: resultMap, position: round.guess, icon: pin("--guess"), title: "Tu respuesta" });
-  const line = new google.maps.Polyline({
-    map: resultMap,
-    path: [round.guess, round.location],
-    geodesic: true,
-    strokeOpacity: 0,
-    icons: [{
-      icon: { path: "M 0,-1 0,1", strokeOpacity: 1, strokeColor: getComputedStyle(document.documentElement).getPropertyValue("--guess").trim(), scale: 3 },
-      offset: "0",
-      repeat: "12px",
-    }],
+  round.guesses.forEach(({ guess }, i) => {
+    if (!guess) return;
+    const color = PLAYER_COLORS[i];
+    resultOverlays.push(
+      new google.maps.Marker({ map: resultMap, position: guess, icon: pin(color), title: game.players[i].name }),
+      new google.maps.Polyline({
+        map: resultMap,
+        path: [guess, round.location],
+        geodesic: true,
+        strokeOpacity: 0,
+        icons: [{
+          icon: { path: "M 0,-1 0,1", strokeOpacity: 1, strokeColor: cssColor(color), scale: 3 },
+          offset: "0",
+          repeat: "12px",
+        }],
+      }),
+    );
   });
-  resultOverlays.push(guess, line);
 }
 
 function fitResult(rounds) {
   // Se espera un momento para que el mapa ya tenga tamaño al mostrarse la pantalla.
   setTimeout(() => {
     const bounds = new google.maps.LatLngBounds();
+    let points = 0;
     rounds.forEach((r) => {
       bounds.extend(r.location);
-      if (r.guess) bounds.extend(r.guess);
+      points++;
+      r.guesses.forEach(({ guess }) => { if (guess) { bounds.extend(guess); points++; } });
     });
-    const onlyOnePoint = rounds.length === 1 && !rounds[0].guess;
-    if (onlyOnePoint) {
+    if (points === 1) {
       resultMap.setCenter(rounds[0].location);
       resultMap.setZoom(5);
       return;
@@ -395,16 +446,65 @@ function fitResult(rounds) {
     const bottom = Math.min(panelHeight + 50, screens.result.clientHeight * 0.65);
     resultMap.fitBounds(bounds, { top: 60, right: 60, bottom, left: 60 });
     google.maps.event.addListenerOnce(resultMap, "idle", () => {
-      if (resultMap.getZoom() > 15) resultMap.setZoom(15);
+      // Si con ese margen no caben todos (lugares muy lejanos), se reencuadra con margen pequeño.
+      const view = resultMap.getBounds();
+      const allVisible = view && view.contains(bounds.getNorthEast()) && view.contains(bounds.getSouthWest());
+      if (!allVisible) resultMap.fitBounds(bounds, 30);
+      else if (resultMap.getZoom() > 15) resultMap.setZoom(15);
     });
   }, 50);
 }
 
 function setBar(fraction) {
+  const wrap = $("result-bar-wrap");
   const bar = $("result-bar");
+  wrap.hidden = fraction === null;
+  if (fraction === null) return;
   bar.style.width = "0";
   bar.getBoundingClientRect(); // fuerza el reinicio para que se vea la animación
   bar.style.width = `${Math.round(fraction * 100)}%`;
+}
+
+// Rellena la lista del panel. Cada fila es una lista de celdas (texto o nodos).
+function setList(rows, { two = false, head = null } = {}) {
+  const list = $("final-list");
+  list.classList.toggle("two", two);
+  const makeRow = (cells, className = "") => {
+    const li = document.createElement("li");
+    if (className) li.className = className;
+    cells.forEach((cell) => {
+      const span = document.createElement("span");
+      if (cell && typeof cell === "object" && !(cell instanceof Node)) {
+        span.className = cell.className || "";
+        span.append(...[].concat(cell.content));
+      } else {
+        span.append(cell);
+      }
+      li.append(span);
+    });
+    return li;
+  };
+  list.replaceChildren(...(head ? [makeRow(head, "head")] : []), ...rows.map((r) => makeRow(r)));
+  list.hidden = rows.length === 0;
+}
+
+function playerLabel(i, text) {
+  const dot = document.createElement("span");
+  dot.className = `dot${i === 1 ? " p2" : ""}`;
+  return { className: "who", content: [dot, text] };
+}
+
+function setDetail(...parts) {
+  const el = $("result-detail");
+  el.replaceChildren();
+  parts.forEach((part) => {
+    if (typeof part === "string") el.append(part);
+    else {
+      const strong = document.createElement("strong");
+      strong.textContent = part.strong;
+      el.append(strong);
+    }
+  });
 }
 
 function showRoundResult() {
@@ -413,16 +513,27 @@ function showRoundResult() {
   goTo("result");
   clearResultOverlays();
   drawRound(round, null);
+
+  if (!isDuel()) {
+    const { km, points } = round.guesses[0];
+    $("result-title").textContent = `${fmt(points)} puntos`;
+    if (km === null) setDetail("Se acabó el tiempo sin respuesta. Era en ", { strong: round.location.country }, ".");
+    else setDetail("Tu respuesta estaba a ", { strong: formatDistance(km) }, ". Era en ", { strong: round.location.country }, ".");
+    setBar(points / MAX_POINTS);
+    setList([]);
+  } else {
+    const [a, b] = round.guesses;
+    const winner = a.points === b.points ? null : a.points > b.points ? 0 : 1;
+    $("result-title").textContent = winner === null ? "Empate en esta ronda" : `Gana la ronda ${game.players[winner].name}`;
+    setDetail("Era en ", { strong: round.location.country }, ".");
+    setBar(null);
+    setList(round.guesses.map((g, i) => [
+      playerLabel(i, `${game.players[i].name} · ${g.guess ? formatDistance(g.km) : "sin respuesta"}`),
+      `+${fmt(g.points)} (total ${fmt(game.players[i].score)})`,
+    ]));
+  }
+
   fitResult([round]);
-
-  const where = game.map.country ? "" : ` Era en <strong>${round.location.country}</strong>.`;
-  $("result-title").textContent = `${fmt(round.points)} puntos`;
-  $("result-detail").innerHTML = round.guess
-    ? `Tu respuesta estaba a <strong>${formatDistance(round.km)}</strong>.${where}`
-    : `Se acabó el tiempo sin respuesta.${where}`;
-  setBar(round.points / MAX_POINTS);
-
-  $("final-list").hidden = true;
   $("result-link").hidden = false;
   $("result-link").href = `https://www.google.com/maps/@?api=1&map_action=pano&pano=${encodeURIComponent(round.location.pano)}`;
   $("next-btn").hidden = false;
@@ -439,26 +550,39 @@ function verdict(fraction) {
 }
 
 function showFinal() {
-  const total = totalScore();
   const max = ROUNDS * MAX_POINTS;
   clearResultOverlays();
   game.rounds.forEach((r, i) => drawRound(r, String(i + 1)));
+
+  if (!isDuel()) {
+    const total = game.players[0].score;
+    $("result-title").textContent = `${fmt(total)} / ${fmt(max)} puntos`;
+    setDetail(verdict(total / max));
+    setBar(total / max);
+    setList(game.rounds.map((r, i) => {
+      const g = r.guesses[0];
+      return [`Ronda ${i + 1} · ${g.guess ? formatDistance(g.km) : "sin respuesta"} · ${r.location.country}`, fmt(g.points)];
+    }));
+  } else {
+    const [p1, p2] = game.players;
+    const winner = p1.score === p2.score ? null : p1.score > p2.score ? p1 : p2;
+    $("result-title").textContent = winner ? `🏆 Gana ${winner.name}` : "¡Empate!";
+    setDetail(`${p1.name} ${fmt(p1.score)} · ${p2.name} ${fmt(p2.score)}`);
+    setBar(null);
+    setList(
+      game.rounds.map((r, i) => {
+        const [a, b] = r.guesses.map((g) => g.points);
+        return [
+          `Ronda ${i + 1} · ${r.location.country}`,
+          { className: a > b ? "win" : "", content: fmt(a) },
+          { className: b > a ? "win" : "", content: fmt(b) },
+        ];
+      }),
+      { two: true, head: ["", playerLabel(0, p1.name), playerLabel(1, p2.name)] },
+    );
+  }
+
   fitResult(game.rounds);
-
-  $("result-title").textContent = `${fmt(total)} / ${fmt(max)} puntos`;
-  $("result-detail").textContent = `${game.map.name} · ${verdict(total / max)}`;
-  setBar(total / max);
-
-  $("final-list").replaceChildren(...game.rounds.map((r, i) => {
-    const li = document.createElement("li");
-    const left = document.createElement("span");
-    const right = document.createElement("span");
-    left.textContent = `Ronda ${i + 1} · ${r.guess ? formatDistance(r.km) : "sin respuesta"}${game.map.country ? "" : ` · ${r.location.country}`}`;
-    right.textContent = fmt(r.points);
-    li.append(left, right);
-    return li;
-  }));
-  $("final-list").hidden = false;
   $("result-link").hidden = true;
   $("next-btn").hidden = true;
   $("again-btn").hidden = false;
