@@ -92,9 +92,14 @@
 .mini-ball.stripe { background: linear-gradient(#f8f6ee 0 26%, var(--ball) 26% 74%, #f8f6ee 74%); }
 .mini-ball.potted { opacity: .22; filter: grayscale(1); }
 
+.message-bar {
+  display: grid;
+  place-items: center;
+  min-height: 2.4rem;
+}
 .message {
-  justify-self: center;
   max-width: 100%;
+  animation: message-in .25s var(--ease);
   padding: .45rem 1rem;
   border-radius: 999px;
   background: var(--panel);
@@ -171,10 +176,46 @@
 }
 .power-track:has(input:focus-visible) { outline: 3px solid var(--accent-text); outline-offset: 3px; }
 
+/* Control de efecto: una bola blanca con un punto que marca dónde golpea el taco. */
+.spin { display: flex; align-items: center; gap: .6rem; }
+.spin-pad {
+  position: relative;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  background:
+    linear-gradient(var(--border), var(--border)) center / 1px 70% no-repeat,
+    linear-gradient(var(--border), var(--border)) center / 70% 1px no-repeat,
+    radial-gradient(circle at 35% 30%, #fff, #e9e6dc 70%, #cfcabb);
+  box-shadow: var(--card-shadow);
+  cursor: pointer;
+  flex: none;
+}
+.spin-pad:hover { border-color: var(--accent-text); }
+.spin-dot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--danger);
+  box-shadow: 0 0 0 2px #fff;
+  transform: translate(-50%, -50%);
+  transition: top .15s var(--ease);
+}
+.spin-label { display: flex; flex-direction: column; font-size: .78rem; font-weight: 700; color: var(--muted); line-height: 1.25; }
+.spin-label strong { color: var(--text); font-size: .85rem; white-space: nowrap; }
+
+@keyframes message-in { from { opacity: 0; transform: translateY(-4px); } }
+
 @media (max-width: 860px) {
   .menu-grid { grid-template-columns: 1fr; }
 }
 @media (max-width: 640px) {
+  .message-bar { min-height: 4.6rem; }  /* hasta 3 líneas en pantallas estrechas */
+  .message { font-size: .85rem; border-radius: 14px; }
   .scoreboard { grid-template-columns: 1fr 1fr; gap: .5rem; }
   .player-card { padding: .5rem .65rem; gap: .5rem; flex-wrap: wrap; }
   .tray { display: none; }

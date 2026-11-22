@@ -59,6 +59,7 @@
           <ul>
             <li><strong>Apuntar:</strong> mueve el ratón sobre la mesa.</li>
             <li><strong>Tirar:</strong> mantén pulsado y arrastra hacia atrás para cargar fuerza; suelta para tirar. También puedes usar la barra de fuerza y el botón <strong>Tirar</strong>.</li>
+            <li><strong>Efecto:</strong> pulsa la bola pequeña junto a la fuerza. Arriba, la blanca sigue a la bola golpeada; abajo, vuelve hacia atrás; en el centro, se frena.</li>
             <li><strong>Teclado:</strong> ← → afinan la puntería (con Mayús, más fino), ↑ ↓ cambian la fuerza y Espacio tira.</li>
             <li>La primera bola que metas tras la salida decide tu grupo: lisas (1–7) o rayadas (9–15).</li>
             <li>Sigues tirando mientras metas bolas de tu grupo. Si haces falta, tu rival coloca la blanca donde quiera.</li>
@@ -91,7 +92,10 @@
       </div>
     </div>
 
-    <p id="message" class="message" aria-live="polite" hidden></p>
+    <!-- Franja de altura fija: el mensaje aparece y desaparece sin mover la mesa. -->
+    <div class="message-bar">
+      <p id="message" class="message" aria-live="polite" hidden></p>
+    </div>
 
     <div class="table-wrap">
       <canvas id="table" class="table" aria-label="Mesa de billar"></canvas>
@@ -115,6 +119,12 @@
           <span id="power-fill" class="power-fill"></span>
           <input id="power" type="range" min="4" max="100" value="60" aria-label="Fuerza del tiro">
         </span>
+      </div>
+      <div class="spin">
+        <button id="spin-pad" class="spin-pad" type="button" title="Efecto: pulsa arriba para seguimiento, abajo para retroceso, en el centro para quitarlo" aria-label="Efecto de la bola blanca. Flechas arriba y abajo para cambiarlo.">
+          <span id="spin-dot" class="spin-dot"></span>
+        </button>
+        <span class="spin-label">Efecto <strong id="spin-value">Centro</strong></span>
       </div>
       <button id="shoot-btn" class="btn">Tirar</button>
       <span class="controls-spacer"></span>

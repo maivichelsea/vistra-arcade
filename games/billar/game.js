@@ -11,33 +11,46 @@ const CANVAS_H = H + RAIL * 2;
 const HEAD_X = W * 0.25;   // línea de salida (cocina)
 const FOOT = { x: W * 0.73, y: H / 2 };
 
-const CORNER_GAP = 30;     // hueco de la banda en troneras de esquina
-const MID_GAP = 24;        // hueco en troneras del centro
+// Troneras con medidas proporcionales a una mesa real de 9 pies:
+// boca de esquina ≈ 2 bolas de ancho y boca central ≈ 2,25 bolas.
+// Las mandíbulas cierran la boca hacia la garganta, así que una bola que llega
+// con mal ángulo o pegada a la banda rebota en ellas en lugar de colarse.
+const CORNER_GAP = 32;     // de la esquina del paño al final de la banda
+const MID_GAP = 25;        // media boca de la tronera central
+// Cada tronera: centro del agujero (x, y), radio en el que la bola cae (drop)
+// y radio dibujado del agujero (r).
 const POCKETS = [
-  { x: -6, y: -6, r: 26 }, { x: W / 2, y: -15, r: 23 }, { x: W + 6, y: -6, r: 26 },
-  { x: -6, y: H + 6, r: 26 }, { x: W / 2, y: H + 15, r: 23 }, { x: W + 6, y: H + 6, r: 26 },
+  { x: -8, y: -8, drop: 19, r: 27 }, { x: W / 2, y: -17, drop: 18, r: 25 }, { x: W + 8, y: -8, drop: 19, r: 27 },
+  { x: -8, y: H + 8, drop: 19, r: 27 }, { x: W / 2, y: H + 17, drop: 18, r: 25 }, { x: W + 8, y: H + 8, drop: 19, r: 27 },
 ];
-// Bandas (segmentos) con las bocas de las troneras.
+const CG = CORNER_GAP, MG = MID_GAP;
+// Bandas (segmentos). Las 6 primeras son las bandas largas; el resto, las mandíbulas.
 const CUSHIONS = [
-  [CORNER_GAP, 0, W / 2 - MID_GAP, 0], [W / 2 + MID_GAP, 0, W - CORNER_GAP, 0],
-  [CORNER_GAP, H, W / 2 - MID_GAP, H], [W / 2 + MID_GAP, H, W - CORNER_GAP, H],
-  [0, CORNER_GAP, 0, H - CORNER_GAP], [W, CORNER_GAP, W, H - CORNER_GAP],
-  // Mandíbulas inclinadas hacia cada tronera.
-  [CORNER_GAP, 0, CORNER_GAP - 16, -16], [0, CORNER_GAP, -16, CORNER_GAP - 16],
-  [W - CORNER_GAP, 0, W - CORNER_GAP + 16, -16], [W, CORNER_GAP, W + 16, CORNER_GAP - 16],
-  [CORNER_GAP, H, CORNER_GAP - 16, H + 16], [0, H - CORNER_GAP, -16, H - CORNER_GAP + 16],
-  [W - CORNER_GAP, H, W - CORNER_GAP + 16, H + 16], [W, H - CORNER_GAP, W + 16, H - CORNER_GAP + 16],
-  [W / 2 - MID_GAP, 0, W / 2 - MID_GAP + 5, -18], [W / 2 + MID_GAP, 0, W / 2 + MID_GAP - 5, -18],
-  [W / 2 - MID_GAP, H, W / 2 - MID_GAP + 5, H + 18], [W / 2 + MID_GAP, H, W / 2 + MID_GAP - 5, H + 18],
+  [CG, 0, W / 2 - MG, 0], [W / 2 + MG, 0, W - CG, 0],
+  [CG, H, W / 2 - MG, H], [W / 2 + MG, H, W - CG, H],
+  [0, CG, 0, H - CG], [W, CG, W, H - CG],
+  // Esquinas: la mandíbula entra en diagonal y estrecha la garganta.
+  [CG, 0, CG - 14, -11], [0, CG, -11, CG - 14],
+  [W - CG, 0, W - CG + 14, -11], [W, CG, W + 11, CG - 14],
+  [CG, H, CG - 14, H + 11], [0, H - CG, -11, H - CG + 14],
+  [W - CG, H, W - CG + 14, H + 11], [W, H - CG, W + 11, H - CG + 14],
+  // Centrales: mandíbulas casi rectas, algo cerradas.
+  [W / 2 - MG, 0, W / 2 - MG + 4, -18], [W / 2 + MG, 0, W / 2 + MG - 4, -18],
+  [W / 2 - MG, H, W / 2 - MG + 4, H + 18], [W / 2 + MG, H, W / 2 + MG - 4, H + 18],
 ];
 
 // ---------- Física ----------
-const MAX_SPEED = 2300;    // velocidad de la blanca a máxima potencia (px/s)
-const ROLL_DECEL = 170;    // frenado constante del paño (px/s²)
-const DRAG = 0.32;         // frenado proporcional a la velocidad
-const BALL_RESTITUTION = 0.96;
-const CUSHION_RESTITUTION = 0.76;
-const STEP = 1 / 480;      // paso fijo de simulación
+// Escala: 1000 px de paño ≈ 2,54 m (mesa de 9 pies), así que 1 m ≈ 394 px.
+const MAX_SPEED = 2300;      // velocidad de la blanca a máxima potencia (≈ 5,8 m/s)
+const SLIDE_DECEL = 700;     // fricción de deslizamiento bola-paño (μ ≈ 0,18)
+const ROLL_DECEL = 90;       // resistencia a la rodadura (px/s²): a 1 m/s rueda ~3 m
+const DRAG = 0.18;           // pérdida extra proporcional a la velocidad (paño y aire)
+const BALL_RESTITUTION = 0.96;   // bolas de resina reales: 0,93–0,98
+const CUSHION_RESTITUTION = 0.8;   // a poca velocidad; baja con golpes fuertes
+const CUSHION_LOSS = 0.00007;      // cuánto baja el rebote por cada px/s de impacto
+const BREAK_BOOST = 1.7;     // en la salida se golpea más fuerte (≈ 10 m/s a tope)
+const MAX_SPIN = 1.25;       // efecto máximo (taco a media bola del centro)
+const STEP = 1 / 480;        // paso fijo de simulación
 
 const BALL_COLORS = {
   1: "#f5c518", 2: "#1d4ed8", 3: "#dc2626", 4: "#7c3aed", 5: "#f97316", 6: "#15803d", 7: "#7f1d1d", 8: "#111111",
@@ -61,11 +74,15 @@ let isBreak = true;
 let shot = null;           // registro del tiro en curso
 let aim = 0;               // ángulo del taco (radianes)
 let power = 0.6;
+let spin = 0;              // efecto vertical: -1 retroceso, 0 centro, 1 seguimiento
 let dragging = null;       // { x, y } al arrastrar para dar potencia
 let pointer = { x: W / 2, y: H / 2, inside: false };
 let breaker = 0;
 let mode = 1;
 let lastTime = 0;
+// Bolas cayendo en una tronera (solo animación): { ball, x, y, vx, vy, pocket, t }
+let sinking = [];
+const SINK_TIME = 0.55;    // segundos que dura la caída
 let accumulator = 0;
 
 const cueBall = () => balls.find((b) => b.n === 0);
@@ -96,9 +113,10 @@ function rack() {
     [numbers[i], numbers[j]] = [numbers[j], numbers[i]];
   }
   const spots = [];
-  const dx = R * Math.sqrt(3) + 0.3;
+  // Triángulo apretado (bolas casi tocándose), como cuando se coloca bien: transmite mejor la energía.
+  const dx = R * Math.sqrt(3) + 0.05;
   for (let row = 0; row < 5; row++) {
-    for (let k = 0; k <= row; k++) spots.push({ row, k, x: FOOT.x + row * dx, y: FOOT.y + (k - row / 2) * (2 * R + 0.3) });
+    for (let k = 0; k <= row; k++) spots.push({ row, k, x: FOOT.x + row * dx, y: FOOT.y + (k - row / 2) * (2 * R + 0.05) });
   }
   const result = [];
   spots.forEach(({ row, k, x, y }) => {
@@ -107,17 +125,18 @@ function rack() {
     else if (row === 4 && k === 0) n = Math.random() < 0.5 ? solid : stripe;
     else if (row === 4 && k === 4) n = result.some((b) => b.n === solid) ? stripe : solid;
     else n = numbers.pop();
-    result.push({ n, x, y, vx: 0, vy: 0, out: false });
+    result.push({ n, x, y, vx: 0, vy: 0, wx: 0, wy: 0, out: false });
   });
   return result;
 }
 
 function newGame() {
-  balls = [{ n: 0, x: HEAD_X - 60, y: H / 2, vx: 0, vy: 0, out: false }, ...rack()];
+  balls = [{ n: 0, x: HEAD_X - 60, y: H / 2, vx: 0, vy: 0, wx: 0, wy: 0, out: false }, ...rack()];
   players.forEach((p) => { p.group = null; });
   turn = breaker;
   isBreak = true;
   shot = null;
+  sinking = [];
   aim = 0;
   power = 0.85;
   setBallInHand(true, true);
@@ -143,15 +162,32 @@ function startTurn() {
 }
 
 // ---------- Física ----------
+// Cada bola guarda su velocidad (vx, vy) y la velocidad de su superficie por el giro (wx, wy).
+// Si no coinciden, la bola desliza: el paño la frena y a la vez le da (o quita) rodadura.
+// Cuando coinciden, rueda y solo la frena la resistencia a la rodadura.
+// Así, tras un choque de frente la blanca sigue hacia delante (seguimiento natural)
+// y con efecto de retroceso vuelve hacia atrás.
 function simulate(dt) {
   const live = onTable();
   for (const b of live) {
-    const speed = Math.hypot(b.vx, b.vy);
-    if (speed === 0) continue;
-    const next = Math.max(0, speed - (ROLL_DECEL + DRAG * speed) * dt);
-    if (next < 3) { b.vx = 0; b.vy = 0; continue; }
-    b.vx *= next / speed;
-    b.vy *= next / speed;
+    const sx = b.vx - b.wx, sy = b.vy - b.wy;
+    const slip = Math.hypot(sx, sy);
+    if (slip > 1.5) {
+      // Deslizando: la fricción reduce el deslizamiento 3,5 veces más rápido que la velocidad
+      // (esfera maciza: la velocidad cambia a, la superficie 2,5·a en sentido contrario).
+      const a = Math.min(SLIDE_DECEL * dt, slip / 3.5);
+      const ux = sx / slip, uy = sy / slip;
+      b.vx -= ux * a; b.vy -= uy * a;
+      b.wx += ux * a * 2.5; b.wy += uy * a * 2.5;
+    } else {
+      b.wx = b.vx; b.wy = b.vy;
+      const speed = Math.hypot(b.vx, b.vy);
+      if (speed > 0) {
+        const next = Math.max(0, speed - (ROLL_DECEL + DRAG * speed) * dt);
+        const k = next < 2.5 ? 0 : next / speed;
+        b.vx *= k; b.vy *= k; b.wx = b.vx; b.wy = b.vy;
+      }
+    }
     b.x += b.vx * dt;
     b.y += b.vy * dt;
   }
@@ -160,18 +196,37 @@ function simulate(dt) {
   for (let i = 0; i < live.length; i++) {
     for (let j = i + 1; j < live.length; j++) {
       const a = live[i], b = live[j];
-      const dx = b.x - a.x, dy = b.y - a.y;
+      let dx = b.x - a.x, dy = b.y - a.y;
       const d = Math.hypot(dx, dy);
       if (d >= 2 * R || d === 0) continue;
-      const nx = dx / d, ny = dy / d;
-      const overlap = 2 * R - d;
-      a.x -= nx * overlap / 2; a.y -= ny * overlap / 2;
-      b.x += nx * overlap / 2; b.y += ny * overlap / 2;
+      const dvx = b.vx - a.vx, dvy = b.vy - a.vy;
+      const closing = dx * dvx + dy * dvy;
+      if (closing >= 0) {
+        // Se tocan pero ya se separan: solo deshacer el solapamiento.
+        const push = (2 * R - d) / 2;
+        a.x -= dx / d * push; a.y -= dy / d * push;
+        b.x += dx / d * push; b.y += dy / d * push;
+        continue;
+      }
+      // Choque exacto: retroceder ambas bolas hasta el instante en que se tocaron
+      // (|d - dv·s| = 2R), calcular el choque con esa geometría y volver a avanzar.
+      // Sin esto, a gran velocidad el ángulo de salida se desviaba varios grados.
+      const A = dvx * dvx + dvy * dvy;
+      const C = d * d - 4 * R * R;
+      const s = Math.min(STEP * 2, (closing + Math.sqrt(closing * closing - A * C)) / A);
+      a.x -= a.vx * s; a.y -= a.vy * s;
+      b.x -= b.vx * s; b.y -= b.vy * s;
+      dx = b.x - a.x; dy = b.y - a.y;
+      const dc = Math.hypot(dx, dy) || 2 * R;
+      const nx = dx / dc, ny = dy / dc;
       const rel = (a.vx - b.vx) * nx + (a.vy - b.vy) * ny;
-      if (rel <= 0) continue;
-      const impulse = rel * (1 + BALL_RESTITUTION) / 2;
-      a.vx -= impulse * nx; a.vy -= impulse * ny;
-      b.vx += impulse * nx; b.vy += impulse * ny;
+      if (rel > 0) {
+        const impulse = rel * (1 + BALL_RESTITUTION) / 2;
+        a.vx -= impulse * nx; a.vy -= impulse * ny;
+        b.vx += impulse * nx; b.vy += impulse * ny;
+      }
+      a.x += a.vx * s; a.y += a.vy * s;
+      b.x += b.vx * s; b.y += b.vy * s;
       if (shot) {
         if (a.n === 0 && shot.firstHit === null) shot.firstHit = b.n;
         else if (b.n === 0 && shot.firstHit === null) shot.firstHit = a.n;
@@ -190,32 +245,89 @@ function simulate(dt) {
       b.x += nx * (R - d); b.y += ny * (R - d);
       const vn = b.vx * nx + b.vy * ny;
       if (vn < 0) {
-        b.vx -= (1 + CUSHION_RESTITUTION) * vn * nx;
-        b.vy -= (1 + CUSHION_RESTITUTION) * vn * ny;
-        b.vx *= 0.97; b.vy *= 0.97;
+        // Rebote: los golpes fuertes pierden más energía en la goma.
+        const e = Math.max(0.55, CUSHION_RESTITUTION - CUSHION_LOSS * -vn);
+        b.vx -= (1 + e) * vn * nx;
+        b.vy -= (1 + e) * vn * ny;
+        // La goma frena un poco el movimiento a lo largo de la banda...
+        const vt = b.vx * -ny + b.vy * nx;
+        b.vx -= vt * 0.08 * -ny; b.vy -= vt * 0.08 * nx;
+        // ...y el impacto anula el giro contra la banda (la bola sale deslizando).
+        const wn = b.wx * nx + b.wy * ny;
+        b.wx -= wn * nx; b.wy -= wn * ny;
+        b.wx *= 0.85; b.wy *= 0.85;
       }
     }
-    const inPocket = POCKETS.some((p) => dist(b.x, b.y, p.x, p.y) < p.r - 2);
-    const escaped = b.x < -R * 2 || b.x > W + R * 2 || b.y < -R * 2 || b.y > H + R * 2;
+    // La bola cae solo cuando su centro está sobre el agujero (ya ha pasado la boca).
+    const inPocket = POCKETS.some((p) => dist(b.x, b.y, p.x, p.y) < p.drop);
+    // Red de seguridad: si por un error numérico atravesara la madera, cuenta como metida.
+    const escaped = b.x < -R * 3 || b.x > W + R * 3 || b.y < -R * 3 || b.y > H + R * 3;
     if (inPocket || escaped) pocket(b);
   }
 }
 
 function pocket(b) {
+  const p = POCKETS.reduce((best, q) => (dist(b.x, b.y, q.x, q.y) < dist(b.x, b.y, best.x, best.y) ? q : best));
+  sinking.push({ ball: { n: b.n }, x: b.x, y: b.y, vx: b.vx, vy: b.vy, pocket: p, t: 0 });
+  if (sinking.length > 16) sinking.shift();
   b.out = true;
-  b.vx = 0; b.vy = 0;
+  b.vx = 0; b.vy = 0; b.wx = 0; b.wy = 0;
   if (shot) shot.potted.push(b.n);
 }
 
-const moving = () => onTable().some((b) => b.vx !== 0 || b.vy !== 0);
+// Animación de caída: la bola sigue un poco su trayectoria, se va al fondo del agujero,
+// se encoge (se aleja de la cámara), se oscurece y el borde de la tronera la va tapando.
+function updateSinking(dt) {
+  for (const s of sinking) {
+    s.t += dt;
+    const k = Math.min(1, s.t / SINK_TIME);
+    // Mantiene algo de su velocidad y la atrae el centro del agujero (rebota en la pared del bolsillo).
+    s.vx = s.vx * Math.pow(0.02, dt) + (s.pocket.x - s.x) * 40 * dt;
+    s.vy = s.vy * Math.pow(0.02, dt) + (s.pocket.y - s.y) * 40 * dt;
+    s.x += s.vx * dt;
+    s.y += s.vy * dt;
+    // Nunca sale del agujero.
+    const dx = s.x - s.pocket.x, dy = s.y - s.pocket.y;
+    const d = Math.hypot(dx, dy), max = s.pocket.r - R * 0.6 * (1 - k);
+    if (d > max) { s.x = s.pocket.x + dx / d * max; s.y = s.pocket.y + dy / d * max; }
+  }
+  sinking = sinking.filter((s) => s.t < SINK_TIME);
+}
+
+function drawSinking() {
+  for (const s of sinking) {
+    const k = Math.min(1, s.t / SINK_TIME);
+    const ease = k * k * (3 - 2 * k);
+    const scale = 1 - 0.42 * ease;
+    ctx.save();
+    // Recorte al agujero: lo que sobresale queda tapado por el borde de la tronera.
+    ctx.beginPath();
+    ctx.arc(s.pocket.x, s.pocket.y, s.pocket.r, 0, Math.PI * 2);
+    ctx.clip();
+    ctx.translate(s.x, s.y);
+    ctx.scale(scale, scale);
+    drawBall(s.ball, 0, 0, 1);
+    // Oscurecer a medida que baja hacia el fondo de la tronera.
+    ctx.fillStyle = `rgba(0, 0, 0, ${0.15 + 0.8 * ease})`;
+    ctx.beginPath();
+    ctx.arc(0, 0, R + 0.5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.restore();
+  }
+}
+
+const moving = () => onTable().some((b) => b.vx !== 0 || b.vy !== 0 || b.wx !== 0 || b.wy !== 0);
 
 // ---------- Tiro ----------
-function shoot(angle, strength) {
+function shoot(angle, strength, english = spin) {
   const cue = cueBall();
   shot = { firstHit: null, potted: [], wasBreak: isBreak };
-  const speed = Math.max(0.04, strength) * MAX_SPEED;
+  const speed = Math.max(0.04, strength) * MAX_SPEED * (isBreak ? BREAK_BOOST : 1);
   cue.vx = Math.cos(angle) * speed;
   cue.vy = Math.sin(angle) * speed;
+  // Golpe al centro: la blanca sale deslizando sin giro. Arriba: seguimiento. Abajo: retroceso.
+  cue.wx = cue.vx * english * MAX_SPIN;
+  cue.wy = cue.vy * english * MAX_SPIN;
   setBallInHand(false);
   dragging = null;
   state = "moving";
@@ -259,7 +371,7 @@ function resolveShot() {
   if (cueIn) {
     const cue = cueBall();
     cue.out = false;
-    cue.x = HEAD_X - 60; cue.y = H / 2; cue.vx = 0; cue.vy = 0;
+    cue.x = HEAD_X - 60; cue.y = H / 2; cue.vx = 0; cue.vy = 0; cue.wx = 0; cue.wy = 0;
   }
 
   // Asignar grupos con la primera bola metida tras la salida.
@@ -294,7 +406,7 @@ function remaining(group, alsoPotted = []) {
 
 function respot(n) {
   const b = balls.find((x) => x.n === n);
-  b.out = false; b.vx = 0; b.vy = 0;
+  b.out = false; b.vx = 0; b.vy = 0; b.wx = 0; b.wy = 0;
   let x = FOOT.x;
   while (onTable().some((o) => o !== b && dist(o.x, o.y, x, FOOT.y) < 2 * R + 1)) x += 2 * R + 1;
   b.x = Math.min(x, W - R); b.y = FOOT.y;
@@ -336,6 +448,31 @@ function pathClear(ax, ay, bx, by, ignore) {
   return onTable().every((o) => ignore.includes(o) || pointSegmentDistance(o.x, o.y, ax, ay, bx, by) > 2 * R - 0.5);
 }
 
+// Distancia que recorre una bola rodando desde la velocidad v hasta pararse
+// (frenado c + k·v): d(v) = v/k − c/k²·ln(1 + k·v/c).
+function rollDistance(v) {
+  const k = DRAG, c = ROLL_DECEL;
+  return v / k - (c / (k * k)) * Math.log(1 + (k * v) / c);
+}
+// Velocidad necesaria para recorrer d (búsqueda binaria sobre rollDistance).
+function speedFor(d) {
+  let lo = 0, hi = MAX_SPEED * 2;
+  for (let i = 0; i < 40; i++) {
+    const mid = (lo + hi) / 2;
+    if (rollDistance(mid) < d) lo = mid; else hi = mid;
+  }
+  return hi;
+}
+// Fuerza para que la bola objetivo llegue a la tronera con algo de margen.
+// La bola golpeada sale deslizando y pierde ~2/7 de velocidad al empezar a rodar,
+// y solo recibe la componente de la velocidad de la blanca en la línea de choque (cos del corte).
+function shotPower(cueDist, objDist, cut) {
+  const objStart = speedFor(objDist + 120) * 7 / 5;
+  const atContact = objStart / Math.max(0.3, Math.cos(cut)) / 0.97;
+  const cueStart = speedFor(rollDistance(atContact * 5 / 7) + cueDist) * 7 / 5;
+  return Math.min(0.95, Math.max(0.12, cueStart / MAX_SPEED));
+}
+
 // Busca el mejor tiro directo: bola objetivo → tronera, con la blanca libre hasta la "bola fantasma".
 function planShot(cue, player) {
   let best = null;
@@ -356,7 +493,7 @@ function planShot(cue, player) {
       if (!pathClear(t.x, t.y, px, py, [t, cue])) continue;
       const score = Math.cos(cut) * 2 - cgLen / 1400 - tpLen / 1400;
       if (!best || score > best.score) {
-        best = { score, angle: Math.atan2(cgy, cgx), power: Math.min(0.95, Math.max(0.28, (cgLen + tpLen * 1.5) / 1500 / Math.max(0.35, Math.cos(cut)) + 0.12)), target: t, ghost: { x: gx, y: gy }, dir: { x: ux, y: uy } };
+        best = { score, angle: Math.atan2(cgy, cgx), power: shotPower(cgLen, tpLen, cut), target: t, ghost: { x: gx, y: gy }, dir: { x: ux, y: uy } };
       }
     }
   }
@@ -424,7 +561,7 @@ function cpuPlay() {
     aim = from + diff * (1 - (1 - t) ** 3);
     power = strength * Math.min(1, t * 1.3);
     if (t < 1) return requestAnimationFrame(animate);
-    setTimeout(() => { if (state === "cpu") shoot(angle, strength); }, 250);
+    setTimeout(() => { if (state === "cpu") shoot(angle, strength, 0); }, 250);
   };
   requestAnimationFrame(animate);
 }
@@ -491,6 +628,23 @@ addEventListener("keydown", (e) => {
   if (e.key === " ") { e.preventDefault(); shoot(aim, power); }
 });
 
+// Efecto: se pulsa en la "bola" del control; arriba seguimiento, abajo retroceso.
+function setSpin(value) {
+  spin = Math.max(-1, Math.min(1, Math.round(value * 10) / 10));
+  $("spin-dot").style.top = `${50 - spin * 32}%`;
+  $("spin-value").textContent = spin === 0 ? "Centro" : spin > 0 ? `Seguimiento ${Math.round(spin * 100)}%` : `Retroceso ${Math.round(-spin * 100)}%`;
+}
+$("spin-pad").addEventListener("pointerdown", (e) => {
+  const rect = e.currentTarget.getBoundingClientRect();
+  const y = (e.clientY - rect.top) / rect.height;        // 0 arriba, 1 abajo
+  setSpin((0.5 - y) / 0.32);
+});
+$("spin-pad").addEventListener("keydown", (e) => {
+  if (e.key === "ArrowUp" || e.key === "w") { setSpin(spin + 0.2); e.preventDefault(); e.stopPropagation(); }
+  if (e.key === "ArrowDown" || e.key === "s") { setSpin(spin - 0.2); e.preventDefault(); e.stopPropagation(); }
+  if (e.key === "0" || e.key === "Enter") { setSpin(0); e.preventDefault(); }
+});
+
 $("power").addEventListener("input", () => {
   power = Number($("power").value) / 100;
   updatePowerUi();
@@ -549,11 +703,7 @@ function drawTable() {
   ctx.strokeStyle = "#1a1478";
   ctx.lineWidth = 6;
   ctx.lineCap = "round";
-  for (const [x1, y1, x2, y2] of CUSHIONS.slice(0, 6)) {
-    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
-  }
-
-  // Troneras
+  // Troneras (debajo de las gomas para que las mandíbulas se vean encima)
   for (const p of POCKETS) {
     const g = ctx.createRadialGradient(p.x, p.y, 2, p.x, p.y, p.r);
     g.addColorStop(0, "#000");
@@ -561,6 +711,12 @@ function drawTable() {
     g.addColorStop(1, "#2b2160");
     ctx.fillStyle = g;
     ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.strokeStyle = "#1a1478";
+  ctx.lineWidth = 6;
+  ctx.lineCap = "round";
+  for (const [x1, y1, x2, y2] of CUSHIONS) {
+    ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); ctx.stroke();
   }
 
   // Diamantes de la banda (acento naranja del arcade)
@@ -716,6 +872,7 @@ function draw() {
     ctx.fillRect(0, 0, HEAD_X, H);
   }
 
+  drawSinking();
   for (const b of onTable()) {
     if (b.n === 0 && state === "placing") continue;
     drawBall(b);
@@ -743,6 +900,7 @@ function draw() {
 function loop(now) {
   const dt = Math.min(0.05, (now - (lastTime || now)) / 1000);
   lastTime = now;
+  if (sinking.length) updateSinking(dt);
   if (state === "moving") {
     accumulator += dt;
     while (accumulator >= STEP) {
@@ -850,4 +1008,5 @@ $("overlay-menu-btn").addEventListener("click", () => {
 
 addEventListener("resize", resizeCanvas);
 updatePowerUi();
+setSpin(0);
 requestAnimationFrame(loop);
