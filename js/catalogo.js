@@ -1,11 +1,21 @@
 // Catálogo de Vistra Arcade.
-// La portada se construye a partir de estas listas: para añadir un juego, una novedad
-// o un próximo lanzamiento, basta con añadir una entrada aquí (no hace falta tocar el HTML).
+// La portada se construye a partir de estas listas: para añadir un juego o una novedad,
+// basta con añadir una entrada aquí (no hace falta tocar el HTML).
 
 // Juegos disponibles.
 // estado: "nuevo" | "disponible" | "beta"
 // imagen: ilustración 16:9 (se recomienda SVG de 320×180 en img/juegos/).
 const VISTRA_JUEGOS = [
+  {
+    id: "sudoku",
+    nombre: "Sudoku",
+    url: "games/sudoku/index.html",
+    imagen: "img/juegos/sudoku.svg",
+    categoria: "Lógica",
+    estado: "nuevo",
+    descripcion: "Completa la cuadrícula de 9×9 sin repetir números en filas, columnas ni cajas. Cuatro niveles de dificultad.",
+    etiquetas: ["1 jugador", "Notas y pistas", "Funciona sin conexión"],
+  },
   {
     id: "billar",
     nombre: "Billar",
@@ -38,30 +48,14 @@ const VISTRA_JUEGOS = [
   },
 ];
 
-// Juegos en desarrollo. Son ideas de ejemplo: cámbialas por las tuyas.
-const VISTRA_PROXIMOS = [
-  {
-    nombre: "Memoria",
-    categoria: "Memoria",
-    imagen: "img/proximos/memoria.svg",
-    descripcion: "Encuentra todas las parejas de cartas en el menor número de intentos.",
-  },
-  {
-    nombre: "Serpiente Neón",
-    categoria: "Arcade",
-    imagen: "img/proximos/serpiente.svg",
-    descripcion: "Recorre la cuadrícula, come fruta y crece sin chocar contigo misma.",
-  },
-  {
-    nombre: "Palabra Oculta",
-    categoria: "Palabras",
-    imagen: "img/proximos/palabra.svg",
-    descripcion: "Adivina la palabra secreta letra a letra con pistas de colores.",
-  },
-];
-
 // Novedades, de la más reciente a la más antigua. fecha en formato AAAA-MM-DD.
 const VISTRA_NOVEDADES = [
+  {
+    fecha: "2026-11-24",
+    juego: "sudoku",
+    titulo: "Nuevo juego: Sudoku",
+    texto: "Tableros generados al azar con solución única, cuatro niveles, modo notas, pistas y deshacer.",
+  },
   {
     fecha: "2026-11-22",
     juego: "billar",

@@ -5,6 +5,7 @@ Minijuegos originales para el navegador, hechos con HTML, CSS y JavaScript sin d
 ## Juegos
 
 - **Buscaminas:** niveles Principiante (8×8, 10 minas), Intermedio (16×16, 40), Experto (16×30, 99) y Personalizado. Primer clic seguro y apertura de vecinas.
+- **Sudoku:** tableros de 9×9 generados al azar con solución única. Niveles Fácil, Medio, Difícil y Experto, modo notas, pistas, deshacer y resaltado de errores.
 - **Billar:** bola 8 con física propia en canvas. 1 jugador contra la CPU o 2 jugadores en el mismo PC. Lisas y rayadas, faltas con bola en mano y victoria al meter la 8.
 - **MundoGuessr:** apareces en un lugar al azar con Google Street View y marcas en el mapa dónde crees que estás. Mapa del mundo, 5 rondas de hasta 5000 puntos y tiempo opcional. Modo de 1 jugador o de 2 jugadores por turnos en el mismo PC.
 
@@ -35,12 +36,12 @@ La portada se construye a partir de `js/catalogo.js`, así que no hace falta toc
 2. Añade una ilustración 16:9 en `img/juegos/` (por ejemplo un SVG de 320×180).
 3. Añade una entrada en `VISTRA_JUEGOS` dentro de `js/catalogo.js` (nombre, enlace, imagen, categoría, estado, descripción y etiquetas).
 
-En el mismo archivo están `VISTRA_PROXIMOS` (próximos lanzamientos) y `VISTRA_NOVEDADES` (novedades).
+En el mismo archivo está `VISTRA_NOVEDADES` (novedades).
 
 ## Estructura
 
 - `index.html`, `css/home.css`, `js/home.js`: portada del arcade.
-- `js/catalogo.js`: juegos, próximos lanzamientos y novedades.
+- `js/catalogo.js`: juegos y novedades.
 - `css/style.css`: colores (modo claro y oscuro) y estilos compartidos con los juegos.
 - `img/`: logotipo e ilustraciones (SVG locales, sin depender de internet).
 - `games/`: cada juego en su carpeta.

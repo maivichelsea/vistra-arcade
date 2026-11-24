@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <title>Sudoku · Vistra Arcade</title>
+  <link rel="icon" href="../../img/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="sudoku.css">
+</head>
+<body class="arcade-bg">
+  <header class="site-nav game-nav">
+    <div class="container nav-inner">
+      <a class="brand" href="../../index.html" aria-label="Volver a Vistra Arcade">
+        <img class="brand-logo" src="../../img/logo.svg" alt="" width="36" height="36">
+        <span class="brand-text"><strong>VISTRA</strong><span>ARCADE</span></span>
+      </a>
+      <span class="nav-sep" aria-hidden="true"></span>
+      <div class="game-title">
+        <span class="eyebrow">Lógica</span>
+        <h1>Sudoku</h1>
+      </div>
+      <div class="nav-actions">
+        <span class="kbd-hint"><kbd>N</kbd> notas · <kbd>Ctrl</kbd>+<kbd>Z</kbd> deshacer</span>
+        <a class="btn btn-ghost btn-sm" href="../../index.html#juegos">← Juegos</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container game-main">
+    <section class="panel game-panel">
+      <div class="levels" role="group" aria-label="Dificultad">
+        <button class="chip level" data-level="facil">Fácil</button>
+        <button class="chip level" data-level="medio">Medio</button>
+        <button class="chip level" data-level="dificil">Difícil</button>
+        <button class="chip level" data-level="experto">Experto</button>
+      </div>
+
+      <div class="status">
+        <div class="counter" title="Errores">
+          <span class="counter-label">✖ Errores</span>
+          <span id="mistakes" class="counter-value">0</span>
+        </div>
+        <button id="new-game" class="face" title="Nuevo sudoku" aria-label="Nuevo sudoku">🔄</button>
+        <div class="counter" title="Tiempo">
+          <span class="counter-label">⏱ Tiempo</span>
+          <span id="timer" class="counter-value">0:00</span>
+        </div>
+      </div>
+
+      <div id="board" class="board" role="grid" aria-label="Tablero de Sudoku"></div>
+
+      <div class="tools">
+        <button id="undo" class="btn ghost btn-sm" type="button">↶ Deshacer</button>
+        <button id="erase" class="btn ghost btn-sm" type="button">⌫ Borrar</button>
+        <button id="notes" class="btn ghost btn-sm" type="button" aria-pressed="false">✎ Notas: no</button>
+        <button id="hint" class="btn ghost btn-sm" type="button"><span id="hint-label">💡 Pista (3)</span></button>
+      </div>
+
+      <div id="pad" class="pad" role="group" aria-label="Números"></div>
+
+      <p id="message" class="message" aria-live="polite"></p>
+
+      <details class="help">
+        <summary>Cómo jugar</summary>
+        <ul>
+          <li>Rellena cada casilla vacía con un número del 1 al 9.</li>
+          <li>Ningún número puede repetirse en la misma <strong>fila</strong>, <strong>columna</strong> ni <strong>caja de 3×3</strong>.</li>
+          <li><strong>Selecciona</strong> una casilla con clic o con las flechas y escribe el número con el teclado o con los botones.</li>
+          <li><strong>Notas:</strong> actívalas (tecla <kbd>N</kbd>) para apuntar candidatos pequeños en una casilla.</li>
+          <li>Los números equivocados se marcan en rojo y suman un error. Tienes 3 pistas por partida.</li>
+        </ul>
+      </details>
+    </section>
+  </main>
+
+  <script src="game.js"></script>
+</body>
+</html>
