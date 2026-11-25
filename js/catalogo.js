@@ -51,6 +51,12 @@ const VISTRA_JUEGOS = [
 // Novedades, de la más reciente a la más antigua. fecha en formato AAAA-MM-DD.
 const VISTRA_NOVEDADES = [
   {
+    fecha: "2026-11-25",
+    juego: "mundoguessr",
+    titulo: "MundoGuessr: 14 países nuevos",
+    texto: "Llegan Bolivia, Guatemala, Costa Rica, Panamá, República Dominicana, Puerto Rico, Países Bajos, Bélgica, Suiza, Austria, Irlanda, Polonia, Croacia y Grecia.",
+  },
+  {
     fecha: "2026-11-24",
     juego: "sudoku",
     titulo: "Nuevo juego: Sudoku",
