@@ -5,6 +5,7 @@ Minijuegos originales para el navegador, hechos con HTML, CSS y JavaScript sin d
 ## Juegos
 
 - **Buscaminas:** niveles Principiante (8×8, 10 minas), Intermedio (16×16, 40), Experto (16×30, 99) y Personalizado. Primer clic seguro y apertura de vecinas.
+- **Banderas y Capitales:** quiz de 10 preguntas contra el reloj. Banderas, capitales o mezcla; todo el mundo o un continente; 20, 12 o 6 segundos por pregunta. Las banderas usan la fuente Twemoji Country Flags (gráficos de Twemoji, CC BY 4.0) incluida en `games/banderas/fuentes/`, así se ven también en Windows.
 - **Serpiente Neón:** come fruta y crece sin chocar. Velocidades Lenta, Normal y Rápida que aceleran con cada fruta, estrellas doradas con puntos extra y récord por velocidad. Teclado, deslizar el dedo o cruceta en el móvil.
 - **Sudoku:** tableros de 9×9 generados al azar con solución única. Niveles Fácil, Medio, Difícil y Experto, modo notas, pistas, deshacer y resaltado de errores.
 - **Billar:** bola 8 con física propia en canvas. 1 jugador contra la CPU o 2 jugadores en el mismo PC. Lisas y rayadas, faltas con bola en mano y victoria al meter la 8.
