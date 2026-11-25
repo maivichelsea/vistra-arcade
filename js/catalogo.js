@@ -62,6 +62,12 @@ const VISTRA_JUEGOS = [
 const VISTRA_NOVEDADES = [
   {
     fecha: "2026-11-25",
+    juego: "mundoguessr",
+    titulo: "MundoGuessr: tabla de récords",
+    texto: "Escribe tu nombre antes de jugar y tu mejor resultado entra al ranking. Javier lidera con 24.966 puntos.",
+  },
+  {
+    fecha: "2026-11-25",
     juego: "serpiente",
     titulo: "Nuevo juego: Serpiente Neón",
     texto: "Tres velocidades, estrellas doradas que dan puntos extra y récord para cada velocidad. En el móvil se juega deslizando el dedo.",

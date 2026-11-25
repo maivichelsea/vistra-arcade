@@ -8,7 +8,7 @@ Minijuegos originales para el navegador, hechos con HTML, CSS y JavaScript sin d
 - **Serpiente Neón:** come fruta y crece sin chocar. Velocidades Lenta, Normal y Rápida que aceleran con cada fruta, estrellas doradas con puntos extra y récord por velocidad. Teclado, deslizar el dedo o cruceta en el móvil.
 - **Sudoku:** tableros de 9×9 generados al azar con solución única. Niveles Fácil, Medio, Difícil y Experto, modo notas, pistas, deshacer y resaltado de errores.
 - **Billar:** bola 8 con física propia en canvas. 1 jugador contra la CPU o 2 jugadores en el mismo PC. Lisas y rayadas, faltas con bola en mano y victoria al meter la 8.
-- **MundoGuessr:** apareces en un lugar al azar con Google Street View y marcas en el mapa dónde crees que estás. Mapa del mundo, 5 rondas de hasta 5000 puntos y tiempo opcional. Modo de 1 jugador o de 2 jugadores por turnos en el mismo PC.
+- **MundoGuessr:** apareces en un lugar al azar con Google Street View y marcas en el mapa dónde crees que estás. Mapa del mundo, 5 rondas de hasta 5000 puntos y tiempo opcional. Modo de 1 jugador o de 2 jugadores por turnos en el mismo PC, y tabla de récords con el mejor resultado de cada persona (se guarda en el navegador).
 
 ### Clave de Google Maps (MundoGuessr)
 
