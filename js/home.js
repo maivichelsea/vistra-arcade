@@ -1,7 +1,7 @@
 // Portada de Vistra Arcade: construye las secciones a partir de js/catalogo.js.
 (() => {
   const $ = (id) => document.getElementById(id);
-  const STATUS_LABELS = { nuevo: "Nuevo", disponible: "Disponible", beta: "Beta", escondido: "Escondido" };
+  const STATUS_LABELS = { nuevo: "Nuevo", disponible: "Disponible", beta: "Beta" };
   const dateFormat = new Intl.DateTimeFormat("es-ES", { day: "numeric", month: "short", year: "numeric" });
 
   // Crea un elemento con clase y texto (el texto nunca se interpreta como HTML).
@@ -79,71 +79,32 @@
   }
 
   // ---------- Modo escondido ----------
-  // Se activa escribiendo "escondido" en la portada o tocando 5 veces el © del pie.
-  // Queda guardado en este navegador hasta pulsar "Salir del modo escondido".
-  const HIDDEN_KEY = "vistra_modo_escondido";
-  const SECRET = "escondido";
-
-  function toast(text) {
-    const node = $("toast");
-    node.textContent = text;
-    node.classList.add("on");
-    clearTimeout(toast.timer);
-    toast.timer = setTimeout(() => node.classList.remove("on"), 2200);
-  }
-
-  function hiddenModeOn() {
-    try { return localStorage.getItem(HIDDEN_KEY) === "1"; } catch { return false; }
-  }
-
-  function showHiddenMode(on) {
-    $("escondido").hidden = !on;
-    document.querySelector(".escondido-link").hidden = !on;
-  }
-
-  function setHiddenMode(on) {
-    try {
-      if (on) localStorage.setItem(HIDDEN_KEY, "1");
-      else localStorage.removeItem(HIDDEN_KEY);
-    } catch { /* sin almacenamiento: dura hasta recargar */ }
-    showHiddenMode(on);
-    if (on) {
-      toast("🔓 Modo escondido activado");
-      $("escondido").scrollIntoView({ behavior: "smooth", block: "start" });
-    } else {
-      toast("🔒 Modo escondido desactivado");
-    }
-  }
+  // Lleva a una página aparte con herramientas. Se abre con la tecla Escape
+  // o, en el móvil, manteniendo pulsado el logo de la barra unos 2 segundos.
+  const HIDDEN_URL = "escondido/index.html";
 
   function setupHiddenMode() {
-    $("escondido-grid").replaceChildren(...VISTRA_ESCONDIDOS.map(gameCard));
-    showHiddenMode(hiddenModeOn());
-    $("escondido-salir").addEventListener("click", () => setHiddenMode(false));
-
-    // Escribir la palabra secreta en cualquier parte de la portada.
-    let typed = "";
     document.addEventListener("keydown", (e) => {
-      if (e.ctrlKey || e.metaKey || e.altKey || e.key.length !== 1) return;
-      if (e.target.closest("input, textarea, select")) return;
-      typed = (typed + e.key.toLowerCase()).slice(-SECRET.length);
-      if (typed === SECRET) {
-        typed = "";
-        setHiddenMode(!hiddenModeOn());
-      }
+      if (e.key === "Escape" && !e.repeat) window.location.href = HIDDEN_URL;
     });
 
-    // En el móvil: 5 toques seguidos sobre el © del pie de página.
-    let taps = 0;
-    let tapTimer = null;
-    $("copyright").addEventListener("click", () => {
-      taps++;
-      clearTimeout(tapTimer);
-      tapTimer = setTimeout(() => { taps = 0; }, 1500);
-      if (taps >= 5) {
-        taps = 0;
-        setHiddenMode(!hiddenModeOn());
-      }
+    const logo = $("nav-brand");
+    let timer = null;
+    let opened = false;
+    const cancel = () => clearTimeout(timer);
+    logo.addEventListener("pointerdown", (e) => {
+      if (e.pointerType === "mouse") return;
+      opened = false;
+      timer = setTimeout(() => {
+        opened = true;
+        if (navigator.vibrate) navigator.vibrate(30);
+        window.location.href = HIDDEN_URL;
+      }, 2000);
     });
+    ["pointerup", "pointerleave", "pointercancel"].forEach((type) => logo.addEventListener(type, cancel));
+    // Evita que el toque largo abra el menú del enlace o recargue la portada.
+    logo.addEventListener("contextmenu", (e) => { if (timer) e.preventDefault(); });
+    logo.addEventListener("click", (e) => { if (opened) e.preventDefault(); });
   }
 
   // ---------- Novedades ----------

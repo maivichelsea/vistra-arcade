@@ -7,6 +7,16 @@
 // imagen: ilustración 16:9 (se recomienda SVG de 320×180 en img/juegos/).
 const VISTRA_JUEGOS = [
   {
+    id: "serpiente",
+    nombre: "Serpiente Neón",
+    url: "games/serpiente/index.html",
+    imagen: "img/juegos/serpiente.svg",
+    categoria: "Arcade",
+    estado: "nuevo",
+    descripcion: "Recorre la cuadrícula, come fruta y crece sin chocar. Cada fruta te hace más rápida.",
+    etiquetas: ["1 jugador", "3 velocidades", "Funciona sin conexión"],
+  },
+  {
     id: "sudoku",
     nombre: "Sudoku",
     url: "games/sudoku/index.html",
@@ -48,35 +58,14 @@ const VISTRA_JUEGOS = [
   },
 ];
 
-// Modo escondido: herramientas que solo aparecen en la portada después de activarlo
-// (escribiendo "escondido" en la portada o tocando 5 veces el © del pie de página).
-const VISTRA_ESCONDIDOS = [
-  {
-    id: "nomina",
-    nombre: "Calculadora de nómina",
-    url: "escondido/nomina/index.html",
-    imagen: "img/escondido/nomina.svg",
-    categoria: "Herramienta",
-    estado: "escondido",
-    accion: "Abrir",
-    descripcion: "Calcula el neto de la quincena: horas ordinarias y festivas, auxilios, salud y pensión.",
-    etiquetas: ["Pega el formato de novedades", "Funciona sin conexión"],
-  },
-  {
-    id: "note-fixer",
-    nombre: "MWNE Note Fixer",
-    url: "escondido/note-fixer/index.html",
-    imagen: "img/escondido/note-fixer.svg",
-    categoria: "Herramienta",
-    estado: "escondido",
-    accion: "Abrir",
-    descripcion: "Corrige la nota de la IA y registra cada llamada en el Interaction Tracker con su puntaje QA.",
-    etiquetas: ["Note Fixer", "Interaction Tracker", "Exporta CSV"],
-  },
-];
-
 // Novedades, de la más reciente a la más antigua. fecha en formato AAAA-MM-DD.
 const VISTRA_NOVEDADES = [
+  {
+    fecha: "2026-11-25",
+    juego: "serpiente",
+    titulo: "Nuevo juego: Serpiente Neón",
+    texto: "Tres velocidades, estrellas doradas que dan puntos extra y récord para cada velocidad. En el móvil se juega deslizando el dedo.",
+  },
   {
     fecha: "2026-11-25",
     juego: "mundoguessr",

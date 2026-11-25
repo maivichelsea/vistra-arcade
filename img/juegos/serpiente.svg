@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" role="img" aria-label="Serpiente de neón avanzando hacia una fruta">
+  <defs>
+    <radialGradient id="glow" cx=".5" cy=".55" r=".7">
+      <stop offset="0" stop-color="#2f27ce" stop-opacity=".55"/>
+      <stop offset="1" stop-color="#2f27ce" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="neon" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="b"/>
+      <feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="320" height="180" fill="#07051a"/>
+  <rect width="320" height="180" fill="url(#glow)"/>
+  <g stroke="#7b74ff" stroke-opacity=".12" stroke-width="1"><path d="M0 0V180" /><path d="M10 0V180" /><path d="M20 0V180" /><path d="M30 0V180" /><path d="M40 0V180" /><path d="M50 0V180" /><path d="M60 0V180" /><path d="M70 0V180" /><path d="M80 0V180" /><path d="M90 0V180" /><path d="M100 0V180" /><path d="M110 0V180" /><path d="M120 0V180" /><path d="M130 0V180" /><path d="M140 0V180" /><path d="M150 0V180" /><path d="M160 0V180" /><path d="M170 0V180" /><path d="M180 0V180" /><path d="M190 0V180" /><path d="M200 0V180" /><path d="M210 0V180" /><path d="M220 0V180" /><path d="M230 0V180" /><path d="M240 0V180" /><path d="M250 0V180" /><path d="M260 0V180" /><path d="M270 0V180" /><path d="M280 0V180" /><path d="M0 0H320" /><path d="M0 10H320" /><path d="M0 20H320" /><path d="M0 30H320" /><path d="M0 40H320" /><path d="M0 50H320" /><path d="M0 60H320" /><path d="M0 70H320" /><path d="M0 80H320" /><path d="M0 90H320" /><path d="M0 100H320" /><path d="M0 110H320" /><path d="M0 120H320" /><path d="M0 130H320" /><path d="M0 140H320" /><path d="M0 150H320" /><path d="M0 160H320" /><path d="M0 170H320" /><path d="M0 180H320" /></g>
+  <g filter="url(#neon)"><rect x="201.8" y="101.8" width="6.4" height="6.4" rx="3" fill="#00cbf4"/><rect x="191.8" y="101.8" width="6.4" height="6.4" rx="3" fill="#00daf9"/><rect x="181.8" y="101.8" width="6.4" height="6.4" rx="3" fill="#00e8fd"/><rect x="171.8" y="101.8" width="6.4" height="6.4" rx="3" fill="#03f4ff"/><rect x="171.8" y="91.8" width="6.4" height="6.4" rx="3" fill="#07feff"/><rect x="171.8" y="81.8" width="6.4" height="6.4" rx="3" fill="#0cfff4"/><rect x="161.8" y="81.8" width="6.4" height="6.4" rx="3" fill="#10ffeb"/><rect x="151.8" y="81.8" width="6.4" height="6.4" rx="3" fill="#15ffe1"/><rect x="141.8" y="81.8" width="6.4" height="6.4" rx="3" fill="#19ffd8"/><rect x="131.8" y="81.8" width="6.4" height="6.4" rx="3" fill="#1dfed0"/><rect x="131.8" y="91.8" width="6.4" height="6.4" rx="3" fill="#22fec7"/><rect x="131.8" y="101.8" width="6.4" height="6.4" rx="3" fill="#26febf"/><rect x="121.8" y="101.8" width="6.4" height="6.4" rx="3" fill="#2bffb8"/><rect x="111.8" y="101.8" width="6.4" height="6.4" rx="3" fill="#2fffb1"/><rect x="101.8" y="101.8" width="6.4" height="6.4" rx="3" fill="#34ffaa"/><rect x="91.8" y="101.8" width="6.4" height="6.4" rx="3" fill="#38ffa4"/><rect x="81.2" y="101.2" width="7.6" height="7.6" rx="3" fill="#3dff9e"/></g>
+  <circle cx="207" cy="103.2" r="1.2" fill="#07051a"/><circle cx="207" cy="106.8" r="1.2" fill="#07051a"/>
+  <g filter="url(#neon)"><circle cx="255" cy="105" r="4.5" fill="#ff4fd8"/></g>
+  <circle cx="253.5" cy="103.5" r="1.2" fill="#fff" opacity=".8"/>
+  <g filter="url(#neon)"><path d="M225 40l2.4 4.9 5.4.8-3.9 3.8.9 5.4-4.8-2.6-4.8 2.6.9-5.4-3.9-3.8 5.4-.8z" fill="#ffd54a"/></g>
+</svg>

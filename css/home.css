@@ -360,26 +360,5 @@
 html:has(.home) { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) { html:has(.home) { scroll-behavior: auto; } }
 
-/* ---------- Modo escondido ---------- */
-.escondido[hidden], .escondido-link[hidden] { display: none; }
-.escondido .section-head { align-items: flex-end; }
-.escondido .game-card { border-style: dashed; }
-#copyright { cursor: default; user-select: none; -webkit-tap-highlight-color: transparent; }
-
-.toast {
-  position: fixed;
-  left: 50%;
-  bottom: 1.5rem;
-  z-index: 60;
-  transform: translate(-50%, 1rem);
-  padding: .7rem 1.1rem;
-  border-radius: 999px;
-  background: #14113d;
-  color: #ffb347;
-  font-weight: 800;
-  box-shadow: 0 10px 30px rgba(5, 3, 21, .3);
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity .25s, transform .25s var(--ease);
-}
-.toast.on { opacity: 1; transform: translate(-50%, 0); }
+/* Toque largo en el logo (modo escondido): sin menú del enlace ni selección */
+#nav-brand { -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; }

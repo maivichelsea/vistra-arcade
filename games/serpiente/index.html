@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <title>Serpiente Neón · Vistra Arcade</title>
+  <link rel="icon" href="../../img/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="serpiente.css">
+</head>
+<body class="arcade-bg">
+  <header class="site-nav game-nav">
+    <div class="container nav-inner">
+      <a class="brand" href="../../index.html" aria-label="Volver a Vistra Arcade">
+        <img class="brand-logo" src="../../img/logo.svg" alt="" width="36" height="36">
+        <span class="brand-text"><strong>VISTRA</strong><span>ARCADE</span></span>
+      </a>
+      <span class="nav-sep" aria-hidden="true"></span>
+      <div class="game-title">
+        <span class="eyebrow">Arcade</span>
+        <h1>Serpiente Neón</h1>
+      </div>
+      <div class="nav-actions">
+        <span class="kbd-hint"><kbd>Espacio</kbd> pausa · <kbd>Enter</kbd> reiniciar</span>
+        <a class="btn btn-ghost btn-sm" href="../../index.html#juegos">← Juegos</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container game-main">
+    <section class="panel game-panel">
+      <div class="levels" role="group" aria-label="Velocidad">
+        <button class="chip level" data-speed="lenta">🐢 Lenta</button>
+        <button class="chip level" data-speed="normal">🐍 Normal</button>
+        <button class="chip level" data-speed="rapida">⚡ Rápida</button>
+      </div>
+
+      <div class="status">
+        <div class="counter" title="Puntos">
+          <span class="counter-label">★ Puntos</span>
+          <span id="score" class="counter-value">0</span>
+        </div>
+        <button id="pause" class="face" title="Pausa (Espacio)" aria-label="Pausar">⏸</button>
+        <div class="counter" title="Récord en esta velocidad">
+          <span class="counter-label">🏆 Récord</span>
+          <span id="best" class="counter-value">0</span>
+        </div>
+      </div>
+
+      <div class="board-wrap">
+        <canvas id="board" class="board" width="480" height="480" aria-label="Tablero de Serpiente Neón"></canvas>
+        <div id="overlay" class="overlay">
+          <p id="overlay-title" class="overlay-title">Serpiente Neón</p>
+          <p id="overlay-text" class="overlay-text">Pulsa una flecha o desliza el dedo para empezar.</p>
+          <button id="overlay-btn" class="btn" type="button">Jugar</button>
+        </div>
+      </div>
+
+      <div class="below-board">
+        <span class="meter"><span class="meter-label">Largo</span> <strong id="length">3</strong></span>
+        <span class="meter"><span class="meter-label">Velocidad</span> <strong id="speed-now">1×</strong></span>
+      </div>
+
+      <div class="dpad" role="group" aria-label="Controles de dirección">
+        <button type="button" class="dpad-btn up" data-dir="up" aria-label="Arriba">▲</button>
+        <button type="button" class="dpad-btn left" data-dir="left" aria-label="Izquierda">◀</button>
+        <button type="button" class="dpad-btn right" data-dir="right" aria-label="Derecha">▶</button>
+        <button type="button" class="dpad-btn down" data-dir="down" aria-label="Abajo">▼</button>
+      </div>
+
+      <details class="help">
+        <summary>Cómo jugar</summary>
+        <ul>
+          <li><strong>Muévete</strong> con las flechas o con <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd>. En el móvil, desliza el dedo sobre el tablero o usa la cruceta.</li>
+          <li><strong>Come fruta</strong> para crecer y sumar puntos. Cada fruta te hace un poco más rápida.</li>
+          <li>A veces aparece una <strong>estrella dorada</strong>: vale mucho más, pero desaparece en unos segundos.</li>
+          <li>Pierdes si chocas con el borde o contigo misma.</li>
+          <li>Las velocidades más altas dan más puntos por fruta. Cada velocidad guarda su propio récord.</li>
+        </ul>
+      </details>
+    </section>
+  </main>
+
+  <script src="game.js"></script>
+</body>
+</html>

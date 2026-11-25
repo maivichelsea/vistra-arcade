@@ -16,7 +16,7 @@
   <!-- 1. Navegación principal -->
   <header class="site-nav">
     <div class="container nav-inner">
-      <a class="brand" href="index.html" aria-label="Vistra Arcade, inicio">
+      <a class="brand" id="nav-brand" href="index.html" aria-label="Vistra Arcade, inicio">
         <img class="brand-logo" src="img/logo.svg" alt="" width="36" height="36">
         <span class="brand-text"><strong>VISTRA</strong><span>ARCADE</span></span>
       </a>
@@ -24,7 +24,6 @@
         <ul class="nav-links">
           <li><a href="#juegos">Juegos</a></li>
           <li><a href="#novedades">Novedades</a></li>
-          <li class="escondido-link" hidden><a href="#escondido">🔒 Escondido</a></li>
         </ul>
       </nav>
       <a class="btn btn-primary nav-cta" href="#juegos">Jugar</a>
@@ -78,23 +77,11 @@
             Activa JavaScript para ver el catálogo completo. Mientras tanto:
             <a href="games/mundoguessr/index.html">MundoGuessr</a> ·
             <a href="games/buscaminas/index.html">Buscaminas</a> ·
-            <a href="games/sudoku/index.html">Sudoku</a>
+            <a href="games/sudoku/index.html">Sudoku</a> ·
+            <a href="games/serpiente/index.html">Serpiente Neón</a>
           </p>
         </noscript>
       </div>
-    </section>
-
-    <!-- Modo escondido: solo se ve en este navegador después de activarlo -->
-    <section id="escondido" class="section container escondido" aria-labelledby="escondido-title" hidden>
-      <div class="section-head">
-        <div>
-          <p class="eyebrow">🔒 Modo escondido</p>
-          <h2 id="escondido-title">Herramientas</h2>
-          <p class="section-lead">Este apartado solo aparece en este navegador mientras el modo escondido está activado.</p>
-        </div>
-        <button id="escondido-salir" class="btn btn-ghost btn-sm" type="button">Salir del modo escondido</button>
-      </div>
-      <div id="escondido-grid" class="game-grid"></div>
     </section>
 
     <!-- 4. Novedades -->
@@ -140,14 +127,12 @@
       </nav>
     </div>
     <div class="container footer-bottom">
-      <span id="copyright">© <span id="year">2026</span> Vistra Arcade</span>
+      <span>© <span id="year">2026</span> Vistra Arcade</span>
       <span>Se adapta al modo claro u oscuro de tu sistema.</span>
     </div>
   </footer>
 
   <script src="js/catalogo.js"></script>
-  <div id="toast" class="toast" role="status" aria-live="polite"></div>
-
   <script src="js/home.js"></script>
 </body>
 </html>
