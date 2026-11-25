@@ -24,6 +24,7 @@
         <ul class="nav-links">
           <li><a href="#juegos">Juegos</a></li>
           <li><a href="#novedades">Novedades</a></li>
+          <li class="escondido-link" hidden><a href="#escondido">🔒 Escondido</a></li>
         </ul>
       </nav>
       <a class="btn btn-primary nav-cta" href="#juegos">Jugar</a>
@@ -83,6 +84,19 @@
       </div>
     </section>
 
+    <!-- Modo escondido: solo se ve en este navegador después de activarlo -->
+    <section id="escondido" class="section container escondido" aria-labelledby="escondido-title" hidden>
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">🔒 Modo escondido</p>
+          <h2 id="escondido-title">Herramientas</h2>
+          <p class="section-lead">Este apartado solo aparece en este navegador mientras el modo escondido está activado.</p>
+        </div>
+        <button id="escondido-salir" class="btn btn-ghost btn-sm" type="button">Salir del modo escondido</button>
+      </div>
+      <div id="escondido-grid" class="game-grid"></div>
+    </section>
+
     <!-- 4. Novedades -->
     <section id="novedades" class="section container" aria-labelledby="novedades-title">
       <div class="section-head reveal">
@@ -126,12 +140,14 @@
       </nav>
     </div>
     <div class="container footer-bottom">
-      <span>© <span id="year">2026</span> Vistra Arcade</span>
+      <span id="copyright">© <span id="year">2026</span> Vistra Arcade</span>
       <span>Se adapta al modo claro u oscuro de tu sistema.</span>
     </div>
   </footer>
 
   <script src="js/catalogo.js"></script>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
   <script src="js/home.js"></script>
 </body>
 </html>

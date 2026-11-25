@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Calculadora de nómina · Vistra Arcade</title>
+<meta name="color-scheme" content="light dark">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="../../img/logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../css/style.css">
+
+<style>
+:root{
+  /* Colores de Vistra Arcade (css/style.css): siguen el modo claro u oscuro del sistema */
+  --bg:var(--background); --card:var(--panel); --ink:var(--text);
+  --primary-2:var(--accent); --plus:var(--success); --minus:var(--danger);
+  --line:var(--border); --focus:color-mix(in srgb, var(--accent-text) 30%, transparent); --r:var(--radius); --t:170ms;
+  --soft:color-mix(in srgb, var(--secondary) 45%, var(--panel));
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{font-size:15px;line-height:1.45;-webkit-font-smoothing:antialiased}
+button,input{font:inherit;color:inherit}
+
+
+/* ---------- Layout ---------- */
+.wrap{width:100%;max-width:1040px;margin:0 auto;padding:22px 18px 40px}
+.intro h1{margin:0;font-size:clamp(1.5rem,3vw,2rem);font-weight:900;letter-spacing:-.02em}
+.intro .eyebrow{margin-bottom:.35rem}
+.intro p{margin:4px 0 18px;color:var(--muted)}
+.grid{display:grid;gap:18px;grid-template-columns:minmax(0,1fr)}
+.grid>*{min-width:0}
+@media(min-width:880px){
+  .grid{grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);align-items:start}
+  .summary{position:sticky;top:88px}
+}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px;box-shadow:var(--card-shadow)}
+.group+.group{margin-top:22px;padding-top:20px;border-top:1px solid var(--line)}
+.gtitle{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin:0 0 14px}
+.gtitle svg{color:var(--arcade)}
+
+/* ---------- Campos ---------- */
+.f{margin-bottom:14px}
+.f:last-child{margin-bottom:0}
+.f label{display:block;font-weight:600;font-size:14px;margin-bottom:6px}
+.box{display:flex;align-items:center;height:46px;border:1px solid var(--line);border-radius:10px;background:var(--background);transition:border-color var(--t),box-shadow var(--t)}
+.box:focus-within{border-color:var(--primary);box-shadow:0 0 0 3px var(--focus)}
+.box .pre,.box .suf{padding:0 12px;color:var(--muted);font-weight:500;flex:none}
+.box .pre{padding-right:0}
+.box input{flex:1;min-width:0;width:100%;border:0;outline:0;background:transparent;height:100%;padding:0 12px;font-size:16px;font-variant-numeric:tabular-nums}
+.fhelp{font-size:12.5px;color:var(--muted);margin-top:5px}
+.err{font-size:12.5px;color:var(--minus);margin-top:5px;display:none}
+.f.bad .box{border-color:var(--minus)}
+.f.bad .box:focus-within{box-shadow:0 0 0 3px rgba(197,72,72,.2)}
+.f.bad .err{display:block}
+.f.bad .fhelp{display:none}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* Interruptor */
+.f .toggle{margin:0}
+.toggle,.f .toggle{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;cursor:pointer}
+.toggle .tx b{display:block;font-size:14px}
+.toggle .tx span{font-size:12.5px;color:var(--muted)}
+.sw{position:relative;display:block;width:42px;height:24px;flex:none}
+.sw input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.sw i{position:absolute;inset:0;border-radius:99px;background:var(--border);transition:background var(--t)}
+.sw i::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:transform var(--t)}
+.sw input:checked+i{background:var(--primary)}
+.sw input:checked+i::after{transform:translateX(18px)}
+.sw input:focus-visible+i{box-shadow:0 0 0 3px var(--focus)}
+
+/* ---------- Botones (los de Vistra Arcade) ---------- */
+.btn{gap:7px}
+.btn.icon{width:38px;height:38px;padding:0}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:18px}
+
+/* ---------- Resumen ---------- */
+.net{border-radius:12px;background:linear-gradient(135deg,#1a1546,var(--primary));color:#fff;padding:18px 18px 16px;box-shadow:0 4px 0 var(--btn-depth)}
+.net small{font-size:12px;font-weight:600;letter-spacing:.6px;opacity:.8}
+.net .amt{font-size:34px;font-weight:900;color:#ffb347;text-shadow:0 0 14px rgba(255,179,71,.45);letter-spacing:-.5px;margin:2px 0 4px;font-variant-numeric:tabular-nums}
+.net .sub{font-size:12.5px;opacity:.8}
+.kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0 4px}
+.kpi{border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.kpi small{display:block;font-size:12px;color:var(--muted)}
+.kpi b{font-size:16px;font-variant-numeric:tabular-nums}
+.kpi.p b{color:var(--plus)} .kpi.m b{color:var(--minus)}
+.sec{display:flex;align-items:center;gap:6px;margin:18px 0 4px;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase}
+.sec.p{color:var(--plus)} .sec.m{color:var(--minus)}
+.ln{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.ln:last-child{border-bottom:0}
+.ln .k{font-size:14px}
+.ln .k em{display:block;font-style:normal;font-size:12px;color:var(--muted);margin-top:1px}
+.ln .v{font-weight:600;white-space:nowrap;font-variant-numeric:tabular-nums}
+.ln.zero{opacity:.5}
+.note{font-size:12.5px;color:var(--muted);margin-top:14px;padding:12px;border-radius:10px;background:var(--soft);border:1px solid var(--line)}
+.note b{color:var(--ink)}
+.hidden-vals .money{filter:blur(7px);user-select:none}
+.money{transition:filter var(--t)}
+
+/* Barra fija en móvil */
+.bar{display:none}
+@media(max-width:879px){
+  .bar{display:flex;position:fixed;left:0;right:0;bottom:0;z-index:20;align-items:center;justify-content:space-between;gap:10px;padding:10px 16px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(135deg,#1a1546,var(--primary));color:#fff;box-shadow:0 -4px 16px rgba(23,32,51,.15);transition:transform var(--t)}
+  .bar small{display:block;font-size:11px;font-weight:600;letter-spacing:.5px;opacity:.8}
+  .bar b{font-size:20px;font-variant-numeric:tabular-nums}
+  .bar .btn{background:rgba(255,255,255,.14);border-color:transparent;color:#fff;box-shadow:none}
+  .bar.away{transform:translateY(110%)}
+  body{padding-bottom:84px}
+}
+
+.toast{position:fixed;left:50%;bottom:100px;transform:translate(-50%,20px);background:#14113d;color:#ffb347;font-weight:800;padding:10px 16px;border-radius:10px;font-size:14px;opacity:0;pointer-events:none;transition:opacity var(--t),transform var(--t);z-index:30}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+footer{text-align:center;font-size:12px;color:var(--muted);padding:6px 18px 30px}
+
+/* ---------- Quincena ---------- */
+.qsel{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.qsel label{position:relative;display:block;border:1px solid var(--line);border-radius:10px;padding:10px 12px 10px 38px;cursor:pointer;transition:border-color var(--t),background var(--t)}
+.qsel input{position:absolute;left:12px;top:13px;width:16px;height:16px;margin:0;accent-color:var(--primary);cursor:pointer}
+.qsel b{display:block;font-size:14px}
+.qsel span{display:block;font-size:12.5px;color:var(--muted)}
+.qsel label:has(input:checked){border-color:var(--accent-text);background:var(--soft)}
+.qsel label:focus-within{box-shadow:0 0 0 3px var(--focus)}
+.qauto{font-size:12.5px;color:var(--muted);margin-top:6px}
+@media(max-width:420px){.qsel{grid-template-columns:1fr}}
+
+/* ---------- Contar horas desde el formato ---------- */
+.tut{border:1px solid var(--line);border-radius:10px;padding:0 14px;margin-bottom:14px;background:var(--bg)}
+.tut summary{cursor:pointer;font-weight:600;font-size:14px;padding:11px 0;color:var(--primary-text);list-style:none}
+.tut summary::-webkit-details-marker{display:none}
+.tut summary::before{content:"▸";display:inline-block;width:16px;transition:transform var(--t)}
+.tut[open] summary::before{transform:rotate(90deg)}
+.tut ol{margin:0 0 10px;padding-left:20px}
+.tut li{margin:4px 0}
+.tut p{margin:0 0 12px;font-size:13.5px;color:var(--muted)}
+.tut p b{color:var(--ink)}
+.paste{width:100%;min-height:118px;border:1px solid var(--line);border-radius:10px;background:var(--card);padding:10px 12px;font:13px/1.45 ui-monospace,Consolas,monospace;color:var(--ink);resize:vertical;outline:0;transition:border-color var(--t),box-shadow var(--t)}
+.paste:focus{border-color:var(--primary);box-shadow:0 0 0 3px var(--focus)}
+.hres{margin-top:12px}
+.hsum{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.hsum div{border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.hsum small{display:block;font-size:12px;color:var(--muted)}
+.hsum b{font-size:18px;font-variant-numeric:tabular-nums}
+.hsum em{display:block;font-style:normal;font-size:12px;color:var(--muted)}
+.hmeta{font-size:12.5px;color:var(--muted);margin:10px 0 0}
+.hwarn{font-size:12.5px;margin:8px 0 0;padding:8px 10px;border-radius:8px;background:rgba(197,72,72,.08);color:var(--minus)}
+.hwarn.info{background:var(--soft);color:var(--muted)}
+.htw{overflow-x:auto;margin-top:10px;border:1px solid var(--line);border-radius:10px}
+.ht{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+.ht th{text-align:left;font-size:11.5px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+.ht td{padding:7px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+.ht tr:last-child td{border-bottom:0}
+.ht .n{text-align:right}
+.tg{display:inline-block;font-size:11px;font-weight:600;border-radius:99px;padding:1px 7px;margin-left:6px;vertical-align:1px}
+.tg.fe{background:rgba(196,131,0,.15);color:#a86b00}
+.tg.de{background:rgba(102,112,133,.15);color:var(--muted)}
+.tg.pr{background:var(--secondary);color:var(--primary-text)}
+.hbtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+/* Pasos guiados (como el Interaction Tracker): se van abriendo y marcando */
+.wz{list-style:none;margin:0;padding:0}
+.wz-s{position:relative;padding:0 0 18px 40px}
+.wz-s:last-child{padding-bottom:0}
+.wz-s::before{content:"";position:absolute;left:13px;top:30px;bottom:2px;width:2px;background:var(--line);border-radius:2px}
+.wz-s:last-child::before,.wz-s.last::before{display:none}
+.wz-h{display:flex;align-items:center;min-height:28px;margin-bottom:8px}
+.wz-h b{font-size:14.5px}
+.wz-n{position:absolute;left:0;top:0;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-weight:700;background:var(--card);color:var(--muted);border:2px solid var(--line);transition:background var(--t),border-color var(--t),color var(--t)}
+.wz-s.cur .wz-n{border-color:var(--arcade);color:var(--arcade);box-shadow:0 0 0 4px var(--focus)}
+.wz-s.done .wz-n{background:var(--plus);border-color:var(--plus);color:#fff;font-size:0}
+.wz-s.done .wz-n::after{content:"";width:6px;height:11px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:translateY(-1px) rotate(45deg)}
+.wz-s.done::before{background:var(--plus)}
+.wz-t{margin:0 0 10px;font-size:13.5px;color:var(--muted)}
+.wz-t b{color:var(--ink)}
+.wz-t .tg{margin-left:0}
+.wz-links{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-top:8px;font-size:13px;color:var(--muted)}
+.lnk{border:0;background:none;padding:0;color:var(--primary-text);font-weight:600;font-size:13px;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.wz-ok{margin-top:12px;padding:10px 12px;border-radius:10px;background:rgba(22,132,91,.1);color:var(--plus);font-weight:600;font-size:13.5px}
+.reveal:not([hidden]){animation:rise .22s ease-out}
+@keyframes rise{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.reveal:not([hidden]){animation:none}}
+
+/* ---------- Impresión ---------- */
+.print-head{display:none}
+@media print{
+  body{background:#fff!important;padding:0}
+  .site-nav,.form-card,.bar,.actions,.toast,.no-print,.intro{display:none!important}
+  .wrap{padding:0}
+  .grid{display:block}
+  .card{border:0;padding:0}
+  .net{background:#fff;color:var(--ink);border:2px solid var(--ink)}
+  .print-head{display:block;margin-bottom:14px}
+  .print-head h2{margin:0;font-size:20px}
+  .print-head p{margin:2px 0 0;color:var(--muted);font-size:13px}
+  .hidden-vals .money{filter:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body class="arcade-bg">
+
+<header class="site-nav game-nav">
+  <div class="container nav-inner">
+    <a class="brand" href="../../index.html" aria-label="Volver a Vistra Arcade">
+      <img class="brand-logo" src="../../img/logo.svg" alt="" width="36" height="36">
+      <span class="brand-text"><strong>VISTRA</strong><span>ARCADE</span></span>
+    </a>
+    <span class="nav-sep" aria-hidden="true"></span>
+    <div class="game-title">
+      <span class="eyebrow">Modo escondido</span>
+      <h1>Calculadora de nómina</h1>
+    </div>
+    <div class="nav-actions">
+      <button class="btn ghost btn-sm icon" id="btnHide" type="button" aria-pressed="false" title="Ocultar valores" aria-label="Ocultar valores">
+      <svg id="icoEye" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>
+    </button>
+      <a class="btn btn-ghost btn-sm" href="../../index.html#escondido">← Volver</a>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="intro">
+    <p class="eyebrow">Herramienta</p>
+    <h1>Calcula tu quincena</h1>
+    <p>Escribe tus horas y mira cuánto vas a recibir. El resultado se actualiza solo.</p>
+  </div>
+
+  <div class="grid">
+    <!-- ================= FORMULARIO ================= -->
+    <section class="card form-card" aria-label="Datos de la quincena">
+      <div class="group" id="g-guia">
+        <h2 class="gtitle">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4M7 13h3M7 17h3M14 13h3M14 17h3"/></svg>
+          Cuenta tus horas paso a paso
+        </h2>
+        <ol class="wz">
+          <li class="wz-s" id="wz1">
+            <div class="wz-h"><span class="wz-n">1</span><b>Elige la quincena</b></div>
+            <div class="wz-b">
+              <div class="qsel" role="radiogroup" aria-label="Quincena">
+                <label><input type="radio" name="quincena" value="q20"><b>Quincena del 20</b><span>Días 1 al 15 · con variable</span></label>
+                <label><input type="radio" name="quincena" value="q5"><b>Quincena del 5</b><span>Días 16 a fin de mes · con auxilio de alimentación</span></label>
+              </div>
+              <div class="qauto" id="qAuto"></div>
+            </div>
+          </li>
+          <li class="wz-s" id="wz2">
+            <div class="wz-h"><span class="wz-n">2</span><b>Copia y pega el formato</b></div>
+            <div class="wz-b">
+              <p class="wz-t">Abre el <b>Formato de novedades y ausentismo</b>, selecciona las filas de los días (desde la primera fecha hasta la última) y cópialas con <kbd>Ctrl</kbd> + <kbd>C</kbd>. Luego pégalas aquí con <kbd>Ctrl</kbd> + <kbd>V</kbd>. Si copias también los títulos, no pasa nada.</p>
+              <textarea class="paste" id="pasteHoras" spellcheck="false" autocomplete="off" aria-label="Pega aquí el formato" placeholder="Pega aquí el formato…&#10;&#10;1/11/26  Domingo  Descanso  0  7&#10;2/11/26  Lunes Festivo  8.5  8.39&#10;3/11/26  Martes  8.5  6.74"></textarea>
+              <div class="wz-links"><button class="lnk" id="wzDemo" type="button">Probar con un ejemplo</button><span>·</span><button class="lnk" id="wzManual" type="button">Prefiero escribir las horas a mano</button></div>
+              <div class="hwarn" id="wzErr" hidden></div>
+            </div>
+          </li>
+          <li class="wz-s reveal" id="wz3" hidden>
+            <div class="wz-h"><span class="wz-n">3</span><b>Revisa los días</b></div>
+            <div class="wz-b">
+              <p class="wz-t">De cada día tomé las <b>horas ordinarias</b> (la última columna). Los días <span class="tg fe">Festivo</span> van a horas festivas, los domingos de <span class="tg de">Descanso</span> suman las horas que trae el formato y, si a un día le faltaban las ordinarias, usé las programadas <span class="tg pr">Programada</span>.</p>
+              <div class="hres" id="hRes"></div>
+            </div>
+          </li>
+          <li class="wz-s reveal" id="wz4" hidden>
+            <div class="wz-h"><span class="wz-n">4</span><b>Usa las horas</b></div>
+            <div class="wz-b">
+              <p class="wz-t" id="wzUseTxt">Toca el botón y se llenan solas las horas ordinarias y festivas de abajo. El neto se calcula de una vez.</p>
+              <div class="hbtns"><button class="btn btn-sm" id="hUse" type="button">Usar estas horas</button><button class="btn ghost btn-sm" id="hClr" type="button">Empezar de nuevo</button></div>
+              <div class="wz-ok" id="wzOk" hidden></div>
+            </div>
+          </li>
+        </ol>
+      </div>
+
+      <div class="group">
+        <h2 class="gtitle">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+          Tiempo trabajado
+        </h2>
+
+        <div class="f" id="f-valorHora">
+          <label for="valorHora">Valor de la hora</label>
+          <div class="box"><span class="pre">$</span><input id="valorHora" data-type="money" inputmode="numeric" autocomplete="off"></div>
+          <div class="fhelp">Se guarda en este dispositivo. Acepta centavos: 10.476,19</div>
+          <div class="err" role="alert"></div>
+        </div>
+
+        <div class="two">
+          <div class="f" id="f-horas">
+            <label for="horas">Horas ordinarias</label>
+            <div class="box"><input id="horas" data-type="hours" inputmode="decimal" autocomplete="off" placeholder="0"><span class="suf">h</span></div>
+            <div class="fhelp">Ej.: 100,29 o 100:17</div>
+            <div class="err" role="alert"></div>
+          </div>
+          <div class="f" id="f-horasFest">
+            <label for="horasFest">Horas festivas</label>
+            <div class="box"><input id="horasFest" data-type="hours" inputmode="decimal" autocomplete="off" placeholder="0"><span class="suf">h</span></div>
+            <div class="fhelp">Se pagan al 190 %</div>
+            <div class="err" role="alert"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="group">
+        <h2 class="gtitle">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+          Beneficios e ingresos
+        </h2>
+
+        <div class="f">
+          <label class="toggle" for="auxOn">
+            <span class="tx"><b>Auxilio de transporte</b><span id="auxHint">Días = horas ordinarias ÷ 7</span></span>
+            <span class="sw"><input type="checkbox" id="auxOn" checked><i></i></span>
+          </label>
+        </div>
+
+        <div class="f" id="f-variable">
+          <label for="variable">Variable</label>
+          <div class="box"><span class="pre">$</span><input id="variable" data-type="money" inputmode="numeric" autocomplete="off" placeholder="0"></div>
+          <div class="fhelp">Opcional. Suma para salud y pensión.</div>
+          <div class="err" role="alert"></div>
+        </div>
+
+        <div class="f" id="f-otros">
+          <label for="otros">Otros ingresos</label>
+          <div class="box"><span class="pre">$</span><input id="otros" data-type="money" inputmode="numeric" autocomplete="off" placeholder="0"></div>
+          <div class="fhelp">Opcional. Ej.: bonificaciones. No paga salud ni pensión.</div>
+          <div class="err" role="alert"></div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn ghost btn-sm" id="btnClear" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/></svg>
+          Limpiar cálculo
+        </button>
+      </div>
+    </section>
+
+    <!-- ================= RESUMEN ================= -->
+    <section class="card summary" id="summary" aria-label="Resultado">
+      <div class="print-head">
+        <h2>Volante estimado de quincena</h2>
+        <p id="printDate"></p>
+      </div>
+
+      <div class="net">
+        <small>NETO ESTIMADO</small>
+        <div class="amt money" id="vNeto" aria-live="polite">$0</div>
+        <div class="sub" id="netSub">Se actualiza automáticamente</div>
+      </div>
+
+      <div class="kpis">
+        <div class="kpi p"><small>Ingresos</small><b class="money" id="vIng">$0</b></div>
+        <div class="kpi m"><small>Descuentos</small><b class="money" id="vDesc">$0</b></div>
+      </div>
+
+      <div class="sec p">+ Ingresos</div>
+      <div class="ln" id="l-basico"><div class="k">Salario básico<em id="dBasico"></em></div><div class="v money" id="vBasico"></div></div>
+      <div class="ln" id="l-fest"><div class="k">Horas festivas<em id="dFest"></em></div><div class="v money" id="vFest"></div></div>
+      <div class="ln" id="l-aux"><div class="k">Auxilio de transporte<em id="dAux"></em></div><div class="v money" id="vAux"></div></div>
+      <div class="ln" id="l-var"><div class="k">Variable<em>Cotiza salud y pensión</em></div><div class="v money" id="vVar"></div></div>
+      <div class="ln" id="l-alim"><div class="k">Auxilio de alimentación<em>Fijo en la quincena del 5 · No cotiza</em></div><div class="v money" id="vAlim"></div></div>
+      <div class="ln" id="l-otros"><div class="k">Otros ingresos<em>No cotiza</em></div><div class="v money" id="vOtros"></div></div>
+
+      <div class="sec m">− Descuentos</div>
+      <div class="ln" id="l-salud"><div class="k">Aporte salud<em id="dSalud"></em></div><div class="v money" id="vSalud"></div></div>
+      <div class="ln" id="l-pension"><div class="k">Aporte pensión<em id="dPension"></em></div><div class="v money" id="vPension"></div></div>
+
+      <div class="actions no-print">
+        <button class="btn btn-sm" id="btnCopy" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v1"/></svg>
+          Copiar neto
+        </button>
+        <button class="btn ghost btn-sm" id="btnPrint" type="button">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9V2h12v7"/><rect x="6" y="14" width="12" height="8"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/></svg>
+          Imprimir volante
+        </button>
+      </div>
+
+      <div class="note">
+        <b>Es un estimado.</b> Tu volante oficial puede variar unos pesos por redondeos o novedades
+        (incapacidades, recargo nocturno, ajustes). El recargo nocturno aún no está incluido.
+      </div>
+    </section>
+  </div>
+</main>
+
+<div class="bar" id="bar" aria-hidden="true">
+  <div><small>NETO ESTIMADO</small><b class="money" id="vNetoBar">$0</b></div>
+  <button class="btn ghost btn-sm" id="btnSeeDetail" type="button">Ver desglose</button>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<footer id="footer"></footer>
+
+<!-- =========================================================
+     1) CONFIGURACIÓN — parámetros salariales (cambiar aquí)
+     ========================================================= -->
+<script>
+window.NOMINA_CONFIG = Object.freeze({
+  anio: 2026,
+  smmlv: 1750905,                 // Decreto 1469 de 2025
+  auxilioTransporteMes: 249095,   // Decreto 1470 de 2025
+  horasPorDiaAuxilio: 7,          // jornada de 42 h ÷ 6 días
+  maxDiasAuxilio: 15,
+  factorFestivo: 1.9,             // hora festiva al 190 %
+  pctSalud: 0.04,
+  pctPension: 0.04,
+  auxAlimentacion: 288000,       // fijo en la quincena del 5 (días 16 a fin de mes); no cotiza
+  valorHoraDefecto: 10476.19,       // 10.000 × 44 ÷ 42
+  limites: { horasOrdinarias: 200, horasFestivas: 120, valorHora: 200000, otros: 5000000 }
+});
+</script>
+
+<!-- =========================================================
+     2) MOTOR DE CÁLCULO — sin interfaz, funciones puras
+     ========================================================= -->
+<script>
+window.NominaEngine = (function(){
+  "use strict";
+
+  // Convierte texto de dinero ("10.476", "$ 150,000", "1050657") a número entero de pesos.
+  function parseMoney(txt){
+    var s = String(txt == null ? "" : txt).trim();
+    if (s === "") return { ok:true, value:0, empty:true };
+    s = s.replace(/[$\s]/g, "");
+    if (s.charAt(0) === "-") return { ok:false, error:"No puede ser negativo." };
+    // Quita separadores de miles (punto o coma seguidos de 3 dígitos)
+    var clean = s.replace(/[.,](?=\d{3}(\D|$))/g, "");
+    clean = clean.replace(",", ".");
+    if (!/^\d+(\.\d+)?$/.test(clean)) return { ok:false, error:"Escribe solo números." };
+    return { ok:true, value:Math.round(parseFloat(clean)*100)/100 };
+  }
+
+  // Convierte horas: "100", "100,5", "100.5" o "100:17" (minutos 0–59).
+  function parseHours(txt){
+    var s = String(txt == null ? "" : txt).trim().replace(/\s/g, "");
+    if (s === "") return { ok:true, value:0, empty:true };
+    if (s.charAt(0) === "-") return { ok:false, error:"Las horas no pueden ser negativas." };
+    var hm = s.match(/^(\d+):(\d{1,2})$/);
+    if (hm){
+      var m = parseInt(hm[2], 10);
+      if (m > 59) return { ok:false, error:"Los minutos van de 0 a 59." };
+      return { ok:true, value:parseInt(hm[1], 10) + m/60 };
+    }
+    if (s.indexOf(":") >= 0) return { ok:false, error:"Usa el formato horas:minutos, ej. 100:17" };
+    s = s.replace(",", ".");
+    if (!/^\d+(\.\d+)?$/.test(s)) return { ok:false, error:"Escribe un número de horas válido." };
+    return { ok:true, value:parseFloat(s) };
+  }
+
+  function formatMoney(n){
+    var v = Math.round(Number(n) || 0);
+    return "$" + v.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  }
+  function formatNumber(n){
+    return Math.round(Number(n) || 0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  }
+  function formatDecimal(n){
+    var v = Math.round((Number(n) || 0) * 100) / 100, ip = Math.floor(v), c = Math.round((v - ip) * 100);
+    return formatNumber(ip) + (c ? "," + (c < 10 ? "0" + c : c) : "");
+  }
+  function formatHours(h){
+    var total = Math.round(h * 60), hh = Math.floor(total/60), mm = total % 60;
+    return mm ? hh + " h " + mm + " min" : hh + " h";
+  }
+
+  // Valida números ya interpretados contra los límites de la configuración.
+  function validar(input, cfg){
+    var e = {}, L = cfg.limites;
+    if (!(input.valorHora > 0)) e.valorHora = "Escribe el valor de tu hora.";
+    else if (input.valorHora > L.valorHora) e.valorHora = "El valor parece demasiado alto.";
+    if (input.horas > L.horasOrdinarias) e.horas = "Máximo " + L.horasOrdinarias + " h por quincena.";
+    if (input.horasFest > L.horasFestivas) e.horasFest = "Máximo " + L.horasFestivas + " h por quincena.";
+    if (input.otros > L.otros) e.otros = "El valor parece demasiado alto.";
+    return e;
+  }
+
+  // Cálculo principal. Recibe números; devuelve el desglose completo.
+  function calcular(input, cfg){
+    var vh = input.valorHora || 0, h = input.horas || 0, hf = input.horasFest || 0;
+    var q5 = input.quincena === "q5";                // q20 = días 1–15 · q5 = días 16 a fin de mes
+    var variable = q5 ? 0 : (input.variable || 0);
+    var alimentacion = q5 ? cfg.auxAlimentacion : 0;
+    var otros = input.otros || 0;
+
+    var basico = Math.round(h * vh);
+    var festivo = Math.round(hf * vh * cfg.factorFestivo);
+    var diasAux = input.auxilio ? Math.min(Math.floor(h / cfg.horasPorDiaAuxilio + 1e-9), cfg.maxDiasAuxilio) : 0;
+    var auxDia = cfg.auxilioTransporteMes / 30;
+    var auxilio = Math.round(auxDia * diasAux);
+
+    var ibc = basico + festivo + variable;      // base de salud y pensión
+    var salud = Math.round(ibc * cfg.pctSalud);
+    var pension = Math.round(ibc * cfg.pctPension);
+
+    var ingresos = basico + festivo + auxilio + variable + alimentacion + otros;
+    var descuentos = salud + pension;
+    return {
+      basico:basico, festivo:festivo, auxilio:auxilio, diasAux:diasAux, auxDia:auxDia,
+      variable:variable, alimentacion:alimentacion, otros:otros, ibc:ibc, salud:salud, pension:pension,
+      ingresos:ingresos, descuentos:descuentos, neto:ingresos - descuentos
+    };
+  }
+
+  return { parseMoney:parseMoney, parseHours:parseHours, formatMoney:formatMoney,
+           formatNumber:formatNumber, formatDecimal:formatDecimal, formatHours:formatHours, validar:validar, calcular:calcular };
+})();
+</script>
+
+<!-- =========================================================
+     3) INTERFAZ — lee campos, muestra resultados, guarda preferencias
+     ========================================================= -->
+<script>
+(function(){
+  "use strict";
+  var CFG = window.NOMINA_CONFIG, E = window.NominaEngine;
+  var $ = function(id){ return document.getElementById(id); };
+  var KEY = "nomina_v2_prefs";
+  var lastNeto = 0;
+  var MESES_Q = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+  // Quincena: q20 = días 1–15 (se paga el 20) · q5 = días 16 a fin de mes (se paga el 5 del mes siguiente)
+  var quincena = "q20", qRef = null, qOrigen = "hoy";   // qRef: año y mes de los días trabajados
+  function quincenaPorFecha(d){
+    var dia = d.getDate();
+    if (dia >= 6 && dia <= 20) return { q:"q20", y:d.getFullYear(), m:d.getMonth() };
+    if (dia > 20) return { q:"q5", y:d.getFullYear(), m:d.getMonth() };
+    var prev = new Date(d.getFullYear(), d.getMonth() - 1, 1);   // del 1 al 5: la quincena del 5 es del mes anterior
+    return { q:"q5", y:prev.getFullYear(), m:prev.getMonth() };
+  }
+  function setQuincena(q, ref, origen){
+    quincena = q; if (ref) qRef = ref; qOrigen = origen;
+    document.querySelectorAll('input[name="quincena"]').forEach(function(r){ r.checked = r.value === q; });
+  }
+  function qTexto(){
+    if (!qRef) return "";
+    var ult = new Date(qRef.y, qRef.m + 1, 0).getDate(), mes = MESES_Q[qRef.m];
+    if (quincena === "q20") return "Pago del 20 de " + mes + " · días 1 al 15";
+    var pago = new Date(qRef.y, qRef.m + 1, 5);
+    return "Pago del 5 de " + MESES_Q[pago.getMonth()] + " · días 16 al " + ult + " de " + mes;
+  }
+  (function(){ var h = quincenaPorFecha(new Date()); setQuincena(h.q, {y:h.y, m:h.m}, "hoy"); })();
+
+  // ---- Preferencias (guardadas en el dispositivo) ----
+  function loadPrefs(){
+    try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e){ return {}; }
+  }
+  function savePrefs(){
+    try {
+      localStorage.setItem(KEY, JSON.stringify({
+        valorHora: $("valorHora").value, auxilio: $("auxOn").checked,
+        ocultar: document.body.classList.contains("hidden-vals")
+      }));
+    } catch(e){}
+  }
+  var prefs = loadPrefs();
+  $("valorHora").value = prefs.valorHora || E.formatDecimal(CFG.valorHoraDefecto);
+  if (typeof prefs.auxilio === "boolean") $("auxOn").checked = prefs.auxilio;
+  if (prefs.ocultar) setHidden(true);
+
+  // ---- Errores por campo ----
+  function setErr(id, msg){
+    var f = $("f-" + id); if (!f) return;
+    f.classList.toggle("bad", !!msg);
+    f.querySelector(".err").textContent = msg || "";
+    $(id).setAttribute("aria-invalid", msg ? "true" : "false");
+  }
+
+  // ---- Separadores de miles mientras se escribe ----
+  function formatMoneyInput(el){
+    // Decimales con coma: "10.476,19" (máx. 2)
+    var dm = el.value.match(/^([\d.\s$]*),(\d{0,2})$/);
+    if (dm){
+      var ip = dm[1].replace(/\D/g, "");
+      el.value = (ip ? E.formatNumber(parseInt(ip, 10)) : "0") + "," + dm[2];
+      return;
+    }
+    var digits = el.value.replace(/\D/g, "");
+    if (/[^\d.\s$,]/.test(el.value)) return;          // deja el error visible si hay letras
+    var before = el.value.slice(0, el.selectionStart).replace(/\D/g, "").length;
+    el.value = digits ? E.formatNumber(parseInt(digits, 10)) : "";
+    var pos = 0, seen = 0;
+    while (pos < el.value.length && seen < before){ if (/\d/.test(el.value[pos])) seen++; pos++; }
+    try { el.setSelectionRange(pos, pos); } catch(e){}
+  }
+
+  function setText(id, txt){ $(id).textContent = txt; }
+
+  function render(){
+    var raw = {
+      valorHora: E.parseMoney($("valorHora").value),
+      horas: E.parseHours($("horas").value),
+      horasFest: E.parseHours($("horasFest").value),
+      variable: E.parseMoney($("variable").value),
+      otros: E.parseMoney($("otros").value)
+    };
+    var input = { auxilio: $("auxOn").checked, quincena: quincena }, errs = {};
+    if (quincena === "q5") delete raw.variable;
+    Object.keys(raw).forEach(function(k){
+      if (raw[k].ok) input[k] = raw[k].value; else { input[k] = 0; errs[k] = raw[k].error; }
+    });
+    var rangeErrs = E.validar(input, CFG);
+    Object.keys(rangeErrs).forEach(function(k){ if (!errs[k]) errs[k] = rangeErrs[k]; });
+    ["valorHora","horas","horasFest","variable","otros"].forEach(function(k){ setErr(k, errs[k]); });
+    var q5 = quincena === "q5";
+    $("f-variable").hidden = q5; $("l-var").hidden = q5; $("l-alim").hidden = !q5;
+    $("netSub").textContent = qTexto() || "Se actualiza automáticamente";
+    $("qAuto").textContent = qOrigen === "formato" ? "Elegida según las fechas que pegaste. Puedes cambiarla." :
+      qOrigen === "hoy" ? "Elegida según la fecha de hoy. Puedes cambiarla." : "";
+
+    var r = E.calcular(input, CFG), F = E.formatMoney;
+    lastNeto = r.neto;
+
+    setText("vBasico", F(r.basico));
+    setText("dBasico", E.formatHours(input.horas) + " × $" + E.formatDecimal(input.valorHora));
+    setText("vFest", F(r.festivo));
+    setText("dFest", E.formatHours(input.horasFest) + " × " + F(input.valorHora) + " × 1,90");
+    setText("vAux", F(r.auxilio));
+    setText("dAux", input.auxilio ? r.diasAux + " días × " + F(r.auxDia) : "No aplica");
+    setText("vVar", F(r.variable));
+    setText("vOtros", F(r.otros));
+    setText("vAlim", F(r.alimentacion));
+    setText("vSalud", F(r.salud));
+    setText("dSalud", "4 % de " + F(r.ibc));
+    setText("vPension", F(r.pension));
+    setText("dPension", "4 % de " + F(r.ibc));
+    setText("vIng", F(r.ingresos));
+    setText("vDesc", F(r.descuentos));
+    setText("vNeto", F(r.neto));
+    setText("vNetoBar", F(r.neto));
+    $("auxHint").textContent = input.auxilio
+      ? (r.diasAux + " días · horas ordinarias ÷ " + CFG.horasPorDiaAuxilio)
+      : "Desactivado";
+
+    // Atenuar líneas en cero
+    [["l-fest",r.festivo],["l-aux",r.auxilio],["l-var",r.variable],["l-otros",r.otros]].forEach(function(p){
+      $(p[0]).classList.toggle("zero", !p[1]);
+    });
+    $("btnCopy").disabled = r.neto <= 0;
+    savePrefs();
+  }
+
+  // ---- Eventos de campos ----
+  document.querySelectorAll("input[data-type]").forEach(function(el){
+    el.addEventListener("input", function(){
+      if (el.dataset.type === "money") formatMoneyInput(el);
+      render();
+    });
+  });
+  $("auxOn").addEventListener("change", render);
+  document.querySelectorAll('input[name="quincena"]').forEach(function(r){
+    r.addEventListener("change", function(){ setQuincena(r.value, null, "mano"); render(); if ($("pasteHoras").value.trim()) renderFormato(false); });
+  });
+
+  // ---- Limpiar (conserva valor hora y auxilio) ----
+  $("btnClear").addEventListener("click", function(){
+    ["horas","horasFest","variable","otros"].forEach(function(id){ $(id).value = ""; });
+    render(); $("horas").focus();
+  });
+
+  // ---- Copiar neto ----
+  function toast(msg){
+    var t = $("toast"); t.textContent = msg; t.classList.add("on");
+    clearTimeout(toast._t); toast._t = setTimeout(function(){ t.classList.remove("on"); }, 1800);
+  }
+  $("btnCopy").addEventListener("click", function(){
+    var txt = E.formatMoney(lastNeto);
+    function fallback(){
+      var ta = document.createElement("textarea"); ta.value = txt; document.body.appendChild(ta);
+      ta.select(); try { document.execCommand("copy"); toast("Neto copiado: " + txt); } catch(e){ toast("No se pudo copiar"); }
+      document.body.removeChild(ta);
+    }
+    if (navigator.clipboard && window.isSecureContext){
+      navigator.clipboard.writeText(txt).then(function(){ toast("Neto copiado: " + txt); }, fallback);
+    } else fallback();
+  });
+
+  // ---- Imprimir ----
+  $("btnPrint").addEventListener("click", function(){
+ $("printDate").textContent = (qTexto() ? qTexto() + " · " : "") + "Generado el " + new Date().toLocaleDateString("es-CO", { day:"numeric", month:"long", year:"numeric" });
+    window.print();
+  });
+
+  // ---- Ocultar valores ----
+  function setHidden(on){
+    document.body.classList.toggle("hidden-vals", on);
+    var b = $("btnHide");
+    b.setAttribute("aria-pressed", on ? "true" : "false");
+    b.title = on ? "Mostrar valores" : "Ocultar valores";
+    b.setAttribute("aria-label", b.title);
+    $("icoEye").innerHTML = on
+      ? '<path d="M3 3l18 18"/><path d="M10.6 5.1A10.4 10.4 0 0 1 12 5c6.5 0 10 7 10 7a17.6 17.6 0 0 1-3.2 4.2M6.6 6.6C3.9 8.3 2 12 2 12s3.5 7 10 7a9.7 9.7 0 0 0 5.4-1.6"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>'
+      : '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>';
+  }
+  $("btnHide").addEventListener("click", function(){
+    setHidden(!document.body.classList.contains("hidden-vals")); savePrefs();
+  });
+
+  // ---- Barra móvil: ir al desglose y esconderse cuando el resumen está a la vista ----
+  $("btnSeeDetail").addEventListener("click", function(){
+    $("summary").scrollIntoView({ behavior:"smooth", block:"start" });
+  });
+  if ("IntersectionObserver" in window){
+    new IntersectionObserver(function(entries){
+      $("bar").classList.toggle("away", entries[0].isIntersecting);
+    }, { threshold: 0.15 }).observe($("summary"));
+  }
+  // Esconder la barra mientras el teclado está abierto en el móvil
+  document.addEventListener("focusin", function(e){ if (e.target.tagName === "INPUT" && e.target.type !== "checkbox") $("bar").classList.add("away"); });
+  document.addEventListener("focusout", function(){ setTimeout(function(){
+    var s = $("summary").getBoundingClientRect();
+    if (s.top > window.innerHeight * 0.85) $("bar").classList.remove("away");
+  }, 120); });
+
+  // ---- Contar horas desde el "Formato de novedades y ausentismo" ----
+  // Cada día: fecha, nombre del día (puede decir Festivo o Descanso), horas programadas y horas ordinarias.
+  var DATE_RE = /^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{2}|\d{4})$/;
+  var NUM_RE = /^\d+(?:[.,]\d+)?$|^\d+:\d{2}$/;
+  var MESES = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+  var DIAS = ["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+  function num(t){ if (t.indexOf(":") > 0){ var p = t.split(":"); return +p[0] + (+p[1])/60; } return parseFloat(t.replace(",", ".")); }
+  function parseFormato(txt){
+    var toks = String(txt || "").split(/\s+/).filter(Boolean), recs = [], cur = null;
+    toks.forEach(function(t){
+      var d = t.match(DATE_RE);
+      if (d){
+        var y = +d[3]; if (y < 100) y += 2000;
+        cur = { day:+d[1], month:+d[2], year:y, words:[], nums:[] }; recs.push(cur); return;
+      }
+      if (!cur) return;                                   // títulos antes de la primera fecha
+      if (NUM_RE.test(t)) cur.nums.push(num(t)); else cur.words.push(t);
+    });
+    var byKey = {}, days = [], dup = 0, sinHoras = [];
+    recs.forEach(function(r){
+      var txtw = r.words.join(" "), fest = /festiv/i.test(txtw), desc = /descans/i.test(txtw);
+      var prog = r.nums.length ? r.nums[0] : null, ord = r.nums.length > 1 ? r.nums[1] : null, prev = false;
+      if (ord == null && prog != null){ ord = prog; prev = true; }   // sin ordinarias: se usan las programadas
+      var dt = new Date(r.year, r.month - 1, r.day);
+      var name = r.words.filter(function(w){ return !/festiv|descans/i.test(w); }).join(" ") || DIAS[dt.getDay()];
+      var o = { dt:dt, key:dt.getTime(), name:name, fest:fest, desc:desc, prog:prog, ord:ord, prev:prev };
+      if (ord == null){ sinHoras.push(o); return; }
+      if (byKey[o.key] != null){ days[byKey[o.key]] = o; dup++; } else { byKey[o.key] = days.length; days.push(o); }
+    });
+    days.sort(function(a, b){ return a.key - b.key; });
+    var ord = 0, fest = 0, prevN = 0;
+    days.forEach(function(d){ if (d.fest) fest += d.ord; else ord += d.ord; if (d.prev) prevN++; });
+    // Fechas que no aparecen entre la primera y la última
+    var faltan = [];
+    if (days.length > 1){
+      for (var t = new Date(days[0].dt); t < days[days.length - 1].dt; t.setDate(t.getDate() + 1)){
+        if (byKey[t.getTime()] == null) faltan.push(DIAS[t.getDay()] + " " + t.getDate() + "/" + (t.getMonth() + 1));
+      }
+    }
+    return { days:days, ord:Math.round(ord * 100) / 100, fest:Math.round(fest * 100) / 100, prevN:prevN, dup:dup, faltan:faltan, sinHoras:sinHoras };
+  }
+  function hTxt(h){ return E.formatDecimal(h) + " h"; }
+  function rango(days){
+    var a = days[0].dt, b = days[days.length - 1].dt;
+    if (a.getMonth() === b.getMonth()) return "del " + a.getDate() + " al " + b.getDate() + " de " + MESES[b.getMonth()];
+    return "del " + a.getDate() + " de " + MESES[a.getMonth()] + " al " + b.getDate() + " de " + MESES[b.getMonth()];
+  }
+  var lastParse = null;
+  function renderFormato(fromInput){
+    var box = $("hRes"), txt = $("pasteHoras").value;
+    usado = false;
+    if (!txt.trim()){ box.innerHTML = ""; lastParse = null; wzState(); return; }
+    var r = parseFormato(txt); lastParse = r;
+    if (fromInput && r.days.length){
+      var mitad = r.days.filter(function(d){ return d.dt.getDate() <= 15; }).length * 2 >= r.days.length;
+      var d0 = r.days[Math.floor(r.days.length / 2)].dt;
+      var nq = mitad ? "q20" : "q5";
+      if (nq !== quincena || qOrigen !== "formato"){ setQuincena(nq, {y:d0.getFullYear(), m:d0.getMonth()}, "formato"); render(); }
+    }
+    if (!r.days.length){ box.innerHTML = ""; wzState(); return; }
+    var esc = function(t){ return String(t).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); };
+    var h = '<div class="hsum">' +
+      '<div><small>Horas ordinarias</small><b>' + hTxt(r.ord) + '</b><em>' + E.formatHours(r.ord) + '</em></div>' +
+      '<div><small>Horas festivas</small><b>' + hTxt(r.fest) + '</b><em>' + (r.fest ? E.formatHours(r.fest) : "Sin festivos") + '</em></div></div>' +
+      '<p class="hmeta">' + r.days.length + (r.days.length === 1 ? " día" : " días") + ", " + rango(r.days) + " · " + (quincena === "q20" ? "quincena del 20" : "quincena del 5") + ".</p>";
+    var malas = r.days.filter(function(d){ return quincena === "q20" ? d.dt.getDate() > 15 : d.dt.getDate() <= 15; }).length;
+    if (malas) h += '<div class="hwarn">' + malas + (malas === 1 ? " día no es" : " días no son") + ' de la ' + (quincena === "q20" ? "quincena del 20 (días 1 al 15)" : "quincena del 5 (días 16 a fin de mes)") + '. Revisa que copiaste solo los días de una quincena.</div>';
+    if (r.prevN) h += '<div class="hwarn info">' + r.prevN + (r.prevN === 1 ? " día no tenía" : " días no tenían") + ' horas ordinarias; usé las programadas (marcados como <b>Programada</b>).</div>';
+    if (r.faltan.length) h += '<div class="hwarn info">No aparecen: ' + esc(r.faltan.join(", ")) + '. Si no te tocaba trabajar esos días, está bien.</div>';
+    if (r.dup) h += '<div class="hwarn">Había ' + r.dup + (r.dup === 1 ? " fecha repetida" : " fechas repetidas") + '; conté solo la última.</div>';
+    if (r.sinHoras.length) h += '<div class="hwarn">Sin horas, no se contaron: ' + esc(r.sinHoras.map(function(d){ return d.dt.getDate() + "/" + (d.dt.getMonth() + 1); }).join(", ")) + '.</div>';
+    h += '<div class="htw"><table class="ht"><thead><tr><th>Fecha</th><th>Día</th><th class="n">Programadas</th><th class="n">Ordinarias</th></tr></thead><tbody>' +
+      r.days.map(function(d){
+        return "<tr><td>" + d.dt.getDate() + "/" + (d.dt.getMonth() + 1) + "</td><td>" + esc(d.name) +
+          (d.fest ? '<span class="tg fe">Festivo</span>' : "") + (d.desc ? '<span class="tg de">Descanso</span>' : "") +
+          '</td><td class="n">' + (d.prog == null ? "–" : E.formatDecimal(d.prog)) + '</td><td class="n">' + E.formatDecimal(d.ord) +
+          (d.prev ? '<span class="tg pr">Programada</span>' : "") + "</td></tr>";
+      }).join("") + "</tbody></table></div>";
+    box.innerHTML = h;
+    wzState();
+  }
+  $("pasteHoras").addEventListener("input", function(){ renderFormato(true); });
+
+  // ---- Pasos guiados: cada paso se marca al completarse y abre el siguiente ----
+  var usado = false;
+  function wzState(){
+    var r = lastParse, ok = !!(r && r.days.length), txt = $("pasteHoras").value.trim();
+    $("wz1").className = "wz-s done";
+    $("wz2").className = "wz-s " + (ok ? "done" : "cur");
+    $("wz3").hidden = !ok; $("wz4").hidden = !ok;
+    $("wz3").className = "wz-s reveal " + (ok ? "done" : "");
+    $("wz4").className = "wz-s reveal " + (usado ? "done" : "cur");
+    $("wz2").classList.toggle("last", !ok);
+    var err = $("wzErr");
+    err.hidden = ok || !txt;
+    err.textContent = "No encontré días con fecha (por ejemplo 3/11/26). Revisa que copiaste las filas del formato.";
+    $("wzOk").hidden = !usado;
+    $("wzUseTxt").hidden = usado;
+    $("hUse").textContent = usado ? "Volver a usar estas horas" : "Usar estas horas";
+  }
+  $("hUse").addEventListener("click", function(){
+    var r = lastParse; if (!r) return;
+    $("horas").value = r.ord ? E.formatDecimal(r.ord) : "";
+    $("horasFest").value = r.fest ? E.formatDecimal(r.fest) : "";
+    usado = true; render(); wzState();
+    $("wzOk").textContent = "✓ Listo: " + hTxt(r.ord) + " ordinarias" + (r.fest ? " y " + hTxt(r.fest) + " festivas" : "") + ". Ya están abajo en Tiempo trabajado; el neto se actualizó.";
+    toast("Horas listas · neto " + E.formatMoney(lastNeto));
+  });
+  $("hClr").addEventListener("click", function(){ $("pasteHoras").value = ""; renderFormato(); $("pasteHoras").focus(); $("wz2").scrollIntoView({ behavior:"smooth", block:"center" }); });
+  $("wzManual").addEventListener("click", function(){ $("horas").focus(); $("f-horas").scrollIntoView({ behavior:"smooth", block:"center" }); });
+  var DEMO = (function(){
+    // Ejemplo: la quincena que corresponde a la fecha de hoy, con un festivo, domingos de descanso y un día sin ordinarias
+    var h = quincenaPorFecha(new Date()), y = h.y, m = h.m, a = h.q === "q20" ? 1 : 16, b = h.q === "q20" ? 15 : new Date(y, m + 1, 0).getDate();
+    var rows = [], horas = [6.74, 6.99, 8.16, 6.63, 7.5, 8.13, 8.25, 6.99, 6.27, 7.8, 8.05], k = 0, dias = ["Domingo","Lunes","Martes","Miercoles","Jueves","Viernes","Sabado"];
+    for (var d = a; d <= b; d++){
+      var dt = new Date(y, m, d), wd = dt.getDay(), f = d + "/" + (m + 1) + "/" + String(y).slice(2);
+      if (wd === 6) continue;
+      if (wd === 0){ rows.push([f, "Domingo", "Descanso", "0", "7"]); continue; }
+      rows.push([f, dias[wd] + (k === 0 ? " Festivo" : ""), "8.5", String(k === 0 ? 8.39 : horas[k % horas.length])]);
+      k++;
+    }
+    for (var i = rows.length - 1; i >= 0; i--) if (rows[i][1] !== "Domingo"){ rows[i].pop(); break; }  // un día sin ordinarias todavía
+    var out = [].concat.apply([], rows);
+    return out.join("\n");
+  })();
+  $("wzDemo").addEventListener("click", function(){
+    $("pasteHoras").value = DEMO; renderFormato(true);
+    toast("Ejemplo cargado: así se ve un formato pegado");
+    setTimeout(function(){ $("wz3").scrollIntoView({ behavior:"smooth", block:"start" }); }, 60);
+  });
+  wzState();
+
+  $("footer").textContent = "Valores " + CFG.anio + ": SMMLV " + E.formatMoney(CFG.smmlv) +
+    " · Auxilio de transporte " + E.formatMoney(CFG.auxilioTransporteMes) + " · Funciona sin internet";
+
+  render();
+})();
+</script>
+</body>
+</html>
