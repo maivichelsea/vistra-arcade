@@ -20,6 +20,19 @@ MundoGuessr necesita una clave de Google Maps Platform con **Maps JavaScript API
 como archivo HTML, la clave no puede restringirse por sitio web; restríngela a Maps JavaScript API
 y pon un límite diario de uso y un presupuesto con alertas en Google Cloud.
 
+### Carpeta compartida de libros
+
+Los PDF que se suban a la carpeta compartida de Google Drive aparecen solos en la biblioteca.
+Para que la página pueda ver qué hay en la carpeta se usa un pequeño script de Google:
+
+1. Abre https://script.google.com con la cuenta dueña de la carpeta y crea un proyecto nuevo.
+2. Pega el contenido de `apps-script/carpeta-libros.gs` y publícalo como **Aplicación web**
+   (Ejecutar como: Yo · Quién tiene acceso: Cualquier persona). Las instrucciones están dentro del archivo.
+3. Copia la URL que termina en `/exec` en `VISTRA_CARPETA_LIBROS.script`, en `js/libros-catalogo.js`.
+
+La carpeta debe estar compartida con «Cualquier persona con el enlace» (lector). Quien vaya a subir
+libros necesita permiso de editor.
+
 ## Ejecutar en local
 
 Abre `index.html` en el navegador, o sirve la carpeta:

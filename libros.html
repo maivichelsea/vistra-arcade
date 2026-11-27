@@ -55,7 +55,7 @@
           <div>
             <p class="eyebrow">Biblioteca</p>
             <h2 id="lista-title">Mis libros</h2>
-            <p class="section-lead">¿Tu libro está en Google Drive? Descárgalo y luego añádelo aquí.</p>
+            <p class="section-lead">Añade un PDF desde tu PC o pega el enlace de Google Drive.</p>
           </div>
           <div class="pages-tools">
             <label class="search-box">
@@ -66,6 +66,17 @@
             <button type="button" class="btn btn-primary" id="btn-agregar">＋ Añadir libro</button>
           </div>
         </div>
+
+        <form class="drive-add" id="form-drive">
+          <label class="search-box drive-input">
+            <span aria-hidden="true">🔗</span>
+            <span class="visually-hidden">Enlace de Google Drive</span>
+            <input type="text" id="drive-url" placeholder="Pega aquí el enlace de un PDF en Google Drive…" autocomplete="off" required>
+          </label>
+          <button type="submit" class="btn btn-ghost">Añadir desde Drive</button>
+          <a class="btn btn-ghost" id="btn-carpeta" target="_blank" rel="noopener" hidden>📁 Carpeta compartida</a>
+          <p class="drive-hint">El archivo debe estar compartido con «Cualquier persona con el enlace». Los PDF que se suban a la carpeta compartida aparecen solos para todos.</p>
+        </form>
 
         <input type="file" id="input-pdf" accept="application/pdf,.pdf" multiple hidden>
         <div id="book-grid" class="game-grid"></div>
@@ -211,6 +222,7 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script src="js/vendor/pdfjs/pdf.min.js"></script>
+  <script src="js/libros-catalogo.js"></script>
   <script src="js/libros-db.js"></script>
   <script src="js/libros.js"></script>
 </body>

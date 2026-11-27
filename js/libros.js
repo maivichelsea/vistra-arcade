@@ -169,15 +169,53 @@
     cta.append(el("span", "", libro.ultimaLectura ? "Seguir leyendo" : "Leer"), el("span", "play-icon", "▶"));
     cta.lastChild.setAttribute("aria-hidden", "true");
 
-    body.append(el("h3", "", libro.titulo), el("p", "", leido), barra, tags, cta);
+    body.append(el("h3", "", libro.titulo), el("p", "", libro.autor ? `${libro.autor} · ${leido}` : leido), barra, tags, cta);
 
-    const borrar = el("button", "book-delete", "✕");
+    const acciones = el("div", "book-actions");
+    const renombrar = el("button", "", "✏️");
+    renombrar.type = "button";
+    renombrar.title = "Cambiar título";
+    renombrar.setAttribute("aria-label", `Cambiar el título de ${libro.titulo}`);
+    renombrar.addEventListener("click", () => renombrarLibro(libro));
+    const borrar = el("button", "is-danger", "✕");
     borrar.type = "button";
     borrar.title = "Quitar de la biblioteca";
     borrar.setAttribute("aria-label", `Quitar ${libro.titulo} de la biblioteca`);
     borrar.addEventListener("click", () => quitarLibro(libro));
+    acciones.append(renombrar, borrar);
 
-    card.append(art, body, link, borrar);
+    card.append(art, body, link, acciones);
+    return card;
+  }
+
+  // Libro del catálogo que aún no se ha descargado en este navegador.
+  function tarjetaDrive(entrada) {
+    const card = el("article", "game-card book-card reveal");
+    card.dataset.search = normalizar(`${entrada.titulo} ${entrada.autor || ""}`);
+    const link = el("a", "book-link");
+    link.href = `#leer=drive-${entrada.drive}`;
+    link.setAttribute("aria-label", `Descargar y leer ${entrada.titulo}`);
+
+    const art = el("div", "game-art book-art drive-art");
+    const portada = el("div", "gen-cover");
+    portada.append(el("strong", "", entrada.titulo), el("span", "", entrada.autor || ""));
+    art.append(portada, el("span", "badge badge-category", "Google Drive"), el("span", "badge badge-status status-nuevo", "Nuevo"));
+
+    const body = el("div", "game-body");
+    const tags = el("ul", "tags");
+    tags.append(el("li", "", "☁ Se descarga al abrirlo"), el("li", "", "Después funciona sin internet"));
+    const cta = el("span", "play-cta");
+    cta.append(el("span", "", "Descargar y leer"), el("span", "play-icon", "⬇"));
+    cta.lastChild.setAttribute("aria-hidden", "true");
+    body.append(
+      el("h3", "", entrada.titulo),
+      el("p", "", entrada.carpeta
+        ? `De la carpeta compartida${entrada.tamano ? ` · ${tamanoLegible(entrada.tamano)}` : ""}${entrada.subido ? ` · subido ${haceCuanto(entrada.subido)}` : ""}`
+        : [entrada.autor, entrada.descripcion].filter(Boolean).join(" · ")),
+      tags,
+      cta,
+    );
+    card.append(art, body, link);
     return card;
   }
 
@@ -195,8 +233,9 @@
   }
 
   function pintarBiblioteca() {
-    const tarjetas = libros.map(tarjetaLibro);
-    $("book-grid").replaceChildren(...tarjetas, tarjetaAgregar(!libros.length));
+    const enDrive = catalogo().filter((e) => !libros.some((l) => l.drive === e.drive));
+    const tarjetas = [...libros.map(tarjetaLibro), ...enDrive.map(tarjetaDrive)];
+    $("book-grid").replaceChildren(...tarjetas, tarjetaAgregar(!tarjetas.length));
     filtrar();
 
     const todas = Object.values(notasPorLibro);
@@ -217,6 +256,36 @@
     $("empty").hidden = !q || visibles > 0;
   }
 
+  // Guarda un PDF nuevo en la biblioteca (portada, páginas y datos iniciales).
+  async function guardarNuevoLibro(datos, info) {
+    const pdf = await abrirPdf(datos);
+    let titulo = info.titulo;
+    if (!titulo) {
+      try { titulo = (await pdf.getMetadata())?.info?.Title?.trim(); } catch { /* sin título */ }
+    }
+    const portada = await crearPortada(pdf).catch(() => null);
+    const libro = {
+      id: info.id || uid(),
+      titulo: titulo || "Libro sin título",
+      autor: info.autor || "",
+      archivo: info.archivo || `${titulo || "libro"}.pdf`,
+      tamano: datos.byteLength,
+      paginas: pdf.numPages,
+      portada,
+      agregado: Date.now(),
+      ultimaLectura: null,
+      pagina: 1,
+      posicion: 0,
+      zoom: "ancho",
+      noche: false,
+      drive: info.drive || null,
+    };
+    pdf.destroy();
+    await LibrosDB.agregar(libro, datos);
+    await aplicarPendiente(libro);
+    return libro;
+  }
+
   async function agregarArchivos(files) {
     const pdfs = [...files].filter((f) => f.type === "application/pdf" || /\.pdf$/i.test(f.name));
     if (!pdfs.length) {
@@ -232,27 +301,7 @@
       }
       toast(`Añadiendo «${tituloDe(f.name)}»…`, "info", 0);
       try {
-        const datos = await f.arrayBuffer();
-        const pdf = await abrirPdf(datos);
-        const portada = await crearPortada(pdf).catch(() => null);
-        const libro = {
-          id: uid(),
-          titulo: tituloDe(f.name),
-          archivo: f.name,
-          tamano: f.size,
-          paginas: pdf.numPages,
-          portada,
-          agregado: Date.now(),
-          ultimaLectura: null,
-          pagina: 1,
-          posicion: 0,
-          zoom: "ancho",
-          noche: false,
-        };
-        pdf.destroy();
-        await LibrosDB.agregar(libro, datos);
-        await aplicarPendiente(libro);
-        libros.push(libro);
+        libros.push(await guardarNuevoLibro(await f.arrayBuffer(), { titulo: tituloDe(f.name), archivo: f.name }));
         agregados++;
       } catch (e) {
         toast(`«${tituloDe(f.name)}»: ${mensajeError(e)}`, "error", 5000);
@@ -261,6 +310,139 @@
     }
     await cargarBiblioteca();
     if (agregados) toast(agregados === 1 ? "Libro añadido a tu biblioteca." : `${agregados} libros añadidos.`);
+  }
+
+  // ---------- Libros desde Google Drive ----------
+  // Drive deja leer los archivos compartidos con "Cualquier persona con el enlace" desde esta
+  // dirección, también al abrir el arcade con doble clic. Se descargan una vez y quedan guardados.
+  const LIBROS_FIJOS = typeof VISTRA_LIBROS !== "undefined" ? VISTRA_LIBROS : [];
+  const CARPETA = typeof VISTRA_CARPETA_LIBROS !== "undefined" ? VISTRA_CARPETA_LIBROS : {};
+  const CLAVE_CARPETA = "vistra-libros-carpeta";
+
+  // Libros de la carpeta compartida. Se guarda la última lista para verla también sin internet.
+  let deCarpeta = [];
+  try { deCarpeta = JSON.parse(localStorage.getItem(CLAVE_CARPETA) || "[]"); } catch { deCarpeta = []; }
+
+  // Catálogo completo: libros escritos a mano + los de la carpeta (sin repetir).
+  function catalogo() {
+    const fijos = new Set(LIBROS_FIJOS.map((l) => l.drive));
+    return [...LIBROS_FIJOS, ...deCarpeta.filter((l) => !fijos.has(l.drive))];
+  }
+
+  async function actualizarCarpeta() {
+    if (!CARPETA.script) return;
+    try {
+      const resp = await fetch(CARPETA.script);
+      const datos = await resp.json();
+      if (!Array.isArray(datos.libros)) return;
+      const nuevos = datos.libros.map((f) => ({
+        drive: f.id,
+        titulo: tituloDe(f.nombre || "Libro"),
+        tamano: f.tamano || 0,
+        subido: f.subido || 0,
+        carpeta: true,
+      }));
+      const cambio = JSON.stringify(nuevos) !== JSON.stringify(deCarpeta);
+      deCarpeta = nuevos;
+      localStorage.setItem(CLAVE_CARPETA, JSON.stringify(nuevos));
+      if (cambio && $("vista-lector").hidden) pintarBiblioteca();
+    } catch {
+      // Sin internet o el script no responde: se queda la última lista guardada.
+    }
+  }
+  const urlDrive = (id) => `https://drive.usercontent.google.com/download?id=${encodeURIComponent(id)}&export=download`;
+  const entradaCatalogo = (driveId) => catalogo().find((l) => l.drive === driveId);
+
+  function idDeDrive(texto) {
+    const t = texto.trim();
+    const m = t.match(/\/d\/([\w-]{10,})/) || t.match(/[?&]id=([\w-]{10,})/) || t.match(/^([\w-]{25,})$/);
+    return m ? m[1] : null;
+  }
+
+  async function descargarDeDrive(driveId, alAvanzar) {
+    let resp;
+    try {
+      resp = await fetch(urlDrive(driveId));
+    } catch {
+      throw new Error("No se pudo conectar con Google Drive. Revisa tu conexión a internet.");
+    }
+    if (!resp.ok) {
+      throw new Error(resp.status === 404 || resp.status === 403
+        ? "Ese archivo de Drive no existe o no está compartido con «Cualquier persona con el enlace»."
+        : `Google Drive respondió con un error (${resp.status}).`);
+    }
+    if ((resp.headers.get("content-type") || "").includes("text/html")) {
+      throw new Error("Drive no dejó descargar el archivo. Revisa que esté compartido con «Cualquier persona con el enlace». Si es muy grande, descárgalo y añádelo desde tu PC.");
+    }
+    const total = Number(resp.headers.get("content-length")) || 0;
+    let datos;
+    if (resp.body?.getReader) {
+      const lector = resp.body.getReader();
+      const partes = [];
+      let recibido = 0;
+      for (;;) {
+        const { done, value } = await lector.read();
+        if (done) break;
+        partes.push(value);
+        recibido += value.length;
+        alAvanzar?.(recibido, total);
+      }
+      datos = new Uint8Array(recibido);
+      let pos = 0;
+      for (const parte of partes) { datos.set(parte, pos); pos += parte.length; }
+    } else {
+      datos = new Uint8Array(await resp.arrayBuffer());
+    }
+    const inicio = String.fromCharCode(...datos.subarray(0, 1024));
+    if (!inicio.includes("%PDF-")) throw new Error("El archivo de Drive no es un PDF.");
+    return datos.buffer;
+  }
+
+  const textoDescarga = (recibido, total) => (total
+    ? `Descargando de Google Drive… ${Math.round((recibido / total) * 100)} %`
+    : `Descargando de Google Drive… ${tamanoLegible(recibido)}`);
+
+  async function agregarDesdeDrive(driveId, alAvanzar) {
+    const entrada = entradaCatalogo(driveId);
+    const datos = await descargarDeDrive(driveId, alAvanzar);
+    LibrosDB.pedirPersistencia();
+    return guardarNuevoLibro(datos, {
+      id: `drive-${driveId}`,
+      titulo: entrada?.titulo,
+      autor: entrada?.autor,
+      archivo: entrada ? `${entrada.titulo}.pdf` : `drive-${driveId}.pdf`,
+      drive: driveId,
+    });
+  }
+
+  async function agregarEnlace(texto) {
+    const driveId = idDeDrive(texto);
+    if (!driveId) {
+      toast("Ese no parece un enlace de Google Drive.", "error", 4000);
+      return false;
+    }
+    if (libros.some((l) => l.drive === driveId)) {
+      toast("Ese libro ya está en tu biblioteca.", "info");
+      return true;
+    }
+    toast("Descargando de Google Drive…", "info", 0);
+    try {
+      const libro = await agregarDesdeDrive(driveId, (r, t) => toast(textoDescarga(r, t), "info", 0));
+      await cargarBiblioteca();
+      toast(`«${libro.titulo}» añadido a tu biblioteca.`);
+      return true;
+    } catch (e) {
+      toast(mensajeError(e), "error", 7000);
+      return false;
+    }
+  }
+
+  async function renombrarLibro(libro) {
+    const nuevo = prompt("Nuevo título del libro:", libro.titulo)?.trim();
+    if (!nuevo || nuevo === libro.titulo) return;
+    libro.titulo = nuevo;
+    await LibrosDB.guardarLibro(libro);
+    cargarBiblioteca();
   }
 
   async function quitarLibro(libro) {
@@ -440,7 +622,13 @@
     $("r-paginas").replaceChildren();
 
     try {
-      const [libro, datos, notas] = await Promise.all([LibrosDB.obtener(id), LibrosDB.archivo(id), LibrosDB.notas(id)]);
+      let libro = await LibrosDB.obtener(id);
+      if (!libro && id.startsWith("drive-")) {
+        $("r-cargando").textContent = "Descargando de Google Drive…";
+        libro = await agregarDesdeDrive(id.slice(6), (r, t) => { $("r-cargando").textContent = textoDescarga(r, t); });
+        $("r-cargando").textContent = "Abriendo libro…";
+      }
+      const [datos, notas] = await Promise.all([LibrosDB.archivo(id), LibrosDB.notas(id)]);
       if (!libro || !datos) throw new Error("Ese libro ya no está en tu biblioteca.");
       R.libro = libro;
       R.notas = notas;
@@ -1113,6 +1301,14 @@
       e.target.value = "";
     });
     $("q").addEventListener("input", filtrar);
+    $("form-drive").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const input = $("drive-url");
+      const boton = e.target.querySelector("button");
+      boton.disabled = true;
+      if (await agregarEnlace(input.value)) input.value = "";
+      boton.disabled = false;
+    });
     $("btn-exportar").addEventListener("click", exportar);
     $("btn-importar").addEventListener("click", () => $("input-backup").click());
     $("input-backup").addEventListener("change", (e) => {
@@ -1129,6 +1325,11 @@
     configurarLector();
     window.addEventListener("hashchange", ruta);
     cargarBiblioteca().then(ruta);
+    actualizarCarpeta();
+    if (CARPETA.carpeta) {
+      $("btn-carpeta").href = `https://drive.google.com/drive/folders/${CARPETA.carpeta}`;
+      $("btn-carpeta").hidden = false;
+    }
   }
 
   iniciar();
