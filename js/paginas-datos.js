@@ -2,7 +2,7 @@
 // La página paginas.html se construye a partir de esta lista: para añadir una, basta con
 // añadir una entrada aquí (no hace falta tocar el HTML).
 //
-// estado: "probada" (se comprobó que abre) | "por-probar" (de Google/Microsoft, debería abrir)
+// estado: "probada" (se comprobó que abre) | "por-probar" (de Google, debería abrir)
 // nota: aviso opcional que se muestra en la tarjeta (límites, si pide cuenta para algo, etc.).
 
 // Portada de cada categoría: degradado, emoji decorativo y orden en la página.
@@ -21,9 +21,6 @@ const VISTRA_PAGINAS = [
   { nombre: "Gemini", url: "https://gemini.google.com", categoria: "Inteligencia artificial", estado: "probada",
     descripcion: "Asistente de IA de Google para preguntar, resumir, traducir y redactar textos.",
     nota: "Chat con límites y no guarda el historial." },
-  { nombre: "Microsoft Copilot", url: "https://copilot.microsoft.com", categoria: "Inteligencia artificial", estado: "probada",
-    descripcion: "Asistente de IA de Microsoft con respuestas apoyadas en búsquedas de la web.",
-    nota: "Chat con límites." },
 
   // Herramientas de Google
   { nombre: "Google Translate", url: "https://translate.google.com", categoria: "Herramientas de Google", estado: "probada",
