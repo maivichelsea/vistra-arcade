@@ -81,6 +81,29 @@ body.playing { overflow: hidden; }
 .names[hidden] { display: none; }
 .names label { display: flex; align-items: center; gap: .5rem; }
 .names .input { width: 11rem; }
+.names-hint { font-size: .85rem; }
+
+/* Ranking de récords */
+.ranking { padding: 1rem 1.25rem .25rem; }
+.ranking h3 { font-size: 1rem; font-weight: 900; margin-bottom: .6rem; }
+.ranking-list { list-style: none; display: grid; gap: .3rem; }
+.ranking-list li {
+  display: grid;
+  grid-template-columns: 2rem 1fr auto;
+  align-items: center;
+  gap: .5rem;
+  padding: .45rem .65rem;
+  border-radius: 8px;
+  background: var(--background);
+  font-size: .92rem;
+}
+.ranking-list .pos { font-weight: 900; color: var(--muted); text-align: center; }
+.ranking-list .who { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ranking-list .pts { font-weight: 900; font-variant-numeric: tabular-nums; }
+.ranking-list li.me { outline: 2px solid var(--arcade); outline-offset: -2px; }
+.ranking-list li.empty { grid-template-columns: 1fr; color: var(--muted); }
+.ranking-note { margin-top: .6rem; font-size: .8rem; color: var(--muted); }
+.record-note { display: block; margin-top: .35rem; font-weight: 800; color: var(--arcade); }
 
 .dot { display: inline-block; width: .8rem; height: .8rem; border-radius: 50%; flex: none; background: var(--guess); }
 .dot.p2 { background: var(--guess-2); }

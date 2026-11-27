@@ -28,7 +28,8 @@
     const card = el("a", "game-card reveal");
     card.href = game.url;
     card.dataset.category = game.categoria;
-    card.setAttribute("aria-label", `${game.nombre}. ${game.categoria}. ${game.descripcion} Jugar.`);
+    const action = game.accion || "Jugar";
+    card.setAttribute("aria-label", `${game.nombre}. ${game.categoria}. ${game.descripcion} ${action}.`);
 
     const art = el("div", "game-art");
     art.append(
@@ -42,7 +43,7 @@
     (game.etiquetas || []).forEach((tag) => tags.append(el("li", "", tag)));
 
     const cta = el("span", "play-cta");
-    cta.append(el("span", "", "Jugar ahora"), el("span", "play-icon", "▶"));
+    cta.append(el("span", "", game.accion || "Jugar ahora"), el("span", "play-icon", "▶"));
     cta.lastChild.setAttribute("aria-hidden", "true");
 
     body.append(el("h3", "", game.nombre), el("p", "", game.descripcion), tags, cta);
@@ -75,6 +76,35 @@
       return btn;
     });
     filters.replaceChildren(...buttons);
+  }
+
+  // ---------- Modo escondido ----------
+  // Lleva a una página aparte con herramientas. Se abre con la tecla Escape
+  // o, en el móvil, manteniendo pulsado el logo de la barra unos 2 segundos.
+  const HIDDEN_URL = "escondido/index.html";
+
+  function setupHiddenMode() {
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !e.repeat) window.location.href = HIDDEN_URL;
+    });
+
+    const logo = $("nav-brand");
+    let timer = null;
+    let opened = false;
+    const cancel = () => clearTimeout(timer);
+    logo.addEventListener("pointerdown", (e) => {
+      if (e.pointerType === "mouse") return;
+      opened = false;
+      timer = setTimeout(() => {
+        opened = true;
+        if (navigator.vibrate) navigator.vibrate(30);
+        window.location.href = HIDDEN_URL;
+      }, 2000);
+    });
+    ["pointerup", "pointerleave", "pointercancel"].forEach((type) => logo.addEventListener(type, cancel));
+    // Evita que el toque largo abra el menú del enlace o recargue la portada.
+    logo.addEventListener("contextmenu", (e) => { if (timer) e.preventDefault(); });
+    logo.addEventListener("click", (e) => { if (opened) e.preventDefault(); });
   }
 
   // ---------- Novedades ----------
@@ -164,6 +194,7 @@
 
   renderCatalog();
   renderNews();
+  setupHiddenMode();
   renderExtras();
   setupReveal();
   setupActiveNav();

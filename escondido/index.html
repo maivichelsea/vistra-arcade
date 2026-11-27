@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Modo escondido · Vistra Arcade</title>
+  <link rel="icon" href="../img/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/home.css">
+  <style>
+    .escondido-main { padding-block: clamp(1.5rem, 4vw, 3rem) 3rem; }
+    .escondido-main .game-card { border-style: dashed; }
+    .escondido-main .game-grid { grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); }
+  </style>
+</head>
+<body class="arcade-bg">
+  <header class="site-nav game-nav">
+    <div class="container nav-inner">
+      <a class="brand" href="../index.html" aria-label="Volver a Vistra Arcade">
+        <img class="brand-logo" src="../img/logo.svg" alt="" width="36" height="36">
+        <span class="brand-text"><strong>VISTRA</strong><span>ARCADE</span></span>
+      </a>
+      <span class="nav-sep" aria-hidden="true"></span>
+      <div class="game-title">
+        <span class="eyebrow">🔒 Solo para ti</span>
+        <h1>Modo escondido</h1>
+      </div>
+      <div class="nav-actions">
+        <span class="kbd-hint"><kbd>Esc</kbd> volver al arcade</span>
+        <a class="btn btn-ghost btn-sm" href="../index.html">← Arcade</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container escondido-main">
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Herramientas</p>
+        <h2>¿Qué necesitas hoy?</h2>
+        <p class="section-lead">Esta página no aparece en el arcade. Se abre con <kbd>Esc</kbd> en la portada o, en el móvil, manteniendo pulsado el logo.</p>
+      </div>
+    </div>
+
+    <div class="game-grid">
+      <a class="game-card" href="nomina/index.html" aria-label="Calculadora de nómina. Calcula el neto de la quincena. Abrir.">
+        <div class="game-art">
+          <img src="../img/escondido/nomina.svg" alt="" width="320" height="180">
+          <span class="badge badge-category">Herramienta</span>
+          <span class="badge badge-status status-escondido">Escondido</span>
+        </div>
+        <div class="game-body">
+          <h3>Calculadora de nómina</h3>
+          <p>Calcula el neto de la quincena: horas ordinarias y festivas, auxilios, salud y pensión.</p>
+          <ul class="tags"><li>Pega el formato de novedades</li><li>Funciona sin conexión</li></ul>
+          <span class="play-cta"><span>Abrir</span><span class="play-icon" aria-hidden="true">▶</span></span>
+        </div>
+      </a>
+
+      <a class="game-card" href="note-fixer/index.html" aria-label="MWNE Note Fixer. Corrige la nota de la IA y registra cada llamada en el Interaction Tracker. Abrir.">
+        <div class="game-art">
+          <img src="../img/escondido/note-fixer.svg" alt="" width="320" height="180">
+          <span class="badge badge-category">Herramienta</span>
+          <span class="badge badge-status status-escondido">Escondido</span>
+        </div>
+        <div class="game-body">
+          <h3>MWNE Note Fixer</h3>
+          <p>Corrige la nota de la IA y registra cada llamada en el Interaction Tracker con su puntaje QA.</p>
+          <ul class="tags"><li>Note Fixer</li><li>Interaction Tracker</li><li>Exporta CSV</li></ul>
+          <span class="play-cta"><span>Abrir</span><span class="play-icon" aria-hidden="true">▶</span></span>
+        </div>
+      </a>
+    </div>
+  </main>
+
+  <script>
+    // Escape devuelve a la portada del arcade.
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && !e.repeat) window.location.href = "../index.html";
+    });
+  </script>
+</body>
+</html>

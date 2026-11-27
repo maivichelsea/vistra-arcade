@@ -47,6 +47,10 @@
           <label><input type="radio" name="players" value="1" checked><span class="chip">👤 1 jugador</span></label>
           <label><input type="radio" name="players" value="2"><span class="chip">👥 2 jugadores (mismo PC)</span></label>
         </div>
+        <div id="solo-name" class="names">
+          <label><span class="dot p1"></span><input class="input" id="name-solo" maxlength="16" placeholder="Tu nombre" aria-label="Tu nombre para el ranking" autocomplete="nickname"></label>
+          <span class="muted names-hint">Escribe tu nombre para entrar al ranking.</span>
+        </div>
         <div id="names" class="names" hidden>
           <label><span class="dot p1"></span><input class="input" id="name-1" maxlength="16" placeholder="Jugador 1" aria-label="Nombre del jugador 1"></label>
           <label><span class="dot p2"></span><input class="input" id="name-2" maxlength="16" placeholder="Jugador 2" aria-label="Nombre del jugador 2"></label>
@@ -68,7 +72,12 @@
 
       <aside class="panel menu-side">
         <img class="menu-art" src="../../img/juegos/mundoguessr.svg" alt="" width="320" height="180">
-        <details class="help" open>
+        <section class="ranking" aria-labelledby="ranking-title">
+          <h3 id="ranking-title">🏆 Récords</h3>
+          <ol id="ranking-list" class="ranking-list"></ol>
+          <p class="ranking-note">Cuenta el mejor resultado de cada persona. Los récords se guardan en este navegador.</p>
+        </section>
+        <details class="help">
           <summary>Cómo jugar</summary>
           <ul>
             <li>Apareces en un lugar al azar en Street View. Puedes moverte, girar y hacer zoom.</li>

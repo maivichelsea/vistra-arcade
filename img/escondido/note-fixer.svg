@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" role="img" aria-label="Nota corregida con cambios resaltados y un medidor de puntaje">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#14113d"/>
+      <stop offset="1" stop-color="#2f27ce"/>
+    </linearGradient>
+    <radialGradient id="glow" cx=".5" cy=".5" r=".6">
+      <stop offset="0" stop-color="#7b74ff" stop-opacity=".45"/>
+      <stop offset="1" stop-color="#7b74ff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="320" height="180" fill="url(#bg)"/>
+  <rect width="320" height="180" fill="url(#glow)"/>
+  <path d="M48 22h118l26 26v112H48z" fill="#f6f5ff"/>
+  <path d="M166 22v26h26" fill="#dedcff"/>
+  <rect x="62" y="40" width="70" height="8" rx="4" fill="#2f27ce"/>
+  <rect x="62" y="62" width="112" height="6" rx="3" fill="#c9c5ff"/>
+  <rect x="62" y="76" width="46" height="6" rx="3" fill="#c9c5ff"/><rect x="112" y="73" width="44" height="12" rx="3" fill="#fff1a8"/><rect x="116" y="76" width="36" height="6" rx="3" fill="#b38f00"/>
+  <rect x="62" y="92" width="96" height="6" rx="3" fill="#c9c5ff"/>
+  <rect x="62" y="106" width="28" height="12" rx="3" fill="#fff1a8"/><rect x="66" y="109" width="20" height="6" rx="3" fill="#b38f00"/><rect x="94" y="109" width="72" height="6" rx="3" fill="#c9c5ff"/>
+  <rect x="62" y="124" width="104" height="6" rx="3" fill="#c9c5ff"/>
+  <rect x="62" y="138" width="60" height="6" rx="3" fill="#c9c5ff"/>
+  <circle cx="246" cy="90" r="40" fill="#14113d"/>
+  <circle cx="246" cy="90" r="30" fill="none" stroke="#2b2675" stroke-width="9"/>
+  <circle cx="246" cy="90" r="30" fill="none" stroke="#1f9d55" stroke-width="9" stroke-linecap="round" stroke-dasharray="188.5" stroke-dashoffset="0" transform="rotate(-90 246 90)"/>
+  <text x="246" y="97" text-anchor="middle" font-family="Segoe UI, Arial, sans-serif" font-weight="900" font-size="20" fill="#ffb347">100</text>
+  <path d="M200 40l6 -12 6 12z" fill="#e8590c"/><circle cx="290" cy="148" r="5" fill="#ff5a4e"/><rect x="24" y="140" width="9" height="9" rx="2" fill="#7b74ff"/>
+</svg>

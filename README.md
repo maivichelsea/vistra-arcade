@@ -6,9 +6,10 @@ Minijuegos originales para el navegador, hechos con HTML, CSS y JavaScript sin d
 
 - **Banderas y Capitales:** quiz de 10 preguntas contra el reloj. Banderas, capitales o mezcla; todo el mundo o un continente; 20, 12 o 6 segundos por pregunta. Las banderas usan la fuente Twemoji Country Flags (gráficos de Twemoji, CC BY 4.0) incluida en `games/banderas/fuentes/`, así se ven también en Windows.
 - **Buscaminas:** niveles Principiante (8×8, 10 minas), Intermedio (16×16, 40), Experto (16×30, 99) y Personalizado. Primer clic seguro y apertura de vecinas.
+- **Serpiente Neón:** come fruta y crece sin chocar. Velocidades Lenta, Normal y Rápida que aceleran con cada fruta, estrellas doradas con puntos extra y récord por velocidad. Teclado, deslizar el dedo o cruceta en el móvil.
 - **Sudoku:** tableros generados al momento con solución única y 4 dificultades (Fácil, Medio, Difícil, Experto). Notas, deshacer, pistas, marcado de errores y guardado automático de la partida.
 - **Billar:** bola 8 con física propia en canvas (deslizamiento y rodadura, efecto de seguimiento y retroceso, choques exactos y troneras con mandíbulas). 1 jugador contra la CPU o 2 jugadores en el mismo PC. Lisas y rayadas, faltas con bola en mano y victoria al meter la 8.
-- **MundoGuessr:** apareces en un lugar al azar con Google Street View y marcas en el mapa dónde crees que estás. Mapa del mundo, 5 rondas de hasta 5000 puntos y tiempo opcional. Modo de 1 jugador o de 2 jugadores por turnos en el mismo PC.
+- **MundoGuessr:** apareces en un lugar al azar con Google Street View y marcas en el mapa dónde crees que estás. Mapa del mundo, 5 rondas de hasta 5000 puntos y tiempo opcional. Modo de 1 jugador o de 2 jugadores por turnos en el mismo PC, y tabla de récords con el mejor resultado de cada persona (se guarda en el navegador).
 
 ### Clave de Google Maps (MundoGuessr)
 

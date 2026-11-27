@@ -51,6 +51,74 @@ const cssColor = (name) => getComputedStyle(document.documentElement).getPropert
 
 // ---------- Estado ----------
 let playerCount = 1;
+
+// ---------- Ranking de récords ----------
+// Guarda el mejor resultado de cada persona (partidas de 1 o 2 jugadores) en este navegador.
+const RECORDS_KEY = "vistra_mundoguessr_records";
+const NAME_KEY = "vistra_mundoguessr_nombre";
+const RANKING_SIZE = 10;
+// Récords de partida conocidos: siempre aparecen en el ranking.
+const RANKING_BASE = [
+  { name: "Javier", score: 24966 },
+  { name: "Lizzie", score: 22483 },
+];
+
+function loadRecords() {
+  try { return JSON.parse(localStorage.getItem(RECORDS_KEY)) || {}; } catch { return {}; }
+}
+
+function ranking() {
+  const best = {};
+  const add = (r) => {
+    const key = r.name.toLocaleLowerCase("es");
+    if (!best[key] || r.score > best[key].score) best[key] = { name: r.name, score: r.score };
+  };
+  RANKING_BASE.forEach(add);
+  Object.values(loadRecords()).forEach(add);
+  return Object.values(best).sort((a, b) => b.score - a.score);
+}
+
+// Guarda el resultado si es el mejor de esa persona. Devuelve si es récord y su puesto.
+function saveRecord(name, score) {
+  const records = loadRecords();
+  const key = name.toLocaleLowerCase("es");
+  const previous = Math.max(records[key]?.score || 0, ...RANKING_BASE.filter((r) => r.name.toLocaleLowerCase("es") === key).map((r) => r.score));
+  const isNew = score > previous;
+  if (isNew) {
+    records[key] = { name, score, date: new Date().toISOString().slice(0, 10) };
+    try { localStorage.setItem(RECORDS_KEY, JSON.stringify(records)); } catch { /* sin almacenamiento */ }
+  }
+  const position = ranking().findIndex((r) => r.name.toLocaleLowerCase("es") === key) + 1;
+  return { isNew, position };
+}
+
+function renderRanking(highlight = "") {
+  const list = $("ranking-list");
+  const rows = ranking().slice(0, RANKING_SIZE);
+  const medals = ["🥇", "🥈", "🥉"];
+  const me = highlight.toLocaleLowerCase("es");
+  list.replaceChildren(...rows.map((r, i) => {
+    const li = document.createElement("li");
+    if (me && r.name.toLocaleLowerCase("es") === me) li.className = "me";
+    const pos = document.createElement("span");
+    pos.className = "pos";
+    pos.textContent = medals[i] || `${i + 1}`;
+    const who = document.createElement("span");
+    who.className = "who";
+    who.textContent = r.name;
+    const pts = document.createElement("span");
+    pts.className = "pts";
+    pts.textContent = fmt(r.score);
+    li.append(pos, who, pts);
+    return li;
+  }));
+  if (!rows.length) {
+    const li = document.createElement("li");
+    li.className = "empty";
+    li.textContent = "Todavía no hay récords.";
+    list.append(li);
+  }
+}
 let timeLimit = 0;
 let game = null;
 let sv, panorama, guessMap, resultMap, guessMarker;
@@ -63,6 +131,7 @@ function buildMenu() {
     input.addEventListener("change", () => {
       playerCount = Number(input.value);
       $("names").hidden = playerCount !== 2;
+      $("solo-name").hidden = playerCount !== 1;
       if (playerCount === 2) $("name-1").focus();
     });
   });
@@ -71,9 +140,17 @@ function buildMenu() {
   });
 }
 
+// Cada jugador: nombre visible y si entra al ranking (solo si escribió su nombre).
 function playerNames() {
-  if (playerCount === 1) return ["Tú"];
-  return [1, 2].map((i) => $(`name-${i}`).value.trim().slice(0, 16) || `Jugador ${i}`);
+  if (playerCount === 1) {
+    const name = $("name-solo").value.trim().slice(0, 16);
+    try { localStorage.setItem(NAME_KEY, name); } catch { /* sin almacenamiento */ }
+    return [{ name: name || "Tú", ranked: Boolean(name) }];
+  }
+  return [1, 2].map((i) => {
+    const name = $(`name-${i}`).value.trim().slice(0, 16);
+    return { name: name || `Jugador ${i}`, ranked: Boolean(name) };
+  });
 }
 
 // ---------- Carga de Google Maps ----------
@@ -173,7 +250,7 @@ const isDuel = () => game.players.length === 2;
 
 function startGame() {
   game = {
-    players: playerNames().map((name) => ({ name, score: 0 })),
+    players: playerNames().map(({ name, ranked }) => ({ name, ranked, score: 0 })),
     rounds: [],          // [{ location, heading, guesses: [{ guess, km, points }] }]
     used: new Set(),
     current: null,
@@ -542,6 +619,13 @@ function showRoundResult() {
   $("menu-btn").hidden = true;
 }
 
+function recordNote(text) {
+  const note = document.createElement("span");
+  note.className = "record-note";
+  note.textContent = text;
+  $("result-detail").append(note);
+}
+
 function verdict(fraction) {
   if (fraction >= 0.9) return "¡Increíble, eres un experto en geografía!";
   if (fraction >= 0.7) return "¡Muy buen ojo!";
@@ -558,6 +642,13 @@ function showFinal() {
     const total = game.players[0].score;
     $("result-title").textContent = `${fmt(total)} / ${fmt(max)} puntos`;
     setDetail(verdict(total / max));
+    const player = game.players[0];
+    if (player.ranked) {
+      const { isNew, position } = saveRecord(player.name, total);
+      recordNote(isNew ? `🏆 ¡Nuevo récord personal! Puesto ${position} del ranking.` : `Puesto ${position} del ranking con tu mejor resultado.`);
+    } else {
+      recordNote("Escribe tu nombre en el menú para guardar tus récords en el ranking.");
+    }
     setBar(total / max);
     setList(game.rounds.map((r, i) => {
       const g = r.guesses[0];
@@ -568,6 +659,10 @@ function showFinal() {
     const winner = p1.score === p2.score ? null : p1.score > p2.score ? p1 : p2;
     $("result-title").textContent = winner ? `🏆 Gana ${winner.name}` : "¡Empate!";
     setDetail(`${p1.name} ${fmt(p1.score)} · ${p2.name} ${fmt(p2.score)}`);
+    const records = game.players
+      .filter((p) => p.ranked && saveRecord(p.name, p.score).isNew)
+      .map((p) => p.name);
+    if (records.length) recordNote(`🏆 Nuevo récord personal: ${records.join(" y ")}.`);
     setBar(null);
     setList(
       game.rounds.map((r, i) => {
@@ -603,6 +698,7 @@ $("next-btn").addEventListener("click", () => {
 $("again-btn").addEventListener("click", startGame);
 $("menu-btn").addEventListener("click", () => {
   game = null;
+  renderRanking($("name-solo").value.trim());
   goTo("menu");
 });
 
@@ -615,4 +711,11 @@ addEventListener("keydown", (e) => {
 
 // ---------- Arranque ----------
 buildMenu();
+try { $("name-solo").value = localStorage.getItem(NAME_KEY) || ""; } catch { /* sin almacenamiento */ }
+renderRanking($("name-solo").value.trim());
+$("name-solo").addEventListener("input", () => {
+  const name = $("name-solo").value.trim();
+  renderRanking(name);
+  try { localStorage.setItem(NAME_KEY, name); } catch { /* sin almacenamiento */ }
+});
 loadGoogleMaps();

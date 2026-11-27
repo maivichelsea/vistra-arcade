@@ -192,6 +192,7 @@
 .status-disponible { background: var(--success-soft); color: var(--success); }
 .status-nuevo { background: var(--arcade); color: #fff; }
 .status-beta { background: var(--secondary); color: var(--primary-text); }
+.status-escondido { background: #14113d; color: #ffb347; }
 .game-art .status-disponible { background: rgba(227, 246, 234, .95); color: #17803f; }
 
 .game-body { display: flex; flex-direction: column; flex: 1; padding: 1.1rem 1.2rem 1.2rem; }
@@ -358,3 +359,6 @@
 
 html:has(.home) { scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) { html:has(.home) { scroll-behavior: auto; } }
+
+/* Toque largo en el logo (modo escondido): sin menú del enlace ni selección */
+#nav-brand { -webkit-touch-callout: none; user-select: none; -webkit-user-select: none; }

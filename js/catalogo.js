@@ -16,6 +16,16 @@ const VISTRA_JUEGOS = [
     etiquetas: ["1 jugador", "Sin clave de Google", "Funciona sin conexión"],
   },
   {
+    id: "serpiente",
+    nombre: "Serpiente Neón",
+    url: "games/serpiente/index.html",
+    imagen: "img/juegos/serpiente.svg",
+    categoria: "Arcade",
+    estado: "nuevo",
+    descripcion: "Recorre la cuadrícula, come fruta y crece sin chocar. Cada fruta te hace más rápida.",
+    etiquetas: ["1 jugador", "3 velocidades", "Funciona sin conexión"],
+  },
+  {
     id: "sudoku",
     nombre: "Sudoku",
     url: "games/sudoku/index.html",
@@ -70,6 +80,24 @@ const VISTRA_NOVEDADES = [
     juego: null,
     titulo: "Nueva sección: Libros",
     texto: "Lee tus PDF en el arcade: guarda por dónde vas, añade marcadores y resalta texto en cuatro colores.",
+  },
+  {
+    fecha: "2026-11-25",
+    juego: "mundoguessr",
+    titulo: "MundoGuessr: tabla de récords",
+    texto: "Escribe tu nombre antes de jugar y tu mejor resultado entra al ranking. Javier lidera con 24.966 puntos.",
+  },
+  {
+    fecha: "2026-11-25",
+    juego: "serpiente",
+    titulo: "Nuevo juego: Serpiente Neón",
+    texto: "Tres velocidades, estrellas doradas que dan puntos extra y récord para cada velocidad. En el móvil se juega deslizando el dedo.",
+  },
+  {
+    fecha: "2026-11-25",
+    juego: "mundoguessr",
+    titulo: "MundoGuessr: 14 países nuevos",
+    texto: "Llegan Bolivia, Guatemala, Costa Rica, Panamá, República Dominicana, Puerto Rico, Países Bajos, Bélgica, Suiza, Austria, Irlanda, Polonia, Croacia y Grecia.",
   },
   {
     fecha: "2026-11-22",

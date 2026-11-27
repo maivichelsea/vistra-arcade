@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MWNE Note Fixer · Vistra Arcade</title>
+<meta name="color-scheme" content="light dark">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="../../img/logo.svg" type="image/svg+xml">
+<link rel="stylesheet" href="../../css/style.css">
+
+<style>
+  /* Colores de Vistra Arcade (css/style.css): siguen el modo claro u oscuro del sistema */
+  :root{
+    --bg:var(--background); --card:var(--panel); --ink:var(--text); --line:var(--border);
+    --zone:color-mix(in srgb, var(--secondary) 40%, var(--background)); --zone-line:var(--border);
+    --nf-shadow:var(--card-shadow-hover); --bad:var(--danger);
+    --brand:var(--primary); --brand-ink:#ffffff; --ok:var(--success); --warn:var(--arcade);
+    --mark:#fff1a8; --mark-ink:#4a3b00; --chip:color-mix(in srgb, var(--secondary) 55%, var(--panel));
+  }
+  @media (prefers-color-scheme: dark){
+    :root{ --mark:#5a4a0c; --mark-ink:#ffeaa0; --zone:color-mix(in srgb, var(--secondary) 60%, var(--panel)); }
+  }
+  *{box-sizing:border-box}
+  [hidden]{display:none !important}
+  body{line-height:1.45}
+  main{display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:18px 24px 2.5rem;width:100%;max-width:1400px;margin:0 auto}
+  .tab{width:100%}
+  @media (max-width:980px){main{grid-template-columns:1fr}}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px}
+  .card + .card{margin-top:14px}
+  h2{font-size:13px;font-weight:800;margin:0 0 12px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted)}
+  label{display:block;font-size:13px;font-weight:600;margin:10px 0 4px}
+  input[type=text],textarea,select{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:inherit;font-size:14px}
+  textarea{min-height:240px;resize:vertical;font-family:ui-monospace,Consolas,monospace;font-size:13px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .row > div{flex:1;min-width:180px}
+  button{font:inherit;font-size:14px;font-weight:600;border:1px solid var(--line);background:var(--chip);color:var(--ink);padding:8px 14px;border-radius:10px;cursor:pointer}
+  button:hover{filter:brightness(.97)}
+  button.primary{background:var(--brand);color:var(--brand-ink);border-color:var(--brand);font-weight:800;box-shadow:0 3px 0 var(--btn-depth);transition:transform .2s var(--ease),box-shadow .2s var(--ease),background-color .2s}
+  button.primary:hover{background:var(--accent);filter:none;transform:translateY(-1px)}
+  button.primary:active{transform:translateY(2px);box-shadow:0 1px 0 var(--btn-depth)}
+  .hint{font-size:12px;color:var(--muted);margin-top:4px}
+  .seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+  .seg button{border:0;border-radius:0;background:transparent}
+  .seg button.on{background:var(--brand);color:var(--brand-ink)}
+  #preview{white-space:pre-wrap;font-family:ui-monospace,Consolas,monospace;font-size:13.5px;background:var(--card);border:1px solid var(--line);border-radius:8px;padding:12px;min-height:220px;outline:none}
+  #preview b{font-weight:700}
+  mark{background:var(--mark);color:var(--mark-ink);border-radius:3px;padding:0 2px}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--ok);color:#fff;padding:10px 18px;border-radius:999px;font-weight:600;opacity:0;transition:opacity .2s;pointer-events:none}
+  .toast.show{opacity:1}
+  ul.changes{margin:0;padding-left:18px;font-size:14px}
+  ul.changes li{margin:3px 0}
+  .empty{color:var(--muted);font-size:14px}
+  .xfer{border-left:4px solid var(--warn);padding:10px 12px;background:var(--bg);border-radius:8px;font-size:14px}
+  .xfer.okb{border-left-color:var(--ok)}
+  .xfer p{margin:4px 0}
+  .tag{display:inline-block;background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:1px 9px;font-size:12.5px;font-weight:600}
+  .depts{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  @media (max-width:600px){.depts{grid-template-columns:1fr}}
+  .dept{border:1px solid var(--line);border-radius:10px;padding:10px;font-size:13px;background:var(--bg)}
+  .dept strong{display:block;font-size:14px;margin-bottom:3px}
+  .rules{font-size:13px;color:var(--muted);margin:0;padding-left:18px}
+  .rules li{margin:3px 0}
+  .tabs{display:flex;gap:6px;margin-left:auto}
+  .tabs button{border-radius:999px;padding:7px 16px;font-weight:600}
+  .tabs button.on{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+  .tab[hidden]{display:none}
+  main.tracker{grid-template-columns:minmax(320px,400px) minmax(0,1fr)}
+  main section{min-width:0}
+  input[type=date]{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font:inherit;font-size:14px}
+  @media (max-width:980px){main.tracker{grid-template-columns:1fr}}
+  .scorebig{font-size:38px;font-weight:800;min-width:78px;text-align:center}
+  .s100{color:var(--ok)} .s80{color:var(--warn)} .slow{color:#d64545}
+  .checklist{margin:0;padding:0;list-style:none;font-size:13.5px}
+  .checklist li{margin:2px 0}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  @media (max-width:700px){.stats{grid-template-columns:repeat(2,1fr)}}
+  .stat{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:10px;text-align:center}
+  .stat b{display:block;font-size:24px}
+  .stat span{font-size:12px;color:var(--muted)}
+  .tablewrap{overflow:auto;max-height:560px;border:1px solid var(--line);border-radius:8px}
+  table{border-collapse:collapse;width:100%;font-size:13px}
+  th,td{padding:7px 8px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}
+  th{position:sticky;top:0;background:var(--card);font-size:12px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)}
+  td.sc{font-weight:700}
+  td .ic{border:0;background:transparent;padding:2px 6px;cursor:pointer;font-size:14px}
+  .chk{display:flex;align-items:center;gap:8px;font-size:13.5px;margin-top:10px;font-weight:600}
+  .chk input{width:16px;height:16px}
+  select:disabled{opacity:.6}
+  /* ---- Barra de pestañas (fila propia) ---- */
+  .tabs{display:flex;gap:4px;padding:14px 24px 0;width:100%;max-width:1400px;margin:0 auto;border-bottom:1px solid var(--line)}
+  .tabs button{border:0;border-bottom:3px solid transparent;border-radius:0;background:transparent;padding:10px 16px;font-weight:600;color:var(--muted)}
+  .tabs button:hover{color:var(--ink);filter:none}
+  .tabs button.on{background:transparent;color:var(--primary-text);border-bottom-color:var(--arcade)}
+  /* ---- Iconos en botones ---- */
+  button{display:inline-flex;align-items:center;gap:7px}
+  .ico{width:17px;height:17px;flex:0 0 auto;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  /* ---- Estado vacío ---- */
+  .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:196px;text-align:center;color:var(--muted);font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+  .empty-state svg{width:46px;height:46px;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;opacity:.45}
+  .empty-state p{margin:0;font-size:14px;max-width:280px}
+  #preview.editing{border-color:var(--brand);background:var(--card)}
+  button.on-edit{background:var(--brand);color:var(--brand-ink);border-color:var(--brand)}
+  /* ---- Controles segmentados (radios ocultos) ---- */
+  .segr{display:inline-flex;flex-wrap:wrap;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--card)}
+  .segr label{margin:0;font-weight:600;font-size:13.5px;position:relative;cursor:pointer}
+  .segr label + label{border-left:1px solid var(--line)}
+  .segr input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none}
+  .segr span{display:block;padding:8px 16px;color:var(--ink)}
+  .segr input:checked + span{background:var(--brand);color:var(--brand-ink)}
+  .segr input:focus-visible + span{box-shadow:inset 0 0 0 3px color-mix(in srgb, var(--brand) 45%, transparent)}
+  .segr.disabled{opacity:.55}
+  .segr.disabled label{cursor:not-allowed}
+  /* ---- Resumen fijo ---- */
+  .sticky-stats{position:sticky;top:80px;z-index:5;box-shadow:0 6px 18px -12px rgba(0,0,0,.35)}
+  .tablewrap{max-height:65vh}
+  /* ---- Foco accesible ---- */
+  input:focus-visible,select:focus-visible,textarea:focus-visible,button:focus-visible,#preview:focus-visible{outline:none;border-color:var(--brand);box-shadow:0 0 0 3px color-mix(in srgb, var(--brand) 35%, transparent)}
+  /* ===== Zonas de trabajo: entrada (gris) vs. resultado (blanco elevado) ===== */
+  .card.zone-in{background:var(--zone);border-color:var(--zone-line);box-shadow:none}
+  .card.zone-out{background:var(--card);border-color:transparent;box-shadow:var(--nf-shadow)}
+  .zone-in h2,.zone-out h2{display:flex;align-items:center;gap:8px}
+  .step{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:var(--brand);color:var(--brand-ink);font-size:12px;font-weight:700;letter-spacing:0}
+  .zone-in .step{background:var(--card);color:var(--arcade);border:1px solid var(--line)}
+  .gi{width:16px;height:16px;opacity:.8}
+  .reveal:not([hidden]){animation:rise .22s ease-out}
+  @keyframes rise{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+  .na-chip{display:inline-flex;align-items:center;gap:6px;margin-top:10px;font-size:13px;color:var(--muted);background:var(--card);border:1px dashed var(--line);border-radius:999px;padding:4px 12px}
+  /* ===== Tooltip de correcciones ===== */
+  mark[data-tip]{position:relative;cursor:help;outline:none}
+  mark[data-tip]::after{content:attr(data-tip);position:absolute;left:50%;bottom:calc(100% + 9px);transform:translate(-50%,4px);width:max-content;max-width:300px;white-space:normal;
+    background:var(--ink);color:var(--card);font:500 12.5px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;padding:7px 11px;border-radius:8px;box-shadow:var(--nf-shadow);opacity:0;pointer-events:none;transition:opacity .15s,transform .15s;z-index:30}
+  mark[data-tip]::before{content:"";position:absolute;left:50%;bottom:calc(100% + 3px);transform:translateX(-50%);border:6px solid transparent;border-top-color:var(--ink);border-bottom:0;opacity:0;transition:opacity .15s;z-index:30}
+  mark[data-tip]:hover::after,mark[data-tip]:focus-visible::after{opacity:1;transform:translate(-50%,0)}
+  mark[data-tip]:hover::before,mark[data-tip]:focus-visible::before{opacity:1}
+  mark[data-tip]:focus-visible{box-shadow:0 0 0 2px var(--brand)}
+  /* ===== Medidor de puntaje ===== */
+  .scorebox{display:flex;align-items:center;gap:16px;margin:0;padding:0;border:0;background:transparent}
+  .ring{position:relative;width:116px;height:116px;flex:0 0 auto}
+  .ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+  .ring circle{fill:none;stroke-width:10}
+  .ring .ring-bg{stroke:var(--line)}
+  .ring .ring-fg{stroke-linecap:round;transition:stroke-dashoffset .5s cubic-bezier(.3,.7,.2,1),stroke .5s}
+  .ring-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.05}
+  .ring-center b{font-size:32px;font-weight:800;transition:color .5s}
+  .ring-center span{font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;margin-top:3px}
+  .ring.bump{animation:bump .35s ease}
+  @keyframes bump{0%{transform:scale(1)}40%{transform:scale(.94)}100%{transform:scale(1)}}
+  .checklist li{display:flex;align-items:flex-start;gap:7px;margin:4px 0}
+  .checklist .ci{width:16px;height:16px;flex:0 0 auto;margin-top:2px;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+  .ci.ok{stroke:var(--ok)} .ci.bad{stroke:var(--bad)} .ci.warn{stroke:var(--warn)}
+  .checklist li.bad{color:var(--bad);font-weight:600}
+  /* ===== Botones de icono ===== */
+  .icon-btn{padding:8px;justify-content:center}
+  .icon-btn.danger:hover{color:var(--bad);border-color:var(--bad)}
+  td .ic{display:inline-grid;place-items:center;width:30px;height:30px;border:1px solid transparent;border-radius:7px;background:transparent;padding:0;color:var(--muted)}
+  td .ic:hover{background:var(--chip);color:var(--ink);border-color:var(--line)}
+  td .ic.del:hover{color:var(--bad)}
+  td .ic .ico{width:16px;height:16px}
+  td:last-child,th:last-child{position:sticky;right:0;background:var(--card);box-shadow:-8px 0 8px -8px rgba(0,0,0,.18)}
+  th:last-child{z-index:2}
+</style>
+</head>
+<body class="arcade-bg">
+<header class="site-nav game-nav">
+  <div class="container nav-inner">
+    <a class="brand" href="../../index.html" aria-label="Volver a Vistra Arcade">
+      <img class="brand-logo" src="../../img/logo.svg" alt="" width="36" height="36">
+      <span class="brand-text"><strong>VISTRA</strong><span>ARCADE</span></span>
+    </a>
+    <span class="nav-sep" aria-hidden="true"></span>
+    <div class="game-title">
+      <span class="eyebrow">Modo escondido</span>
+      <h1>MWNE Note Fixer</h1>
+    </div>
+    <div class="nav-actions">
+      <a class="btn btn-ghost btn-sm" href="../index.html">← Volver</a>
+    </div>
+  </div>
+</header>
+<nav class="tabs" aria-label="Secciones"><button data-tab="fixer" class="on">Note Fixer</button><button data-tab="tracker">Interaction Tracker</button></nav>
+
+<div id="tab-fixer" class="tab">
+<main>
+  <!-- ===== Columna izquierda: entrada ===== -->
+  <section>
+    <div class="card zone-in">
+      <h2><span class="step">1</span>Datos de la llamada</h2>
+      <div class="row">
+        <div>
+          <label for="callerId">Caller ID</label>
+          <input type="text" id="callerId" placeholder="Ej: 614-555-0123">
+        </div>
+        <div>
+          <label for="who">Who you talked to</label>
+          <input type="text" id="who" placeholder="Ej: Account holder, John Smith">
+                  </div>
+      </div>
+      <div class="hint">Si los dejas vacíos, se usan los que traiga la nota de la IA (si los trae).</div>
+
+      <label for="aiNote">Nota generada por la IA</label>
+      <textarea id="aiNote" placeholder="Pega aquí el resumen de la IA..."></textarea>
+      <div class="row" style="margin-top:10px">
+        <button id="btnClear" title="Borrar Caller ID, Who y la nota"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg>Limpiar</button>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ===== Columna derecha: salida ===== -->
+  <section>
+    <div class="card zone-out">
+      <h2><span class="step">2</span>Nota corregida</h2>
+      <div id="preview" spellcheck="true" aria-live="polite"><div class="empty-state"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M10 13h6M10 17h4"/></svg><p>Pega la nota de la IA a la izquierda y aquí aparecerá corregida.</p></div></div>
+      <div class="hint" id="editHint">Pasa el cursor sobre lo resaltado para ver qué había escrito la IA.</div>
+      <div class="row" style="margin-top:10px">
+        <button class="primary" id="btnCopy" title="Copiar nota al portapapeles"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>Copiar</button>
+        <button id="btnEdit" aria-pressed="false" title="Editar la nota manualmente"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg><span id="btnEditLabel">Editar</span></button>
+        <button id="btnToTracker" title="Registrar esta llamada en el Interaction Tracker"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13"/><path d="M13 6l6 6-6 6"/></svg>Al tracker</button>
+      </div>
+    </div>
+
+    <div class="card zone-out">
+      <h2>Cambios realizados</h2>
+      <div id="changes"><span class="empty">Todavía no hay cambios.</span></div>
+    </div>
+
+  </section>
+</main>
+</div>
+<div id="tab-tracker" class="tab" hidden>
+<main class="tracker">
+  <section>
+    <div class="card zone-in">
+      <h2><span class="step">1</span><span id="formTitle">Llamada</span></h2>
+      <div class="row">
+        <div><label for="tDate">Fecha</label><input type="date" id="tDate"></div>
+        <div id="tNumWrap" hidden style="max-width:110px;min-width:90px"><label for="tNum">Llamada N°</label><input type="text" id="tNum" inputmode="numeric"></div>
+      </div>
+      <label for="tBrand">Brand</label>
+      <select id="tBrand">
+        <option value="">Selecciona…</option>
+        <option>Dynegy</option><option>Energy Harbor</option><option>USGE</option><option>Public Power</option>
+        <option>Ambit</option><option>Better Buy</option><option>Brighten</option><option>Homefield</option><option>Other</option>
+      </select>
+      <div id="tMuniWrap" class="reveal" hidden>
+        <label id="tMuniLbl">¿Cuenta Muni-Agg?</label>
+        <div class="segr" role="radiogroup" aria-labelledby="tMuniLbl" id="tMuni">
+          <label><input type="radio" name="tMuni" value="Si"><span>Sí</span></label>
+          <label><input type="radio" name="tMuni" value="No" checked><span>No</span></label>
+        </div>
+      </div>
+    </div>
+
+    <div class="card zone-in reveal" id="tStep2" hidden>
+      <h2><span class="step">2</span>Resolución</h2>
+      <label for="tDisp">Disposition</label>
+      <select id="tDisp">
+        <option value="">Selecciona…</option>
+        <option>Inquiry – Account Info</option><option>Inquiry – General Information</option>
+        <option>General – Update Account Info</option><option>Bill Explanation</option>
+        <option>Internal/External Transfer</option><option>Muni Agg Enrollment</option>
+        <option>Opt Out</option><option>Opt-Out/Drop Save</option><option>Drop</option>
+        <option>Move Out</option><option>No Account Number</option><option>Other</option>
+      </select>
+      <label for="tTransfer">Transfer</label>
+      <select id="tTransfer">
+        <option>No Transfer</option><option>Customer Success</option><option>Acquisition</option>
+        <option>Utility</option><option>Texas</option>
+      </select>
+    </div>
+
+    <div class="card zone-in reveal" id="tStep3" hidden>
+      <h2><span class="step">3</span>QA</h2>
+      <label for="tStatement">Loyalty / Regret statement</label>
+      <select id="tStatement">
+        <option>We appreciate you calling us today</option>
+        <option>Thank you for choosing us</option>
+        <option>Thank you for being a loyal customer</option>
+        <option>We're sorry to lose you as a customer</option>
+        <option>No statement</option>
+      </select>
+      <div id="tSurveyWrap" class="reveal">
+        <label id="tSurveyLbl">Survey ofrecida</label>
+        <div class="segr" role="radiogroup" aria-labelledby="tSurveyLbl" id="tSurvey">
+          <label><input type="radio" name="tSurvey" value="Si"><span>Sí</span></label>
+          <label><input type="radio" name="tSurvey" value="No"><span>No</span></label>
+          <label><input type="radio" name="tSurvey" value="No Aplica"><span>No aplica</span></label>
+        </div>
+      </div>
+      <div id="tSurveyNA" class="na-chip reveal" hidden><svg class="ico gi" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h11"/><path d="M12 4l3 3-3 3"/><path d="M20 17H9"/><path d="M12 14l-3 3 3 3"/></svg>Survey no aplica: llamada transferida</div>
+      <div id="tEpnWrap" class="reveal" hidden>
+        <label for="tEpn">Correo y teléfono (E / PN)</label>
+        <select id="tEpn">
+          <option value="">Selecciona…</option>
+          <option value="Ambos">Agregué/actualicé ambos</option>
+          <option value="Solo uno">Solo uno de los dos</option>
+          <option value="Ninguno">No los actualicé</option>
+          <option value="No Aplica">No aplica</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card zone-out">
+      <div class="scorebox">
+        <div class="ring" id="tRing" role="meter" aria-label="Puntaje QA" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100">
+          <svg viewBox="0 0 120 120" aria-hidden="true"><circle class="ring-bg" cx="60" cy="60" r="52"/><circle class="ring-fg" id="tRingFg" cx="60" cy="60" r="52"/></svg>
+          <div class="ring-center"><b id="tScore">100</b><span id="tDelta">QA</span></div>
+        </div>
+        <ul class="checklist" id="tCheck"></ul>
+      </div>
+      <div class="row" style="margin-top:14px">
+        <button class="primary" id="tSave"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span id="tSaveLabel">Guardar</span></button>
+        <button id="tCancel" hidden title="Cancelar edición"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>Cancelar</button>
+      </div>
+      <div class="hint" id="tMsg"></div>
+    </div>
+  </section>
+
+  <section>
+    <div class="card zone-out sticky-stats">
+      <div class="row" style="justify-content:space-between">
+        <h2 style="margin:0">Resumen</h2>
+        <div style="max-width:200px"><select id="tMonth"></select></div>
+      </div>
+      <div class="stats" style="margin-top:10px">
+        <div class="stat"><b id="stCount">0</b><span>Llamadas</span></div>
+        <div class="stat"><b id="stAvg">–</b><span>Promedio QA</span></div>
+        <div class="stat"><b id="st100">0</b><span>Llamadas en 100</span></div>
+        <div class="stat"><b id="stLow">0</b><span>Por debajo de 100</span></div>
+      </div>
+      <div class="hint" id="stMiss" style="margin-top:8px"></div>
+    </div>
+
+    <div class="card zone-out">
+      <div class="row" style="justify-content:space-between">
+        <h2 style="margin:0">Interacciones</h2>
+        <div class="row" style="flex:0 0 auto">
+          <button class="primary" id="tExport" title="Exportar CSV (se abre en Excel)"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11"/><path d="M7.5 10.5L12 15l4.5-4.5"/><path d="M5 19h14"/></svg>Exportar</button>
+          <button id="tImportBtn" title="Importar un CSV del tracker"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 15V4"/><path d="M7.5 8.5L12 4l4.5 4.5"/><path d="M5 19h14"/></svg>Importar</button>
+          <input type="file" id="tImport" accept=".csv,text/csv" hidden>
+          <button id="tWipe" class="icon-btn danger" title="Borrar todas las interacciones" aria-label="Borrar todas las interacciones"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/></svg></button>
+        </div>
+      </div>
+      <div class="tablewrap" style="margin-top:10px">
+        <table>
+          <thead><tr><th>N°</th><th>Fecha</th><th>Brand</th><th>Disposition</th><th>Transfer</th><th>Loyalty / Regret</th><th>Survey</th><th>E / PN</th><th>Score</th><th></th></tr></thead>
+          <tbody id="tBody"></tbody>
+        </table>
+      </div>
+      <div class="hint">Se guarda automáticamente en este navegador. Exporta el CSV de vez en cuando como respaldo; se abre en Excel.</div>
+    </div>
+  </section>
+</main>
+</div>
+
+
+<div class="toast" id="toast">¡Nota copiada!</div>
+
+<script>
+(function(){
+  "use strict";
+
+  // Marcadores invisibles para resaltar cambios (se quitan al copiar)
+  const MS = "", ME = "";
+  const MO = "\uE002";
+  // mk(nuevo, original): guarda el texto original de la IA para el tooltip
+  const mk = (s, orig) => MS + String(orig || "").replace(/[\uE000-\uE002]/g, "") + MO + s + ME;
+  const strip = s => s.replace(/\uE000[^\uE002]*\uE002/g, "").replace(/[\uE000-\uE002]/g, "");
+
+  // ---------------- Preferencias ----------------
+  const centsStyle = "sym";
+
+  // ---------------- 1. "The agent" → I / me / my ----------------
+  const AGENT_RE = /\b(the\s+)?((?:customer\s+service\s+|support\s+|call\s+center\s+|trusted\s+)?(?:agent|representative|rep|advisor|adviser|associate|csr))\b(['’]s\b)?(\s+[A-Za-z’']+)?/gi;
+  const OBJ_WORDS = new Set(["to","with","for","by","from","about","asked","told","thanked","informed","called","contacted","gave","allowed","helped","provided","requested","let","sent","emailed","permitted","authorized","authorised","at","toward","towards","showed","assured","reminded","advised","instructed","understand","on","than"]);
+  const S_STOP = new Set(["always","thus","perhaps","sometimes","nevertheless","unless","across","towards","afterwards","besides","various","previous","this","his","its","yes","plus","less","nonetheless","regardless","as","us"]);
+  const IRREG = {"is":"am","isn't":"am not","isn’t":"am not","has":"have","hasn't":"haven't","hasn’t":"haven’t","does":"do","doesn't":"don't","doesn’t":"don’t"};
+
+  function isSentenceStart(before){
+    return /(^\s*|[.!?:;]\s+|\n\s*)([-*•]\s*)?(["“(]\s*)?$/.test(before);
+  }
+  function conj(word){
+    const lw = word.toLowerCase();
+    if (IRREG[lw]) return IRREG[lw];
+    if (word !== lw) return word;                 // no tocar palabras con mayúscula
+    if (S_STOP.has(lw) || lw.length <= 3 || !lw.endsWith("s") || lw.endsWith("ss") || lw.endsWith("us") || lw.endsWith("is")) return word;
+    if (/[^aeiou]ies$/.test(lw)) return lw.slice(0,-3) + "y";          // verifies → verify
+    if (/(sses|shes|ches|xes|zes|oes)$/.test(lw)) return lw.slice(0,-2); // reaches → reach
+    return lw.slice(0,-1);                                               // explains → explain
+  }
+
+  function fixAgent(text, log){
+    return text.replace(AGENT_RE, (m, the, noun, poss, next, offset, str) => {
+      const before = str.slice(0, offset);
+      const start = isSentenceStart(before);
+      if (!the && !start) return m;               // "an agent", "a representative" → es otra persona
+      // Si justo antes se habla de transferir, probablemente es OTRO agente
+      if (/(transferr?ed|transferring|connected|routed|referred|escalated)\b[^.!?\n]{0,40}$/i.test(before)) return m;
+      next = next || "";
+      let rep;
+      if (poss){
+        rep = start ? "My" : "my";
+        log.agent.push(strip(m.slice(0, m.length - next.length).trim()) + " → " + rep);
+        return mk(rep, m.slice(0, m.length - next.length)) + next;
+      }
+      const prev = (before.match(/([A-Za-z]+)\s*$/) || [,""])[1].toLowerCase();
+      if (!start && OBJ_WORDS.has(prev)){
+        rep = "me";
+        log.agent.push(strip(m.slice(0, m.length - next.length).trim()) + " → me");
+        return mk(rep, m.slice(0, m.length - next.length)) + next;
+      }
+      // Sujeto: "I" + verbo conjugado
+      let nextOut = next;
+      if (next){
+        const w = next.trim();
+        const c = conj(w);
+        if (c !== w) nextOut = next.replace(w, c);
+      }
+      const orig = strip(m.trim());
+      log.agent.push(orig + " → I" + (nextOut ? nextOut : ""));
+      return nextOut !== next ? mk("I" + nextOut, m) : mk("I", m.slice(0, m.length - next.length)) + next;
+    });
+  }
+
+  // ---------------- 2. Tarifas ----------------
+  function fmtNum(n){ return Number(n.toFixed(4)).toString(); }
+  function fmtCents(n){ return centsStyle === "sym" ? fmtNum(n) + "¢" : fmtNum(n) + " cents"; }
+  function fmtDollars(n){
+    let s = Number(n.toFixed(4)).toString();
+    if (!s.includes(".")) s += ".00"; else if (s.split(".")[1].length === 1) s += "0";
+    return "$" + s;
+  }
+  function unitNorm(u){
+    const l = u.toLowerCase().replace(/\s+/g," ");
+    if (l === "ccf") return "CCF";
+    if (l === "mcf") return "MCF";
+    if (l.startsWith("therm")) return l;           // therm / therms
+    return "kWh";                                  // kwh, kilowatt hour(s)...
+  }
+  function connNorm(c){
+    if (/\//.test(c)) return centsStyle === "sym" ? "/" : " per ";
+    if (!c.trim()) return " per ";
+    return " " + c.trim() + " ";
+  }
+  // ¿El número viene en dólares? kWh: menos de 1 → dólares. CCF: menos de 10 → dólares.
+  function toCents(v, unit){
+    const lim = unit === "CCF" ? 10 : 1;
+    return v < lim ? v * 100 : v;
+  }
+
+  const RATE_A = /\$\s?((?:\d{1,3}(?:,\d{3})+|\d+)?(?:\.\d+)?)(\s*(?:cents?|¢))?(\s*(?:per|\/|a|an|each)?\s*)(kwh|kw\/h|kw-h|kilowatt[\s-]?hours?|ccf)\b/gi;
+  const RATE_B = /\b(kwh|kilowatt[\s-]?hours?|ccf)(\s+(?:supply\s+)?(?:rate|price|charge)?\s*(?:of|is|was|at|=|:)?\s*)\$\s?(\d*\.?\d+)/gi;
+  const RATE_C = /(\d*\.?\d+)\s*(¢|cents?)(\s*(?:per|\/|a|an)?\s*)(therms?|mcf)\b/gi;
+
+  function fixRates(text, log){
+    text = text.replace(RATE_A, (m, num, already, conn, unit) => {
+      if (!num || isNaN(parseFloat(num.replace(/,/g,"")))) return m;
+      const v = parseFloat(num.replace(/,/g,""));
+      const u = unitNorm(unit);
+      const c = already ? v : toCents(v, u);
+      const out = fmtCents(c) + connNorm(conn) + u;
+      log.rates.push(m.trim() + " → " + out);
+      return mk(out, m);
+    });
+    text = text.replace(RATE_B, (m, unit, mid, num) => {
+      const v = parseFloat(num);
+      if (isNaN(v)) return m;
+      const u = unitNorm(unit);
+      const out = fmtCents(toCents(v, u));
+      log.rates.push(m.trim() + " → " + unit + mid + out);
+      return unit + mid + mk(out, m.slice(unit.length + mid.length));
+    });
+    text = text.replace(RATE_C, (m, num, cents, conn, unit) => {
+      const v = parseFloat(num);
+      if (isNaN(v)) return m;
+      const u = unitNorm(unit);
+      const c = conn.includes("/") ? "/" : (conn.trim() ? " " + conn.trim() + " " : " per ");
+      const out = fmtDollars(v / 100) + c + u;
+      log.rates.push(m.trim() + " → " + out);
+      return mk(out, m);
+    });
+    return text;
+  }
+
+  // ---------------- 3. Transferencias ----------------
+  const DEPTS = {
+    cs:   {name:"Customer Success",  phrase:"the Customer Success department"},
+    acq:  {name:"Acquisition",       phrase:"the Acquisition department"},
+    util: {name:"Utility",           phrase:"the utility company"},
+  };
+  const SUF = "(?:\\s+(?:department|dept\\.?|team|line|queue|group|unit|specialists?|representatives?|agents?))";
+  const ART = "(?:(?:the|our|a|an)\\s+)?";
+  const ALIASES = [
+    ["cs",   new RegExp("\\b" + ART + "(?:customer\\s+success|retentions?)" + SUF + "?\\b", "i")],
+    ["cs",   new RegExp("\\b" + ART + "(?:renewals?|cancellations?|save|loyalty|plan\\s+changes?|plans?|planes|rates?|pricing|offers?)" + SUF + "\\b", "i")],
+    ["cs",   new RegExp("\\b" + ART + "renewals\\b", "i")],
+    ["acq",  new RegExp("\\b" + ART + "acquisitions?" + SUF + "?\\b", "i")],
+    ["acq",  new RegExp("\\b" + ART + "(?:sales|enrollments?|new\\s+accounts?|new\\s+service|new\\s+customers?)" + SUF + "\\b", "i")],
+    ["acq",  new RegExp("\\b" + ART + "sales\\b", "i")],
+    // Nosotros somos Customer Service: si la IA dice que transferimos ahí, se reemplaza por el departamento correcto
+    ["generic", new RegExp("\\b" + ART + "(?:customer\\s+service|customer\\s+care|customer\\s+support|muni(?:cipal)?[\\s-]+agg(?:regation)?s?|aggregation|account\\s+services|general\\s+support)" + SUF + "?\\b", "i")],
+    ["util", new RegExp("\\b" + ART + "(?:local\\s+)?(?:utility|utilities)(?:\\s+(?:company|provider|department|team))?\\b", "i")],
+    ["util", new RegExp("\\b" + ART + "(?:billing|metering|meter\\s+reading|meter|outages?)" + SUF + "\\b", "i")],
+    ["util", new RegExp("\\b" + ART + "(?:EDC|LDC)\\b")],
+    ["generic", /\b(?:another|the\s+(?:appropriate|correct|right|proper|relevant|respective|corresponding))\s+(?:department|team|line|queue)\b/i]
+  ];
+  const XFER_RE = /\b(transferr?(?:ed|ing)?|transfers|warm[-\s]transfer|cold[-\s]transfer|routed|re-?routed|redirected|referred|escalated|connected\s+(?:the\s+)?(?:customer|caller|call))\b/i;
+
+  const KEYWORDS = {
+    cs:   [/renew/i, /\bplan change/i, /chang\w*\s+(?:\w+\s+)?plan/i, /switch\w*\s+(?:\w+\s+)?plans?/i, /cancel/i, /terminat/i, /early termination|\bETF\b/i, /lower (?:rate|price)|better (?:rate|price)/i],
+    acq:  [/new account/i, /enroll/i, /sign(?:ing)?\s*up/i, /start(?:ing)? (?:new )?service/i, /new service/i, /new address|moving|relocat/i, /become a customer|new customer/i],
+    util: [/\bmeter/i, /outage|power (?:is )?out|no power|lights? out/i, /\bbill(?:ing|ed)?\b/i, /estimated read/i, /disconnect|shut[-\s]?off/i, /delivery charge|distribution charge/i, /payment (?:plan|arrangement)/i],
+  };
+
+  function sentences(text){ return text.match(/[^.!?\n]+[.!?]*[ \t]*|\n/g) || []; }
+
+  function findAlias(sentence, fromIdx){
+    let best = null;
+    for (const [key, re] of ALIASES){
+      const sub = sentence.slice(fromIdx);
+      const m = re.exec(sub);
+      if (m && (!best || m.index < best.index)) best = {key, index: m.index + fromIdx, text: m[0]};
+    }
+    return best;
+  }
+
+  function analyzeTransfer(fullText){
+    const plain = strip(fullText);
+    let found = false, detected = null, detectedText = "";
+    for (const s of sentences(plain)){
+      const x = XFER_RE.exec(s);
+      if (!x) continue;
+      const a = findAlias(s, x.index + x[0].length);
+      if (a){ found = true; detected = a.key === "generic" ? null : a.key; detectedText = a.text; break; }
+      if (!found){ found = true; }
+    }
+    // Sugerencia por palabras clave
+    const scores = {}, hits = {};
+    for (const k in KEYWORDS){
+      scores[k] = 0; hits[k] = [];
+      for (const re of KEYWORDS[k]){
+        const m = plain.match(re);
+        if (m){ scores[k] += (k === "util" && re.source.includes("bill")) ? 0.5 : 1; hits[k].push(m[0]); }
+      }
+    }
+    let suggested = null, top = 0;
+    for (const k in scores){ if (scores[k] > top){ top = scores[k]; suggested = k; } }
+    return {found, detected, detectedText, suggested: top >= 1 ? suggested : null, hits: suggested ? hits[suggested] : []};
+  }
+
+  // ¿La frase habla de transferir la llamada (no de "transfer service" a otra dirección)?
+  function isCallTransfer(seg){
+    const plain = strip(seg), x = XFER_RE.exec(plain);
+    if (!x) return false;
+    const after = plain.slice(x.index + x[0].length);
+    return !!findAlias(plain, x.index + x[0].length) ||
+      /\b(department|dept|team|queue|line|specialists?|agents?|representatives?|the call|the customer|the caller|him|her|them)\b/i.test(after);
+  }
+  // Posición de la palabra de transferencia en el texto visible (no dentro del texto original guardado para el globo)
+  function visibleXferIndex(seg){
+    const re = new RegExp(XFER_RE.source, "gi"); let m;
+    while ((m = re.exec(seg))){
+      const b = seg.slice(0, m.index);
+      if (b.lastIndexOf("\uE000") <= b.lastIndexOf("\uE002")) return m.index;
+    }
+    return -1;
+  }
+  // Si la nota menciona la transferencia varias veces, deja solo la última
+  function dedupeTransfers(text, log){
+    const segs = sentences(text);
+    const idx = segs.map((s, k) => isCallTransfer(s) ? k : -1).filter(k => k >= 0);
+    if (idx.length < 2) return text;
+    idx.slice(0, -1).forEach(k => {
+      const seg = segs[k], tail = (seg.match(/\s*$/) || [""])[0];
+      const xi = visibleXferIndex(seg);
+      const before = xi > 0 ? seg.slice(0, xi) : "";
+      // Si antes de la transferencia hay otra acción ("I verified the account and ..."), se conserva esa parte
+      let cutAt = -1, m; const sep = /(,?\s+and\s+|,\s*then\s+|;\s+)/gi;
+      while ((m = sep.exec(before))) cutAt = m.index;
+      const head = cutAt > 0 ? before.slice(0, cutAt) : "";
+      if (head && strip(head).trim().split(/\s+/).length >= 3){
+        log.xfer.push("Mención repetida quitada: “…" + strip(seg.slice(cutAt)).trim().replace(/^(,?\s*and|,\s*then|;)\s*/i, "") + "”");
+        segs[k] = head.replace(/\s+$/, "") + "." + tail;
+      } else {
+        log.xfer.push("Mención repetida quitada: “" + strip(seg).trim() + "”");
+        segs[k] = "";
+      }
+    });
+    return segs.join("").replace(/[ \t]{2,}/g, " ").replace(/^[ \t]+/gm, "");
+  }
+
+  function applyTransfer(text, key, log){
+    if (!key || key === "keep") return {text, done:false};
+    let done = false;
+    const out = sentences(text).map(s => {
+      const plain = strip(s);
+      if (plain !== s) { /* tiene marcadores; trabajamos igual sobre s */ }
+      const x = XFER_RE.exec(s);
+      if (!x) return s;
+      const a = findAlias(s, x.index + x[0].length);
+      if (!a) return s;
+      done = true;
+      const target = DEPTS[key].phrase;
+      if (strip(a.text).toLowerCase() === target.toLowerCase()) return s;
+      log.xfer.push("\"" + strip(a.text) + "\" → \"" + target + "\"");
+      return s.slice(0, a.index) + mk(target, strip(a.text)) + s.slice(a.index + a.text.length);
+    }).join("");
+    return {text: out, done};
+  }
+
+  // ---------------- Separar la nota en campos ----------------
+  const LABEL_RE = /^[ \t]*(?:[-*•][ \t]*)?(caller[ \t]*id|ani|phone(?:[ \t]+number)?|who[ \t]+(?:you|i|the[ \t]+agent)[ \t]+(?:talked|spoke)[ \t]+(?:to|with)|spoke[ \t]+with|caller[ \t]+name|contact(?:[ \t]+name)?|why[ \t]+(?:the[ \t]+)?customer[ \t]+called|reason[ \t]+for[ \t]+(?:the[ \t]+)?call|call[ \t]+reason|reason|issue|steps[ \t]+taken|actions?[ \t]+taken|steps|resolution|outcome|next[ \t]+steps|summary)[ \t]*:[ \t]*/gim;
+  function labelField(l){
+    l = l.toLowerCase().replace(/\s+/g," ");
+    if (/caller id|^ani$|phone/.test(l)) return "callerId";
+    if (/who|spoke with|caller name|contact/.test(l)) return "who";
+    if (/why|reason|issue/.test(l)) return "why";
+    if (/summary/.test(l)) return "auto";
+    return "steps";
+  }
+  function parseNote(text){
+    text = text.replace(/^[ \t]*(?:[-*•#]+[ \t]*)?\**[ \t]*(?:(?:call|interaction|ai|conversation)[ \t]+)?summary[ \t]*\**[ \t]*(?:[:\-–—][ \t]*|$)/gim, "");
+    const f = {callerId:"", who:"", why:"", steps:"", auto:""};
+    const marks = [];
+    let m; LABEL_RE.lastIndex = 0;
+    while ((m = LABEL_RE.exec(text))) marks.push({field: labelField(m[1]), start: m.index, end: m.index + m[0].length});
+    const add = (k, v) => { v = v.replace(/^\s+|\s+$/g,""); if (v) f[k] = f[k] ? f[k] + "\n" + v : v; };
+    if (!marks.length) add("auto", text);
+    else {
+      add("auto", text.slice(0, marks[0].start));
+      marks.forEach((mm, i) => add(mm.field, text.slice(mm.end, i + 1 < marks.length ? marks[i+1].start : text.length)));
+    }
+    if (f.auto){
+      const ss = sentences(f.auto);
+      let rest = [];
+      ss.forEach(s => {
+        if (!f.why && /\b(called|calling|reached out|contacted|wanted|inquir\w*|asked about|asked|reported|reporting|needed|requested|requesting)\b/i.test(s) && /\b(customer|caller|she|he|they|account holder|client)\b/i.test(s)) f.why = s.trim();
+        else rest.push(s);
+      });
+      const r = rest.join("").replace(/^\s+|\s+$/g,"");
+      if (r) f.steps = f.steps ? r + "\n" + f.steps : r;
+    }
+    return f;
+  }
+
+  // ---------------- Render ----------------
+  const $ = id => document.getElementById(id);
+  const esc = s => s.replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  const toHtml = s => esc(s)
+    .replace(/\uE000([^\uE002]*)\uE002/g, (m, o) => '<mark tabindex="0" data-tip="' + (o.trim() ? "La IA escribió: “" + o.trim() + "”" : "Agregado: no estaba en la nota de la IA") + '">')
+    .replace(/\uE001/g, "</mark>");
+
+
+  function run(){
+    const raw = $("aiNote").value;
+    const log = {agent:[], rates:[], xfer:[]};
+    const p = parseNote(raw);
+
+    const fix = s => fixRates(fixAgent(s, log), log);
+    let callerId = $("callerId").value.trim() || p.callerId.trim();
+    let who      = fix($("who").value.trim() || p.who.trim());
+    let why      = fix(p.why);
+    let steps    = fix(p.steps);
+
+    // Transferencia: si se menciona varias veces, queda solo la última
+    steps = dedupeTransfers(steps, log);
+    const info = analyzeTransfer(why + "\n" + steps);
+    const choice = info.found ? (info.suggested || info.detected || "keep") : "keep";
+    window.__mwneLastTransfer = choice;
+    const rs = applyTransfer(steps, choice, log); steps = rs.text;
+    const rw = applyTransfer(why, choice, log); why = rw.text;
+    {
+      if (!rs.done && !rw.done && choice !== "keep"){
+        const sentence = "I transferred the call to " + DEPTS[choice].phrase + ".";
+        steps = steps ? steps.replace(/\s*$/,"") + (/[.!?]$/.test(strip(steps).trim()) ? " " : ". ") + mk(sentence) : mk(sentence);
+        log.xfer.push("Agregado: \"" + sentence + "\"");
+      }
+    }
+
+    const lines = [
+      ["Caller ID", callerId], ["Who you talked to", who],
+      ["Why customer called", why], ["Steps taken", steps]
+    ];
+    if (!raw.trim() && !callerId && !who && !manualEdit){
+      $("preview").innerHTML = EMPTY_HTML;
+    } else if (!manualEdit) {
+      $("preview").innerHTML = lines.map(([k,v]) => "<b>" + k + ":</b> " + toHtml(v)).join("\n");
+    }
+    renderChanges(log);
+  }
+
+
+  function renderChanges(log){
+    const items = [];
+    if (log.agent.length) items.push("<li><b>" + log.agent.length + "× tercera persona → primera persona:</b> " + log.agent.map(esc).join(" · ") + "</li>");
+    if (log.rates.length) items.push("<li><b>" + log.rates.length + "× tarifa corregida:</b> " + log.rates.map(esc).join(" · ") + "</li>");
+    if (log.xfer.length)  items.push("<li><b>Transferencia:</b> " + log.xfer.map(esc).join(" · ") + "</li>");
+    $("changes").innerHTML = items.length ? "<ul class='changes'>" + items.join("") + "</ul>" : "<span class='empty'>No se encontraron errores para corregir.</span>";
+  }
+
+  function copyNote(){
+    const txt = strip($("preview").innerText).replace(/ /g," ").trim();
+    if (!txt || $("preview").querySelector(".empty-state")) return;
+    const done = () => { const t = $("toast"); t.classList.add("show"); setTimeout(() => t.classList.remove("show"), 1400); };
+    if (navigator.clipboard && window.isSecureContext){
+      navigator.clipboard.writeText(txt).then(done, () => fallbackCopy(txt, done));
+    } else fallbackCopy(txt, done);
+  }
+  function fallbackCopy(txt, done){
+    const ta = document.createElement("textarea");
+    ta.value = txt; ta.style.position = "fixed"; ta.style.opacity = "0";
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); done(); } catch(e){ alert("No se pudo copiar automáticamente. Selecciona el texto y usa Ctrl+C."); }
+    document.body.removeChild(ta);
+  }
+
+
+  // ---------------- Eventos ----------------
+  const EMPTY_HTML = '<div class="empty-state"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5"/><path d="M10 13h6M10 17h4"/></svg><p>Pega la nota de la IA a la izquierda y aquí aparecerá corregida.</p></div>';
+  let manualEdit = false;
+  let t;
+  const debounced = () => { clearTimeout(t); t = setTimeout(run, 250); };
+  ["aiNote","callerId","who"].forEach(id => $(id).addEventListener("input", debounced));
+  $("btnEdit").addEventListener("click", () => {
+    const pv = $("preview");
+    if (pv.querySelector(".empty-state")) return;
+    manualEdit = !manualEdit;
+    pv.contentEditable = manualEdit ? "true" : "false";
+    pv.classList.toggle("editing", manualEdit);
+    $("btnEdit").classList.toggle("on-edit", manualEdit);
+    $("btnEdit").setAttribute("aria-pressed", String(manualEdit));
+    $("btnEditLabel").textContent = manualEdit ? "Listo" : "Editar";
+    $("editHint").textContent = manualEdit
+      ? "Edición manual activa: los cambios que hagas en la columna izquierda no reemplazarán este texto hasta que termines la edición."
+      : "Edición terminada. Si cambias algo en la columna izquierda, la nota se vuelve a generar.";
+    if (manualEdit) pv.focus();
+  });
+  $("btnClear").addEventListener("click", () => { ["aiNote","callerId","who"].forEach(id => $(id).value = ""); run(); });
+  $("btnCopy").addEventListener("click", copyNote);
+
+  // Exponer para pruebas
+  window.__mwne = {fixAgent, fixRates, parseNote, analyzeTransfer, strip};
+})();
+</script>
+<script>
+(function(){
+  "use strict";
+  const $ = id => document.getElementById(id);
+  const esc = s => String(s == null ? "" : s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+  const KEY = "mwneTracker.v1";
+  const MONTHS = ["","Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+  // Puntos que se descuentan (según el tracker de QA)
+  const PEN = {statement:15, survey:20, epnNone:20, epnOne:10};
+
+  let rows = [];
+  try { rows = JSON.parse(localStorage.getItem(KEY) || "[]"); } catch(e){ rows = []; }
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(rows)); } catch(e){} };
+  let editingId = null;
+
+  // ---------- Pestañas ----------
+  window.mwneShowTab = function(name){
+    document.querySelectorAll(".tab").forEach(t => t.hidden = t.id !== "tab-" + name);
+    document.querySelectorAll(".tabs button").forEach(b => b.classList.toggle("on", b.dataset.tab === name));
+  };
+  document.querySelectorAll(".tabs button").forEach(b => b.addEventListener("click", () => mwneShowTab(b.dataset.tab)));
+
+  // ---------- Reglas ----------
+  function evaluate(r){
+    let score = 100; const items = [];
+    const transferred = r.transfer && r.transfer !== "No Transfer";
+    if (r.statement === "No statement"){ score -= PEN.statement; items.push(["bad","Sin statement de apreciación (−" + PEN.statement + ")"]); }
+    else items.push(["ok","Statement: “" + r.statement + "”"]);
+    if (transferred) items.push(["ok","Survey no aplica (llamada transferida)"]);
+    else if (r.survey === "No"){ score -= PEN.survey; items.push(["bad","No ofreciste la survey (−" + PEN.survey + ")"]); }
+    else if (r.survey === "Si") items.push(["ok","Survey ofrecida"]);
+    else if (r.survey === "No Aplica") items.push(["ok","Survey no aplica"]);
+    else items.push(["warn","Falta marcar si ofreciste la survey"]);
+    if (r.muni){
+      if (r.epn === "Ninguno"){ score -= PEN.epnNone; items.push(["bad","No actualizaste correo ni teléfono (−" + PEN.epnNone + ")"]); }
+      else if (r.epn === "Solo uno"){ score -= PEN.epnOne; items.push(["bad","Faltó correo o teléfono (−" + PEN.epnOne + ")"]); }
+      else if (r.epn === "Ambos") items.push(["ok","Correo y teléfono actualizados"]);
+      else if (r.epn === "No Aplica") items.push(["ok","E / PN no aplica"]);
+      else items.push(["warn","Falta marcar correo y teléfono (Dynegy Muni-Agg)"]);
+    }
+    return {score: Math.max(0, score), items};
+  }
+  const scoreClass = s => s >= 100 ? "s100" : s >= 80 ? "s80" : "slow";
+  // Iconos (SVG en línea, sin internet)
+  const SVG = (p, c) => '<svg class="' + (c || "ico") + '" viewBox="0 0 24 24" aria-hidden="true">' + p + "</svg>";
+  const IC = {
+    ok:   SVG('<circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.8"/>', "ci ok"),
+    bad:  SVG('<circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/>', "ci bad"),
+    warn: SVG('<path d="M12 3l9.5 17h-19z"/><path d="M12 10v4.5M12 17.5v.01"/>', "ci warn"),
+    edit: SVG('<path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>'),
+    del:  SVG('<path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13h10l1-13"/>')
+  };
+  const RING_C = 2 * Math.PI * 52;
+  let lastScore = 100;
+  function paintRing(score){
+    const fg = $("tRingFg"), hue = Math.round(Math.max(0, Math.min(1, (score - 50) / 50)) * 140);
+    const color = "hsl(" + hue + " 68% 42%)";
+    fg.style.strokeDasharray = RING_C.toFixed(2);
+    fg.style.strokeDashoffset = (RING_C * (1 - score / 100)).toFixed(2);
+    fg.style.stroke = color;
+    $("tScore").textContent = score; $("tScore").style.color = color;
+    $("tDelta").textContent = score >= 100 ? "Perfecto" : "−" + (100 - score) + " pts";
+    $("tRing").setAttribute("aria-valuenow", score);
+    if (score < lastScore){ const r = $("tRing"); r.classList.remove("bump"); void r.offsetWidth; r.classList.add("bump"); }
+    lastScore = score;
+  }
+  function updateVisibility(){
+    const brand = $("tBrand").value, disp = $("tDisp").value, editing = !!editingId;
+    const transferred = $("tTransfer").value !== "No Transfer";
+    $("tStep2").hidden = !(brand || editing);
+    $("tStep3").hidden = !((brand && disp) || editing);
+    $("tMuniWrap").hidden = !(brand === "Dynegy" || disp === "Muni Agg Enrollment" || getR("tMuni") === "Si");
+    $("tSurveyWrap").hidden = transferred;
+    $("tSurveyNA").hidden = !transferred;
+    $("tEpnWrap").hidden = getR("tMuni") !== "Si";
+  }
+
+  // ---------- Formulario ----------
+  // Radios segmentados
+  const radios = name => [...document.querySelectorAll('input[name="' + name + '"]')];
+  const getR = name => (radios(name).find(r => r.checked) || {}).value || "";
+  const setR = (name, v) => radios(name).forEach(r => r.checked = r.value === v);
+  const disR = (name, on) => { radios(name).forEach(r => r.disabled = on); $(name).classList.toggle("disabled", on); };
+  const isDis = name => radios(name)[0].disabled;
+  const muniOn = () => getR("tMuni") === "Si";
+
+  function todayISO(){ const d = new Date(); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0,10); }
+  function isoToDM(iso){ const [y,m,d] = iso.split("-").map(Number); return {d, m, y}; }
+  function nextNum(d, m){ return rows.filter(r => r.d === d && r.m === m).reduce((mx, r) => Math.max(mx, Number(r.n) || 0), 0) + 1; }
+
+  function readForm(){
+    const {d, m, y} = isoToDM($("tDate").value || todayISO());
+    return {
+      d, m, y, n: Number($("tNum").value) || nextNum(d, m),
+      brand: $("tBrand").value, muni: muniOn(),
+      disp: $("tDisp").value, transfer: $("tTransfer").value,
+      statement: $("tStatement").value, survey: getR("tSurvey"),
+      epn: muniOn() ? $("tEpn").value : "No Aplica"
+    };
+  }
+  function syncForm(){
+    const transferred = $("tTransfer").value !== "No Transfer";
+    if (transferred){ setR("tSurvey", "No Aplica"); disR("tSurvey", true); }
+    else { if (isDis("tSurvey")){ setR("tSurvey", ""); } disR("tSurvey", false); }
+    const muni = muniOn();
+    if (!muni){ $("tEpn").value = "No Aplica"; $("tEpn").disabled = true; }
+    else { if ($("tEpn").disabled) $("tEpn").value = ""; $("tEpn").disabled = false; }
+    const r = readForm(); const ev = evaluate(r);
+    updateVisibility();
+    paintRing(ev.score);
+    $("tCheck").innerHTML = ev.items.map(([k,t]) => '<li class="' + k + '">' + IC[k] + "<span>" + esc(t) + "</span></li>").join("");
+  }
+  function resetForm(keepDate){
+    const date = keepDate ? $("tDate").value : todayISO();
+    $("tDate").value = date;
+    const {d, m} = isoToDM(date);
+    $("tNum").value = nextNum(d, m);
+    $("tBrand").value = ""; setR("tMuni", "No"); $("tDisp").value = "";
+    $("tTransfer").value = "No Transfer"; $("tStatement").value = "We appreciate you calling us today";
+    disR("tSurvey", false); setR("tSurvey", ""); $("tEpn").value = "";
+    editingId = null; $("tNumWrap").hidden = true; $("formTitle").textContent = "Llamada"; $("tSaveLabel").textContent = "Guardar"; $("tCancel").hidden = true;
+    syncForm();
+  }
+
+  $("tBrand").addEventListener("change", () => {
+    setR("tMuni", ($("tBrand").value === "Dynegy" || $("tDisp").value === "Muni Agg Enrollment") ? "Si" : "No");
+    syncForm();
+  });
+  $("tDisp").addEventListener("change", () => {
+    if ($("tDisp").value === "Muni Agg Enrollment") setR("tMuni", "Si");
+    if ($("tDisp").value === "Internal/External Transfer" && $("tTransfer").value === "No Transfer") $("tTransfer").focus();
+    syncForm();
+  });
+  $("tDate").addEventListener("change", () => { if (!editingId){ const {d,m} = isoToDM($("tDate").value || todayISO()); $("tNum").value = nextNum(d, m); } syncForm(); });
+  ["tNum","tTransfer","tStatement","tEpn"].forEach(id => $(id).addEventListener(id === "tNum" ? "input" : "change", syncForm));
+  radios("tSurvey").concat(radios("tMuni")).forEach(r => r.addEventListener("change", syncForm));
+
+  $("tSave").addEventListener("click", () => {
+    const r = readForm();
+    const missing = [];
+    if (!r.brand) missing.push("Brand");
+    if (!r.disp) missing.push("Disposition");
+    if (!r.survey) missing.push("Survey");
+    if (r.muni && !r.epn) missing.push("E / PN");
+    if (missing.length){ $("tMsg").textContent = "Completa: " + missing.join(", ") + "."; return; }
+    r.score = evaluate(r).score;
+    if (editingId){ r.id = editingId; rows = rows.map(x => x.id === editingId ? r : x); }
+    else { r.id = Date.now().toString(36) + Math.random().toString(36).slice(2,6); rows.push(r); }
+    save(); $("tMsg").textContent = "Guardada ✓ (score " + r.score + ")";
+    if (!$("tMonth").value || Number($("tMonth").value) !== r.m) $("tMonth").value = String(r.m);
+    resetForm(true); render();
+  });
+  $("tCancel").addEventListener("click", () => { resetForm(true); $("tMsg").textContent = ""; });
+
+  function editRow(id){
+    const r = rows.find(x => x.id === id); if (!r) return;
+    editingId = id;
+    const y = r.y || new Date().getFullYear();
+    $("tDate").value = y + "-" + String(r.m).padStart(2,"0") + "-" + String(r.d).padStart(2,"0");
+    $("tNum").value = r.n;
+    const setSel = (el, v) => { if (v && ![...el.options].some(o => o.value === v)) el.add(new Option(v, v)); el.value = v || ""; };
+    setSel($("tBrand"), r.brand); setR("tMuni", r.muni ? "Si" : "No"); setSel($("tDisp"), r.disp);
+    setSel($("tTransfer"), r.transfer || "No Transfer"); setSel($("tStatement"), r.statement || "No statement");
+    disR("tSurvey", false); $("tEpn").disabled = false;
+    setR("tSurvey", r.survey || ""); $("tEpn").value = r.epn === "?" ? "" : (r.epn || "");
+    $("formTitle").textContent = "Editando llamada " + r.n + " · " + r.d + "-" + r.m;
+    $("tNumWrap").hidden = false; $("tSaveLabel").textContent = "Guardar cambios"; $("tCancel").hidden = false; $("tMsg").textContent = "";
+    syncForm(); window.scrollTo({top:0, behavior:"smooth"});
+  }
+
+  // ---------- Tabla y resumen ----------
+  function render(){
+    const months = [...new Set(rows.map(r => r.m))].sort((a,b) => a - b);
+    const cur = $("tMonth").value;
+    $("tMonth").innerHTML = '<option value="">Todos los meses</option>' + months.map(m => '<option value="' + m + '">' + MONTHS[m] + "</option>").join("");
+    $("tMonth").value = months.map(String).includes(cur) ? cur : (cur === "" && rows.length ? "" : "");
+    const list = filtered();
+    $("tBody").innerHTML = list.map(r =>
+      "<tr><td>" + esc(r.n) + "</td><td>" + r.d + "-" + r.m + "</td><td>" + esc(r.brand) + (r.muni ? " <span class='tag'>Muni</span>" : "") +
+      "</td><td>" + esc(r.disp) + "</td><td>" + esc(r.transfer) + "</td><td>" + esc(r.statement) + "</td><td>" + esc(r.survey) +
+      "</td><td>" + esc(r.epn) + "</td><td class='sc " + scoreClass(r.score) + "'>" + r.score +
+      "</td><td><button class='ic' data-e='" + r.id + "' title='Editar' aria-label='Editar llamada " + esc(r.n) + "'>" + IC.edit + "</button><button class='ic del' data-d='" + r.id + "' title='Borrar' aria-label='Borrar llamada " + esc(r.n) + "'>" + IC.del + "</button></td></tr>"
+    ).join("") || "<tr><td colspan='10' class='empty'>Todavía no hay interacciones.</td></tr>";
+    const n = list.length;
+    $("stCount").textContent = n;
+    $("stAvg").textContent = n ? (list.reduce((a, r) => a + Number(r.score), 0) / n).toFixed(1) : "–";
+    $("st100").textContent = list.filter(r => r.score >= 100).length;
+    $("stLow").textContent = list.filter(r => r.score < 100).length;
+    const noSt = list.filter(r => r.statement === "No statement").length;
+    const noSv = list.filter(r => r.survey === "No" && r.transfer === "No Transfer").length;
+    const noEp = list.filter(r => r.muni && (r.epn === "Ninguno" || r.epn === "Solo uno")).length;
+    $("stMiss").innerHTML = n ? "Puntos perdidos por: <b>" + noSt + "</b> sin statement · <b>" + noSv + "</b> sin survey · <b>" + noEp + "</b> sin correo/teléfono" : "";
+  }
+  function filtered(){
+    const m = $("tMonth").value;
+    return rows.filter(r => !m || r.m === Number(m))
+      .sort((a, b) => (a.y || 0) - (b.y || 0) || a.m - b.m || a.d - b.d || a.n - b.n);
+  }
+  $("tMonth").addEventListener("change", render);
+  $("tBody").addEventListener("click", e => {
+    const b = e.target.closest("button"); if (!b) return;
+    if (b.dataset.e) editRow(b.dataset.e);
+    if (b.dataset.d && confirm("¿Borrar esta interacción?")){ rows = rows.filter(r => r.id !== b.dataset.d); save(); render(); syncForm(); }
+  });
+  $("tWipe").addEventListener("click", () => {
+    if (rows.length && confirm("¿Borrar TODAS las interacciones guardadas? Exporta el CSV antes si quieres un respaldo.")){ rows = []; save(); render(); resetForm(); }
+  });
+
+  // ---------- CSV ----------
+  const HEAD = ["CALL N°","DATE","BRAND","DISPOSITION","TRANSFER","LOYALTY / REGRET","SURVEY","E / PN","SCORE"];
+  $("tExport").addEventListener("click", () => {
+    const list = filtered(); if (!list.length) return;
+    const cell = v => { v = String(v == null ? "" : v); return /[;"\n]/.test(v) ? '"' + v.replace(/"/g,'""') + '"' : v; };
+    const lines = [HEAD.join(";")].concat(list.map(r => [r.n, r.d + "-" + r.m, r.brand, r.disp, r.transfer, r.statement, r.survey, r.epn, r.score].map(cell).join(";")));
+    const blob = new Blob(["﻿" + lines.join("\r\n")], {type:"text/csv;charset=utf-8"});
+    const m = $("tMonth").value;
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "Interaction_Tracker" + (m ? "_" + MONTHS[m].toUpperCase() : "") + ".csv";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+  });
+  $("tImportBtn").addEventListener("click", () => $("tImport").click());
+  $("tImport").addEventListener("change", async () => {
+    const f = $("tImport").files[0]; if (!f) return;
+    const buf = await f.arrayBuffer();
+    let text = new TextDecoder("utf-8").decode(buf);
+    if (text.includes("�")) text = new TextDecoder("windows-1252").decode(buf);
+    text = text.replace(/^﻿/, "");
+    const lines = text.split(/\r?\n/).filter(l => l.trim());
+    if (!lines.length) return;
+    const delim = (lines[0].match(/;/g) || []).length >= (lines[0].match(/,/g) || []).length ? ";" : ",";
+    const split = l => { const out = []; let cur = "", q = false; for (let i = 0; i < l.length; i++){ const c = l[i];
+      if (q){ if (c === '"' && l[i+1] === '"'){ cur += '"'; i++; } else if (c === '"') q = false; else cur += c; }
+      else if (c === '"') q = true; else if (c === delim){ out.push(cur); cur = ""; } else cur += c; } out.push(cur); return out.map(s => s.trim()); };
+    const head = split(lines[0]).map(h => h.toUpperCase());
+    const col = re => head.findIndex(h => re.test(h));
+    const ix = {n:col(/CALL/), date:col(/DATE|FECHA/), brand:col(/BRAND/), disp:col(/DISPOSITION/), tr:col(/TRANSFER/), st:col(/LOYALTY|REGRET|STATEMENT/), sv:col(/SURVEY/), ep:col(/E\s*\/\s*PN|EPN/), sc:col(/SCORE/)};
+    const year = new Date().getFullYear();
+    let added = 0, skipped = 0;
+    lines.slice(1).forEach(l => {
+      const c = split(l); const g = k => ix[k] >= 0 ? (c[ix[k]] || "") : "";
+      if (!g("brand")){ skipped++; return; }
+      const dm = g("date").match(/(\d{1,2})\D+(\d{1,2})/); if (!dm){ skipped++; return; }
+      const r = {
+        id: Date.now().toString(36) + Math.random().toString(36).slice(2,7),
+        n: Number(g("n")) || 0, d: Number(dm[1]), m: Number(dm[2]), y: year,
+        brand: g("brand").replace(/^Brigthen$/i, "Brighten"), disp: g("disp").replace(/\s*[�\-–]\s*/g, " – ").replace("Internal/External", "Internal/External").replace("Opt – Out/Drop Save","Opt-Out/Drop Save"),
+        transfer: g("tr") || "No Transfer", statement: g("st") || "No statement", survey: g("sv"),
+        epn: g("ep") || "?"
+      };
+      r.muni = r.brand === "Dynegy" || r.disp === "Muni Agg Enrollment";
+      const s = Number(g("sc")); r.score = isNaN(s) || g("sc") === "" ? evaluate(r).score : s;
+      const dup = rows.some(x => x.d === r.d && x.m === r.m && Number(x.n) === r.n && x.brand === r.brand && x.disp === r.disp);
+      if (dup){ skipped++; return; }
+      rows.push(r); added++;
+    });
+    save(); $("tImport").value = ""; render(); resetForm(true);
+    alert("Importadas " + added + " interacciones" + (skipped ? " (" + skipped + " filas vacías o repetidas omitidas)" : "") + ".");
+  });
+
+  // ---------- Desde el Note Fixer ----------
+  const XMAP = {cs:"Customer Success", acq:"Acquisition", util:"Utility", keep:"No Transfer"};
+  const toTracker = $("btnToTracker");
+  if (toTracker) toTracker.addEventListener("click", () => {
+    resetForm();
+    const t = XMAP[window.__mwneLastTransfer || "keep"] || "No Transfer";
+    $("tTransfer").value = t;
+    if (t !== "No Transfer") $("tDisp").value = "Internal/External Transfer";
+    syncForm(); mwneShowTab("tracker"); $("tBrand").focus();
+  });
+
+  resetForm(); render();
+})();
+</script>
+</body>
+</html>
