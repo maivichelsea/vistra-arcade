@@ -359,40 +359,76 @@
     return m ? m[1] : null;
   }
 
-  async function descargarDeDrive(driveId, alAvanzar) {
+  // Lee la respuesta por partes para poder mostrar el progreso.
+  async function leerConProgreso(resp, total, alAvanzar) {
+    if (!resp.body?.getReader) return new Uint8Array(await resp.arrayBuffer());
+    const lector = resp.body.getReader();
+    const partes = [];
+    let recibido = 0;
+    for (;;) {
+      const { done, value } = await lector.read();
+      if (done) break;
+      partes.push(value);
+      recibido += value.length;
+      alAvanzar?.(Math.min(recibido, total || recibido), total);
+    }
+    const datos = new Uint8Array(recibido);
+    let pos = 0;
+    for (const parte of partes) { datos.set(parte, pos); pos += parte.length; }
+    return datos;
+  }
+
+  const ERRORES_SCRIPT = {
+    "no-encontrado": "Ese archivo de Drive no existe o tu cuenta no puede verlo.",
+    "no-es-pdf": "Ese archivo de Drive no es un PDF.",
+    "privado": "Ese PDF no está compartido. En Drive, compártelo con «Cualquier persona con el enlace» o súbelo a la carpeta compartida.",
+  };
+
+  // El navegador no puede descargar directamente de Drive (Drive responde 403 a las páginas web),
+  // así que el PDF llega a través del script de la carpeta compartida, en base64.
+  async function descargarConScript(driveId, alAvanzar) {
+    const tamano = entradaCatalogo(driveId)?.tamano || 0;
+    const total = tamano ? Math.ceil(tamano / 3) * 4 : 0;
+    let resp;
+    try {
+      resp = await fetch(`${CARPETA.script}?id=${encodeURIComponent(driveId)}`);
+    } catch {
+      throw new Error("No se pudo descargar el libro de Google Drive. Si el problema sigue, descárgalo y añádelo desde tu PC.");
+    }
+    if (!resp.ok) throw new Error(`Google Drive respondió con un error (${resp.status}).`);
+    const texto = new TextDecoder().decode(await leerConProgreso(resp, total, alAvanzar)).trim();
+    if (texto.startsWith("{")) {
+      let error = "";
+      try { error = JSON.parse(texto).error; } catch { /* respuesta rara */ }
+      throw new Error(ERRORES_SCRIPT[error] || "Google Drive no entregó el libro.");
+    }
+    if (texto.startsWith("<")) {
+      throw new Error("El script de la carpeta no respondió bien. Puede que haya que volver a publicarlo.");
+    }
+    const binario = atob(texto);
+    const datos = new Uint8Array(binario.length);
+    for (let i = 0; i < binario.length; i++) datos[i] = binario.charCodeAt(i);
+    return datos;
+  }
+
+  // Descarga directa: solo funciona en algunos casos, se usa si no hay script.
+  async function descargarDirecto(driveId, alAvanzar) {
     let resp;
     try {
       resp = await fetch(urlDrive(driveId));
     } catch {
-      throw new Error("No se pudo conectar con Google Drive. Revisa tu conexión a internet.");
+      throw new Error("Google Drive no dejó descargar el libro desde esta página. Descárgalo y añádelo desde tu PC.");
     }
-    if (!resp.ok) {
-      throw new Error(resp.status === 404 || resp.status === 403
-        ? "Ese archivo de Drive no existe o no está compartido con «Cualquier persona con el enlace»."
-        : `Google Drive respondió con un error (${resp.status}).`);
+    if (!resp.ok || (resp.headers.get("content-type") || "").includes("text/html")) {
+      throw new Error("Drive no dejó descargar el archivo. Revisa que esté compartido con «Cualquier persona con el enlace».");
     }
-    if ((resp.headers.get("content-type") || "").includes("text/html")) {
-      throw new Error("Drive no dejó descargar el archivo. Revisa que esté compartido con «Cualquier persona con el enlace». Si es muy grande, descárgalo y añádelo desde tu PC.");
-    }
-    const total = Number(resp.headers.get("content-length")) || 0;
-    let datos;
-    if (resp.body?.getReader) {
-      const lector = resp.body.getReader();
-      const partes = [];
-      let recibido = 0;
-      for (;;) {
-        const { done, value } = await lector.read();
-        if (done) break;
-        partes.push(value);
-        recibido += value.length;
-        alAvanzar?.(recibido, total);
-      }
-      datos = new Uint8Array(recibido);
-      let pos = 0;
-      for (const parte of partes) { datos.set(parte, pos); pos += parte.length; }
-    } else {
-      datos = new Uint8Array(await resp.arrayBuffer());
-    }
+    return leerConProgreso(resp, Number(resp.headers.get("content-length")) || 0, alAvanzar);
+  }
+
+  async function descargarDeDrive(driveId, alAvanzar) {
+    const datos = CARPETA.script
+      ? await descargarConScript(driveId, alAvanzar)
+      : await descargarDirecto(driveId, alAvanzar);
     const inicio = String.fromCharCode(...datos.subarray(0, 1024));
     if (!inicio.includes("%PDF-")) throw new Error("El archivo de Drive no es un PDF.");
     return datos.buffer;

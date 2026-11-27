@@ -23,7 +23,8 @@ y pon un límite diario de uso y un presupuesto con alertas en Google Cloud.
 ### Carpeta compartida de libros
 
 Los PDF que se suban a la carpeta compartida de Google Drive aparecen solos en la biblioteca.
-Para que la página pueda ver qué hay en la carpeta se usa un pequeño script de Google:
+Para que la página pueda ver qué hay en la carpeta y descargar los PDF se usa un pequeño script de Google
+(el navegador no puede descargar directamente de Drive: Drive responde 403 a las páginas web):
 
 1. Abre https://script.google.com con la cuenta dueña de la carpeta y crea un proyecto nuevo.
 2. Pega el contenido de `apps-script/carpeta-libros.gs` y publícalo como **Aplicación web**
