@@ -1,0 +1,121 @@
+/* Crisol. Botones, chips, paneles y barra superior vienen de css/style.css. */
+.crisol-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 1rem;
+  padding-block: clamp(1rem, 3vw, 2rem) 2.5rem;
+  align-items: start;
+}
+.crisol-main .help { grid-column: 1 / -1; margin-top: 0; }
+@media (max-width: 860px) {
+  .crisol-main { grid-template-columns: 1fr; }
+}
+
+h2 { margin: 0; font-size: 1.05rem; font-weight: 800; }
+
+/* ---------- Mesa ---------- */
+.mesa-head { display: flex; justify-content: space-between; align-items: flex-start; gap: .75rem; flex-wrap: wrap; margin-bottom: .75rem; }
+.mesa-sub { margin: .15rem 0 0; color: var(--muted); font-size: .85rem; }
+.mesa-tools { display: flex; gap: .4rem; flex-wrap: wrap; }
+
+.mesa {
+  position: relative;
+  height: clamp(340px, 62vh, 620px);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  touch-action: none;
+  background:
+    radial-gradient(circle at 50% 110%, color-mix(in srgb, var(--arcade) 22%, transparent), transparent 55%),
+    radial-gradient(circle, color-mix(in srgb, var(--muted) 30%, transparent) 1px, transparent 1.5px) 0 0 / 22px 22px,
+    color-mix(in srgb, var(--secondary) 45%, var(--panel));
+  border: 1px dashed var(--border);
+}
+.mesa.objetivo { outline: 3px solid var(--accent-text); outline-offset: -3px; }
+.mesa-vacia {
+  position: absolute; inset: 0; display: grid; place-items: center; margin: 0; padding: 2rem;
+  text-align: center; color: var(--muted); font-weight: 600; pointer-events: none;
+}
+
+/* Elemento sobre la mesa (y el que se arrastra) */
+.ficha {
+  position: absolute;
+  display: flex; flex-direction: column; align-items: center; gap: .1rem;
+  width: 84px; padding: .45rem .25rem .4rem;
+  border-radius: 14px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  box-shadow: var(--card-shadow);
+  cursor: grab; user-select: none; -webkit-user-select: none; touch-action: none;
+  transition: transform .15s var(--ease), box-shadow .15s var(--ease);
+}
+.ficha .emoji { font-size: 2rem; line-height: 1.1; }
+.ficha .nombre { font-size: .72rem; font-weight: 700; text-align: center; line-height: 1.15; overflow-wrap: anywhere; }
+.ficha.arrastrando { cursor: grabbing; z-index: 50; transform: scale(1.08) rotate(-2deg); box-shadow: var(--card-shadow-hover); }
+.ficha.encima { box-shadow: 0 0 0 3px var(--arcade), var(--card-shadow-hover); transform: scale(1.06); }
+.ficha.nueva { animation: nace .5s var(--ease); }
+.ficha.nada { animation: nada .35s; }
+.ficha.flotante { position: fixed; pointer-events: none; z-index: 1000; }
+@keyframes nace { 0% { transform: scale(.2); opacity: 0; } 60% { transform: scale(1.18); } 100% { transform: scale(1); opacity: 1; } }
+@keyframes nada { 0%, 100% { translate: 0; } 25% { translate: -6px; } 75% { translate: 6px; } }
+
+.chispa {
+  position: absolute; width: 8px; height: 8px; border-radius: 50%;
+  background: var(--arcade); pointer-events: none; animation: chispa .6s ease-out forwards;
+}
+@keyframes chispa { to { transform: translate(var(--dx), var(--dy)) scale(.2); opacity: 0; } }
+
+/* ---------- Progreso ---------- */
+.progreso { display: flex; align-items: center; gap: .75rem; margin-top: .85rem; }
+.progreso-barra { flex: 1; height: 10px; border-radius: 99px; background: var(--secondary); overflow: hidden; }
+.progreso-barra span { display: block; height: 100%; width: 0; border-radius: inherit; background: linear-gradient(90deg, var(--primary), var(--arcade)); transition: width .4s var(--ease); }
+.progreso-texto { font-size: .85rem; color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.progreso-texto strong { color: var(--text); }
+
+/* ---------- Colección ---------- */
+.coleccion-panel { display: flex; flex-direction: column; max-height: calc(62vh + 170px); min-height: 0; }
+@media (max-width: 860px) { .coleccion-panel { max-height: none; } }
+.col-head { display: grid; gap: .6rem; margin-bottom: .75rem; }
+.buscar {
+  display: flex; align-items: center; gap: .5rem; padding: .5rem .75rem;
+  border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--background);
+}
+.buscar input { flex: 1; min-width: 0; border: 0; outline: 0; background: transparent; color: var(--text); font: inherit; }
+.orden { display: flex; gap: .4rem; }
+
+.coleccion {
+  list-style: none; margin: 0; padding: 0 .15rem .15rem 0;
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); gap: .45rem;
+  overflow-y: auto; min-height: 0; flex: 1;
+}
+@media (max-width: 860px) { .coleccion { max-height: 320px; } }
+.item {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center; gap: .1rem;
+  padding: .45rem .2rem; border-radius: 12px;
+  border: 1px solid var(--border); background: var(--background);
+  cursor: grab; user-select: none; -webkit-user-select: none; touch-action: none;
+  transition: border-color .15s, transform .15s var(--ease);
+}
+.item:hover { border-color: var(--accent-text); transform: translateY(-2px); }
+.item .emoji { font-size: 1.6rem; line-height: 1.1; }
+.item .nombre { font-size: .7rem; font-weight: 700; text-align: center; line-height: 1.15; overflow-wrap: anywhere; }
+.item .final { position: absolute; top: 3px; right: 6px; font-size: .7rem; color: var(--arcade); }
+.item.reciente { border-color: var(--arcade); background: var(--arcade-soft); }
+.coleccion .sin-resultados { grid-column: 1 / -1; color: var(--muted); font-size: .9rem; padding: .5rem; }
+.col-nota { margin: .6rem 0 .2rem; font-size: .75rem; color: var(--muted); }
+.btn-link { align-self: flex-start; background: none; border: 0; padding: .2rem 0; color: var(--danger); font: inherit; font-size: .8rem; font-weight: 700; cursor: pointer; text-decoration: underline; }
+
+/* ---------- Aviso ---------- */
+.toast {
+  position: fixed; left: 50%; bottom: 1.5rem; translate: -50% 1rem;
+  max-width: min(92vw, 460px); padding: .8rem 1.1rem; border-radius: var(--radius-sm);
+  background: var(--text); color: var(--background); font-weight: 700; text-align: center;
+  box-shadow: var(--card-shadow-hover); opacity: 0; pointer-events: none;
+  transition: opacity .25s, translate .25s var(--ease); z-index: 2000;
+}
+.toast.visible { opacity: 1; translate: -50% 0; }
+.toast .grande { display: block; font-size: 1.8rem; margin-bottom: .15rem; }
+
+.mesa-vacia[hidden] { display: none; }
+.buscar { box-sizing: border-box; width: 100%; min-width: 0; }
+.col-head, .coleccion-panel { min-width: 0; }

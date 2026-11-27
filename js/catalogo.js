@@ -6,6 +6,16 @@
 // imagen: ilustración 16:9 (se recomienda SVG de 320×180 en img/juegos/).
 const VISTRA_JUEGOS = [
   {
+    id: "crisol",
+    nombre: "Crisol",
+    url: "games/crisol/index.html",
+    imagen: "img/juegos/crisol.svg",
+    categoria: "Lógica",
+    estado: "nuevo",
+    descripcion: "Empieza con agua, fuego, tierra y aire y combínalos para descubrir más de 160 elementos: animales, personas e inventos.",
+    etiquetas: ["1 jugador", "163 elementos", "Funciona sin conexión"],
+  },
+  {
     id: "banderas",
     nombre: "Banderas y Capitales",
     url: "games/banderas/index.html",
@@ -69,6 +79,12 @@ const VISTRA_JUEGOS = [
 
 // Novedades, de la más reciente a la más antigua. fecha en formato AAAA-MM-DD.
 const VISTRA_NOVEDADES = [
+  {
+    fecha: "2026-11-27",
+    juego: "crisol",
+    titulo: "Nuevo juego: Crisol",
+    texto: "Mezcla los cuatro elementos y descubre 163 cosas: del vapor y el barro hasta dragones, cohetes y el propio Vistra Arcade.",
+  },
   {
     fecha: "2026-11-27",
     juego: "banderas",

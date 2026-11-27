@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <title>Crisol · Vistra Arcade</title>
+  <link rel="icon" href="../../img/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="crisol.css">
+</head>
+<body class="arcade-bg">
+  <header class="site-nav game-nav">
+    <div class="container nav-inner">
+      <a class="brand" href="../../index.html" aria-label="Volver a Vistra Arcade">
+        <img class="brand-logo" src="../../img/logo.svg" alt="" width="36" height="36">
+        <span class="brand-text"><strong>VISTRA</strong><span>ARCADE</span></span>
+      </a>
+      <span class="nav-sep" aria-hidden="true"></span>
+      <div class="game-title">
+        <span class="eyebrow">Lógica</span>
+        <h1>Crisol</h1>
+      </div>
+      <div class="nav-actions">
+        <span class="kbd-hint">Arrastra un elemento sobre otro para combinarlos</span>
+        <a class="btn btn-ghost btn-sm" href="../../index.html#juegos">← Juegos</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container crisol-main">
+    <section class="panel mesa-panel" aria-labelledby="mesa-title">
+      <div class="mesa-head">
+        <div>
+          <h2 id="mesa-title">Mesa de trabajo</h2>
+          <p class="mesa-sub">Suelta un elemento encima de otro. Doble clic para duplicarlo.</p>
+        </div>
+        <div class="mesa-tools">
+          <button id="btn-pista" class="btn btn-ghost btn-sm" type="button">💡 Pista</button>
+          <button id="btn-limpiar" class="btn btn-ghost btn-sm" type="button">🧹 Limpiar mesa</button>
+        </div>
+      </div>
+      <div id="mesa" class="mesa" aria-label="Mesa de trabajo">
+        <p id="mesa-vacia" class="mesa-vacia">Toca o arrastra un elemento de tu colección para ponerlo aquí.</p>
+      </div>
+      <div class="progreso">
+        <div class="progreso-barra"><span id="progreso-fill"></span></div>
+        <span class="progreso-texto"><strong id="cuenta">4</strong> de <span id="total">0</span> elementos</span>
+      </div>
+    </section>
+
+    <aside class="panel coleccion-panel" aria-labelledby="col-title">
+      <div class="col-head">
+        <h2 id="col-title">Tu colección</h2>
+        <label class="buscar">
+          <span aria-hidden="true">🔍</span>
+          <input id="buscar" type="search" placeholder="Buscar elemento…" autocomplete="off" aria-label="Buscar elemento">
+        </label>
+        <div class="orden" role="group" aria-label="Ordenar">
+          <button class="chip active" data-orden="az" type="button">A–Z</button>
+          <button class="chip" data-orden="nuevos" type="button">Recientes</button>
+        </div>
+      </div>
+      <ul id="coleccion" class="coleccion"></ul>
+      <p class="col-nota">✦ = elemento final: ya no se combina con nada más.</p>
+      <button id="btn-reiniciar" class="btn-link" type="button">Reiniciar progreso</button>
+    </aside>
+
+    <details class="panel help">
+      <summary>Cómo jugar</summary>
+      <ul>
+        <li>Empiezas con cuatro elementos: <strong>agua, fuego, tierra y aire</strong>.</li>
+        <li><strong>Toca o arrastra</strong> un elemento de tu colección para ponerlo en la mesa.</li>
+        <li><strong>Arrastra</strong> un elemento de la mesa (o de la colección) <strong>encima de otro</strong> para combinarlos. Si la mezcla funciona, descubres algo nuevo.</li>
+        <li>Puedes combinar un elemento consigo mismo: haz <strong>doble clic</strong> sobre él en la mesa para duplicarlo.</li>
+        <li>Para quitar algo de la mesa, arrástralo de vuelta a la colección o fuera de la mesa.</li>
+        <li>¿Atascada? <strong>Pista</strong> te dice uno de los ingredientes de algo que ya puedes descubrir.</li>
+        <li>Tu progreso se guarda solo en este navegador.</li>
+      </ul>
+    </details>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="recetas.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

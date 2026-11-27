@@ -5,6 +5,7 @@ Minijuegos originales para el navegador, hechos con HTML, CSS y JavaScript sin d
 ## Juegos
 
 - **Banderas y Capitales:** quiz de 10 preguntas contra el reloj. Banderas, capitales o mezcla; todo el mundo o un continente; 20, 12 o 6 segundos por pregunta. Las banderas usan la fuente Twemoji Country Flags (gráficos de Twemoji, CC BY 4.0) incluida en `games/banderas/fuentes/`, así se ven también en Windows.
+- **Crisol:** juego de alquimia. Empiezas con agua, fuego, tierra y aire y los combinas en una mesa de trabajo para descubrir 163 elementos. Pistas, búsqueda y progreso guardado en el navegador. Las recetas están en `games/crisol/recetas.js`.
 - **Buscaminas:** niveles Principiante (8×8, 10 minas), Intermedio (16×16, 40), Experto (16×30, 99) y Personalizado. Primer clic seguro y apertura de vecinas.
 - **Serpiente Neón:** come fruta y crece sin chocar. Velocidades Lenta, Normal y Rápida que aceleran con cada fruta, estrellas doradas con puntos extra y récord por velocidad. Teclado, deslizar el dedo o cruceta en el móvil.
 - **Sudoku:** tableros generados al momento con solución única y 4 dificultades (Fácil, Medio, Difícil, Experto). Notas, deshacer, pistas, marcado de errores y guardado automático de la partida.
