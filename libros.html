@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Lector de libros PDF: guarda por dónde vas, marcadores y resaltados en tu navegador.">
+  <title>Libros · Vistra Arcade</title>
+  <link rel="icon" href="img/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/home.css">
+  <link rel="stylesheet" href="css/paginas.css">
+  <link rel="stylesheet" href="css/libros.css">
+</head>
+<body class="home arcade-bg" id="top">
+  <a class="skip-link" href="#biblioteca">Saltar a la biblioteca</a>
+
+  <!-- ===================== Biblioteca ===================== -->
+  <div id="vista-biblioteca">
+    <header class="site-nav">
+      <div class="container nav-inner">
+        <a class="brand" href="index.html" aria-label="Vistra Arcade, inicio">
+          <img class="brand-logo" src="img/logo.svg" alt="" width="36" height="36">
+          <span class="brand-text"><strong>VISTRA</strong><span>ARCADE</span></span>
+        </a>
+        <nav aria-label="Principal">
+          <ul class="nav-links">
+            <li><a href="index.html#juegos">Juegos</a></li>
+            <li><a href="libros.html" class="active" aria-current="page">Libros</a></li>
+            <li><a href="paginas.html">Páginas</a></li>
+            <li><a href="index.html#novedades">Novedades</a></li>
+          </ul>
+        </nav>
+        <a class="btn btn-primary nav-cta" href="index.html#juegos">Jugar</a>
+      </div>
+    </header>
+
+    <main>
+      <section class="pages-hero container" aria-labelledby="libros-title">
+        <p class="eyebrow"><span class="pulse" aria-hidden="true"></span> Lector PDF</p>
+        <h1 id="libros-title">Tu <span>biblioteca</span></h1>
+        <p class="lead">
+          Añade tus libros en PDF y léelos aquí. Se guarda por dónde vas, tus marcadores y tus
+          resaltados. Todo queda <strong>solo en este navegador</strong>: nada se sube a internet.
+        </p>
+        <ul class="hero-stats">
+          <li><strong id="stat-libros">0</strong><span>libros</span></li>
+          <li><strong id="stat-marcadores">0</strong><span>marcadores</span></li>
+          <li><strong id="stat-resaltados">0</strong><span>resaltados</span></li>
+        </ul>
+      </section>
+
+      <section id="biblioteca" class="section container" aria-labelledby="lista-title">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">Biblioteca</p>
+            <h2 id="lista-title">Mis libros</h2>
+            <p class="section-lead">¿Tu libro está en Google Drive? Descárgalo y luego añádelo aquí.</p>
+          </div>
+          <div class="pages-tools">
+            <label class="search-box">
+              <span class="visually-hidden">Buscar libro</span>
+              <span aria-hidden="true">🔍</span>
+              <input type="search" id="q" placeholder="Buscar libro…" autocomplete="off">
+            </label>
+            <button type="button" class="btn btn-primary" id="btn-agregar">＋ Añadir libro</button>
+          </div>
+        </div>
+
+        <input type="file" id="input-pdf" accept="application/pdf,.pdf" multiple hidden>
+        <div id="book-grid" class="game-grid"></div>
+        <p id="empty" class="pages-empty" hidden>No hay libros con ese nombre.</p>
+
+        <div class="backup">
+          <div>
+            <h3>Copia de seguridad</h3>
+            <p>Guarda tus marcadores, resaltados y por dónde vas en un archivo. Si se borran los datos del
+              navegador, impórtalo y vuelve a añadir los mismos PDF.</p>
+          </div>
+          <div class="backup-actions">
+            <button type="button" class="btn btn-ghost" id="btn-exportar">⬇ Exportar notas</button>
+            <button type="button" class="btn btn-ghost" id="btn-importar">⬆ Importar notas</button>
+            <input type="file" id="input-backup" accept="application/json,.json" hidden>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <div class="footer-brand">
+          <a class="brand" href="index.html" aria-label="Vistra Arcade, inicio">
+            <img class="brand-logo" src="img/logo.svg" alt="" width="32" height="32">
+            <span class="brand-text"><strong>VISTRA</strong><span>ARCADE</span></span>
+          </a>
+          <p>Minijuegos originales para el navegador, hechos con HTML, CSS y JavaScript.</p>
+        </div>
+        <nav class="footer-col" aria-label="Arcade">
+          <h2>Arcade</h2>
+          <ul>
+            <li><a href="index.html#juegos">Juegos</a></li>
+            <li><a href="index.html#novedades">Novedades</a></li>
+          </ul>
+        </nav>
+        <nav class="footer-col" aria-label="Trabajo">
+          <h2>Trabajo</h2>
+          <ul>
+            <li><a href="libros.html">Libros</a></li>
+            <li><a href="paginas.html">Páginas permitidas</a></li>
+          </ul>
+        </nav>
+        <nav class="footer-col" aria-label="Proyecto">
+          <h2>Proyecto</h2>
+          <ul>
+            <li><a href="https://github.com/maivichelsea/vistra-arcade" target="_blank" rel="noopener">Código en GitHub</a></li>
+            <li><a href="#top">Volver arriba ↑</a></li>
+          </ul>
+        </nav>
+      </div>
+      <div class="container footer-bottom">
+        <span>© <span id="year">2026</span> Vistra Arcade</span>
+        <span>Lector PDF hecho con PDF.js (Mozilla, licencia Apache 2.0).</span>
+      </div>
+    </footer>
+
+    <div class="drop-overlay" id="drop-overlay" aria-hidden="true">
+      <div><span>📚</span><strong>Suelta tus PDF aquí</strong></div>
+    </div>
+  </div>
+
+  <!-- ===================== Lector ===================== -->
+  <div id="vista-lector" class="reader" hidden>
+    <header class="reader-bar">
+      <div class="rb-group">
+        <button type="button" class="rb-btn" id="r-volver" title="Volver a la biblioteca">← <span class="rb-label">Biblioteca</span></button>
+        <strong class="rb-title" id="r-titulo"></strong>
+      </div>
+      <div class="rb-group rb-center">
+        <button type="button" class="rb-btn" id="r-anterior" title="Página anterior (←)" aria-label="Página anterior">‹</button>
+        <label class="rb-page">
+          <span class="visually-hidden">Página</span>
+          <input type="number" id="r-pagina" min="1" value="1" inputmode="numeric">
+          <span>/ <span id="r-total">0</span></span>
+        </label>
+        <button type="button" class="rb-btn" id="r-siguiente" title="Página siguiente (→)" aria-label="Página siguiente">›</button>
+        <span class="rb-sep" aria-hidden="true"></span>
+        <button type="button" class="rb-btn" id="r-menos" title="Alejar (−)" aria-label="Alejar">−</button>
+        <button type="button" class="rb-btn rb-zoom" id="r-ajustar" title="Ajustar al ancho">100%</button>
+        <button type="button" class="rb-btn" id="r-mas" title="Acercar (+)" aria-label="Acercar">+</button>
+      </div>
+      <div class="rb-group rb-end">
+        <button type="button" class="rb-btn" id="r-noche" title="Modo noche" aria-pressed="false">🌙</button>
+        <button type="button" class="rb-btn" id="r-marcar" title="Marcar esta página (B)" aria-pressed="false">🔖</button>
+        <button type="button" class="rb-btn" id="r-panel" title="Marcadores, resaltados y búsqueda" aria-pressed="false">☰</button>
+      </div>
+      <div class="reader-progress" aria-hidden="true"><span id="r-progreso"></span></div>
+    </header>
+
+    <div class="reader-body">
+      <div class="reader-scroll" id="r-scroll" tabindex="-1">
+        <div class="reader-pages" id="r-paginas"></div>
+        <p class="reader-loading" id="r-cargando">Abriendo libro…</p>
+      </div>
+
+      <aside class="reader-panel" id="r-lateral" hidden aria-label="Panel del libro">
+        <div class="panel-tabs" role="tablist">
+          <button type="button" role="tab" class="panel-tab" data-tab="marcadores" aria-selected="true">🔖 Marcadores</button>
+          <button type="button" role="tab" class="panel-tab" data-tab="resaltados" aria-selected="false">🖍 Resaltados</button>
+          <button type="button" role="tab" class="panel-tab" data-tab="buscar" aria-selected="false">🔍 Buscar</button>
+        </div>
+        <div class="panel-body" data-panel="marcadores">
+          <button type="button" class="btn btn-ghost panel-add" id="p-agregar-marcador">＋ Marcar página actual</button>
+          <ol class="panel-list" id="p-marcadores"></ol>
+          <p class="panel-empty" id="p-marcadores-vacio">Aún no hay marcadores. Pulsa 🔖 para marcar la página que estás leyendo.</p>
+        </div>
+        <div class="panel-body" data-panel="resaltados" hidden>
+          <ol class="panel-list" id="p-resaltados"></ol>
+          <p class="panel-empty" id="p-resaltados-vacio">Selecciona texto en el libro y elige un color para resaltarlo.</p>
+        </div>
+        <div class="panel-body" data-panel="buscar" hidden>
+          <form class="search-box panel-search" id="p-buscar-form">
+            <span aria-hidden="true">🔍</span>
+            <input type="search" id="p-buscar" placeholder="Buscar en el libro…" aria-label="Buscar en el libro">
+          </form>
+          <p class="panel-empty" id="p-buscar-estado">Escribe una palabra y pulsa Enter.</p>
+          <ol class="panel-list" id="p-resultados"></ol>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Barra que aparece al seleccionar texto -->
+    <div class="hl-toolbar" id="hl-toolbar" hidden role="toolbar" aria-label="Resaltar selección">
+      <button type="button" class="hl-color" data-color="amarillo" title="Amarillo" aria-label="Resaltar en amarillo"></button>
+      <button type="button" class="hl-color" data-color="verde" title="Verde" aria-label="Resaltar en verde"></button>
+      <button type="button" class="hl-color" data-color="azul" title="Azul" aria-label="Resaltar en azul"></button>
+      <button type="button" class="hl-color" data-color="rosa" title="Rosa" aria-label="Resaltar en rosa"></button>
+      <button type="button" class="hl-note" id="hl-con-nota" title="Resaltar y añadir nota">📝</button>
+    </div>
+
+    <!-- Ventana para ver o editar un resaltado o un marcador -->
+    <div class="hl-popover" id="hl-popover" hidden role="dialog" aria-label="Nota">
+      <p class="hl-quote" id="hl-cita"></p>
+      <textarea id="hl-nota" rows="3" placeholder="Escribe una nota (opcional)…"></textarea>
+      <div class="hl-pop-actions">
+        <button type="button" class="btn btn-ghost hl-borrar" id="hl-borrar">Borrar</button>
+        <button type="button" class="btn btn-primary" id="hl-guardar">Guardar</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/vendor/pdfjs/pdf.min.js"></script>
+  <script src="js/libros-db.js"></script>
+  <script src="js/libros.js"></script>
+</body>
+</html>

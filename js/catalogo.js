@@ -50,6 +50,12 @@ const VISTRA_JUEGOS = [
 // Novedades, de la más reciente a la más antigua. fecha en formato AAAA-MM-DD.
 const VISTRA_NOVEDADES = [
   {
+    fecha: "2026-11-26",
+    juego: null,
+    titulo: "Nueva sección: Libros",
+    texto: "Lee tus PDF en el arcade: guarda por dónde vas, añade marcadores y resalta texto en cuatro colores.",
+  },
+  {
     fecha: "2026-11-22",
     juego: "sudoku",
     titulo: "Nuevo juego: Sudoku",

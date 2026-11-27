@@ -42,6 +42,7 @@ En el mismo archivo está `VISTRA_NOVEDADES` (novedades).
 
 - `index.html`, `css/home.css`, `js/home.js`: portada del arcade.
 - `js/catalogo.js`: juegos y novedades.
+- `libros.html`, `css/libros.css`, `js/libros.js`, `js/libros-db.js`: lector de libros PDF. Guarda por dónde vas, marcadores y resaltados en el navegador (IndexedDB). Usa PDF.js 3.11 (`js/vendor/pdfjs/`, licencia Apache 2.0).
 - `paginas.html`, `css/paginas.css`, `js/paginas.js`: páginas permitidas en el trabajo (sin cuenta). La lista está en `js/paginas-datos.js`.
 - `css/style.css`: colores (modo claro y oscuro) y estilos compartidos con los juegos.
 - `img/`: logotipo e ilustraciones (SVG locales, sin depender de internet).
