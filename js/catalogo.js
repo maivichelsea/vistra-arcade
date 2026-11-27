@@ -1,6 +1,5 @@
 // Catálogo de Vistra Arcade.
-// La portada se construye a partir de estas listas: para añadir un juego, una novedad
-// o un próximo lanzamiento, basta con añadir una entrada aquí (no hace falta tocar el HTML).
+// La portada se construye a partir de estas listas: para añadir un juego, o una novedad, basta con añadir una entrada aquí (no hace falta tocar el HTML).
 
 // Juegos disponibles.
 // estado: "nuevo" | "disponible" | "beta"
@@ -45,28 +44,6 @@ const VISTRA_JUEGOS = [
     estado: "disponible",
     descripcion: "Despeja el tablero sin pisar ninguna mina. Cuatro niveles, desde principiante hasta personalizado.",
     etiquetas: ["1 jugador", "Funciona sin conexión"],
-  },
-];
-
-// Juegos en desarrollo. Son ideas de ejemplo: cámbialas por las tuyas.
-const VISTRA_PROXIMOS = [
-  {
-    nombre: "Memoria",
-    categoria: "Memoria",
-    imagen: "img/proximos/memoria.svg",
-    descripcion: "Encuentra todas las parejas de cartas en el menor número de intentos.",
-  },
-  {
-    nombre: "Serpiente Neón",
-    categoria: "Arcade",
-    imagen: "img/proximos/serpiente.svg",
-    descripcion: "Recorre la cuadrícula, come fruta y crece sin chocar contigo misma.",
-  },
-  {
-    nombre: "Palabra Oculta",
-    categoria: "Palabras",
-    imagen: "img/proximos/palabra.svg",
-    descripcion: "Adivina la palabra secreta letra a letra con pistas de colores.",
   },
 ];
 

@@ -50,26 +50,10 @@
     return card;
   }
 
-  // Tarjeta final del catálogo que invita a ver los próximos lanzamientos.
-  function upcomingTeaser() {
-    const tile = el("a", "teaser-card reveal");
-    tile.href = "#proximamente";
-    const stack = el("div", "teaser-stack");
-    stack.setAttribute("aria-hidden", "true");
-    VISTRA_PROXIMOS.slice(0, 3).forEach((item) => stack.append(image(item.imagen, 120, 120)));
-    tile.append(
-      stack,
-      el("h3", "", "Más juegos en camino"),
-      el("p", "", `${VISTRA_PROXIMOS.length} juegos en desarrollo. Descubre lo que llega pronto.`),
-      el("span", "teaser-link", "Ver próximos lanzamientos ↓"),
-    );
-    return tile;
-  }
-
   function renderCatalog() {
     const grid = $("game-grid");
     const cards = VISTRA_JUEGOS.map(gameCard);
-    grid.replaceChildren(...cards, ...(VISTRA_PROXIMOS.length ? [upcomingTeaser()] : []));
+    grid.replaceChildren(...cards);
 
     // Filtros por categoría (solo si hay más de una).
     const categories = [...new Set(VISTRA_JUEGOS.map((g) => g.categoria))];
@@ -91,27 +75,6 @@
       return btn;
     });
     filters.replaceChildren(...buttons);
-  }
-
-  // ---------- Próximos lanzamientos ----------
-  function renderUpcoming() {
-    const section = $("proximamente");
-    if (!VISTRA_PROXIMOS.length) {
-      section.hidden = true;
-      document.querySelector('a[href="#proximamente"]')?.parentElement.remove();
-      return;
-    }
-    $("upcoming-grid").replaceChildren(...VISTRA_PROXIMOS.map((item) => {
-      const card = el("article", "upcoming-card reveal");
-      const preview = el("div", "upcoming-preview");
-      preview.append(image(item.imagen, 120, 120));
-      const info = el("div", "upcoming-info");
-      const meta = el("div", "upcoming-meta");
-      meta.append(el("span", "badge badge-dev", "En desarrollo"), el("span", "upcoming-category", item.categoria));
-      info.append(meta, el("h3", "", item.nombre), el("p", "", item.descripcion));
-      card.append(preview, info);
-      return card;
-    }));
   }
 
   // ---------- Novedades ----------
@@ -200,7 +163,6 @@
   }
 
   renderCatalog();
-  renderUpcoming();
   renderNews();
   renderExtras();
   setupReveal();

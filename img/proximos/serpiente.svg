@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Serpiente de neón recorriendo una cuadrícula hacia una fruta">
-  <rect width="120" height="120" rx="18" fill="#0b0a1f"/>
-  <path d="M10 10V110M10 10H110" stroke="#ffffff" stroke-opacity=".06"/><path d="M20 10V110M10 20H110" stroke="#ffffff" stroke-opacity=".06"/><path d="M30 10V110M10 30H110" stroke="#ffffff" stroke-opacity=".06"/><path d="M40 10V110M10 40H110" stroke="#ffffff" stroke-opacity=".06"/><path d="M50 10V110M10 50H110" stroke="#ffffff" stroke-opacity=".06"/><path d="M60 10V110M10 60H110" stroke="#ffffff" stroke-opacity=".06"/><path d="M70 10V110M10 70H110" stroke="#ffffff" stroke-opacity=".06"/><path d="M80 10V110M10 80H110" stroke="#ffffff" stroke-opacity=".06"/><path d="M90 10V110M10 90H110" stroke="#ffffff" stroke-opacity=".06"/><path d="M100 10V110M10 100H110" stroke="#ffffff" stroke-opacity=".06"/><path d="M110 10V110M10 110H110" stroke="#ffffff" stroke-opacity=".06"/>
-  <path d="M25 85H55V55H85V35" fill="none" stroke="#4fd18b" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
-  <path d="M25 85H55V55H85V35" fill="none" stroke="#c8ffd9" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity=".7"/>
-  <circle cx="88" cy="32" r="2" fill="#0b0a1f"/>
-  <circle cx="85" cy="18" r="5.5" fill="#ff7b72"/>
-</svg>

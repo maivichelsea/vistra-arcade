@@ -8,10 +8,7 @@
 // Portada de cada categoría: degradado, emoji decorativo y orden en la página.
 const VISTRA_PAGINAS_CATEGORIAS = {
   "Inteligencia artificial": { desde: "#5b2be0", hasta: "#1a1546", emoji: "✨" },
-  "Buscadores":              { desde: "#2f27ce", hasta: "#1a1546", emoji: "🔍" },
   "Herramientas de Google":  { desde: "#0f7a55", hasta: "#12213f", emoji: "🧰" },
-  "Video y música":          { desde: "#c2261c", hasta: "#2a0f2e", emoji: "🎵" },
-  "Reuniones":               { desde: "#1666c5", hasta: "#101a45", emoji: "🎥" },
   "Entidades del Estado":    { desde: "#9a6a00", hasta: "#2a1a08", emoji: "🏛️" },
   "Noticias":                { desde: "#44476a", hasta: "#12112a", emoji: "📰" },
   "Diseño e imágenes":       { desde: "#c2185b", hasta: "#2b0b2a", emoji: "🎨" },
@@ -28,16 +25,6 @@ const VISTRA_PAGINAS = [
     descripcion: "Asistente de IA de Microsoft con respuestas apoyadas en búsquedas de la web.",
     nota: "Chat con límites." },
 
-  // Buscadores
-  { nombre: "Google", url: "https://www.google.com", categoria: "Buscadores", estado: "probada",
-    descripcion: "El buscador de siempre para encontrar páginas, imágenes, videos y respuestas rápidas." },
-  { nombre: "Bing", url: "https://www.bing.com", categoria: "Buscadores", estado: "por-probar",
-    descripcion: "Buscador de Microsoft con imágenes, noticias, mapas y videos." },
-  { nombre: "Google Scholar", url: "https://scholar.google.com", categoria: "Buscadores", estado: "probada",
-    descripcion: "Busca artículos académicos, tesis, libros y citas de investigaciones." },
-  { nombre: "Google News", url: "https://news.google.com", categoria: "Buscadores", estado: "por-probar",
-    descripcion: "Titulares de muchos medios agrupados por tema y actualizados al momento." },
-
   // Herramientas de Google
   { nombre: "Google Translate", url: "https://translate.google.com", categoria: "Herramientas de Google", estado: "probada",
     descripcion: "Traduce textos, documentos y páginas web entre más de cien idiomas." },
@@ -51,21 +38,6 @@ const VISTRA_PAGINAS = [
     descripcion: "Descubre qué se está buscando y cómo cambia el interés con el tiempo." },
   { nombre: "Google Fonts", url: "https://fonts.google.com", categoria: "Herramientas de Google", estado: "probada",
     descripcion: "Catálogo de tipografías gratuitas para probar y descargar." },
-
-  // Video y música
-  { nombre: "YouTube", url: "https://www.youtube.com", categoria: "Video y música", estado: "probada",
-    descripcion: "Videos, tutoriales, conferencias y música de todo tipo." },
-  { nombre: "YouTube Music", url: "https://music.youtube.com", categoria: "Video y música", estado: "probada",
-    descripcion: "Canciones, álbumes y listas de reproducción para escuchar mientras trabajas.",
-    nota: "Puede pedir cuenta para algunas funciones." },
-
-  // Reuniones
-  { nombre: "Zoom", url: "https://zoom.us", categoria: "Reuniones", estado: "probada",
-    descripcion: "Únete a reuniones de Zoom desde el navegador, sin instalar la aplicación.",
-    nota: "Entra con el enlace y elige “Unirse desde el navegador”." },
-  { nombre: "Microsoft Teams", url: "https://teams.microsoft.com", categoria: "Reuniones", estado: "probada",
-    descripcion: "Únete a reuniones de Teams como invitado directamente en el navegador.",
-    nota: "Entra con el enlace de la reunión como invitado." },
 
   // Entidades del Estado
   { nombre: "Corte Constitucional", url: "https://www.corteconstitucional.gov.co", categoria: "Entidades del Estado", estado: "probada",

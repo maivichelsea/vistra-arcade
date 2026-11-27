@@ -36,12 +36,12 @@ La portada se construye a partir de `js/catalogo.js`, así que no hace falta toc
 2. Añade una ilustración 16:9 en `img/juegos/` (por ejemplo un SVG de 320×180).
 3. Añade una entrada en `VISTRA_JUEGOS` dentro de `js/catalogo.js` (nombre, enlace, imagen, categoría, estado, descripción y etiquetas).
 
-En el mismo archivo están `VISTRA_PROXIMOS` (próximos lanzamientos) y `VISTRA_NOVEDADES` (novedades).
+En el mismo archivo está `VISTRA_NOVEDADES` (novedades).
 
 ## Estructura
 
 - `index.html`, `css/home.css`, `js/home.js`: portada del arcade.
-- `js/catalogo.js`: juegos, próximos lanzamientos y novedades.
+- `js/catalogo.js`: juegos y novedades.
 - `paginas.html`, `css/paginas.css`, `js/paginas.js`: páginas permitidas en el trabajo (sin cuenta). La lista está en `js/paginas-datos.js`.
 - `css/style.css`: colores (modo claro y oscuro) y estilos compartidos con los juegos.
 - `img/`: logotipo e ilustraciones (SVG locales, sin depender de internet).
