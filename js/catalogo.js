@@ -6,6 +6,16 @@
 // imagen: ilustración 16:9 (se recomienda SVG de 320×180 en img/juegos/).
 const VISTRA_JUEGOS = [
   {
+    id: "banderas",
+    nombre: "Banderas y Capitales",
+    url: "games/banderas/index.html",
+    imagen: "img/juegos/banderas.svg",
+    categoria: "Geografía",
+    estado: "nuevo",
+    descripcion: "Quiz contra el reloj: adivina banderas y capitales de todo el mundo o de un solo continente.",
+    etiquetas: ["1 jugador", "Sin clave de Google", "Funciona sin conexión"],
+  },
+  {
     id: "sudoku",
     nombre: "Sudoku",
     url: "games/sudoku/index.html",
@@ -49,6 +59,12 @@ const VISTRA_JUEGOS = [
 
 // Novedades, de la más reciente a la más antigua. fecha en formato AAAA-MM-DD.
 const VISTRA_NOVEDADES = [
+  {
+    fecha: "2026-11-27",
+    juego: "banderas",
+    titulo: "Nuevo juego: Banderas y Capitales",
+    texto: "Más de 190 países, preguntas por continente, tres tiempos por pregunta y bonus por rachas de aciertos.",
+  },
   {
     fecha: "2026-11-26",
     juego: null,

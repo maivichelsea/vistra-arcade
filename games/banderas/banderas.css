@@ -1,0 +1,179 @@
+/* Banderas y Capitales. Botones, chips, paneles y barra superior vienen de css/style.css. */
+
+/* Fuente con las banderas: se usa solo para los emojis de bandera (unicode-range),
+   así se ven igual en Windows, que no trae banderas en sus emojis. */
+@font-face {
+  font-family: "Twemoji Country Flags";
+  src: url("fuentes/TwemojiCountryFlags.woff2") format("woff2");
+  unicode-range: U+1F1E6-1F1FF, U+1F3F4, U+E0062-E007F;
+  font-display: block;
+}
+
+:root {
+  --led-bg: #14113d;
+  --led-text: #ffb347;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --led-bg: #020016; }
+}
+
+.game-main {
+  display: flex;
+  justify-content: center;
+  padding-block: clamp(1rem, 3vw, 2rem) 1.5rem;
+}
+.game-panel { width: min(100%, 620px); }
+.game-panel[hidden] { display: none; }
+
+/* Menú */
+.menu-title { margin-top: .35rem; font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 900; letter-spacing: -.01em; line-height: 1.15; }
+.menu-lead { margin-top: .4rem; color: var(--muted); }
+.game-panel h3 {
+  margin: 1.25rem 0 .55rem;
+  font-size: .75rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.menu-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; margin-top: 1.5rem; }
+.record-chip { color: var(--muted); font-weight: 700; }
+.record-chip strong { color: var(--arcade); font-variant-numeric: tabular-nums; }
+
+/* Pregunta */
+.quiz-top {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  font-weight: 700;
+  color: var(--muted);
+}
+.quiz-top strong { color: var(--text); font-variant-numeric: tabular-nums; }
+.quiz-score { margin-left: auto; font-size: 1.1rem; }
+.quiz-score strong { color: var(--arcade); }
+.quiz-streak {
+  padding: .15rem .6rem;
+  border-radius: 999px;
+  background: var(--arcade-soft);
+  color: var(--arcade);
+  font-size: .85rem;
+  font-weight: 800;
+}
+.timer {
+  height: 8px;
+  margin-top: .75rem;
+  border-radius: 999px;
+  background: var(--secondary);
+  overflow: hidden;
+}
+.timer-bar {
+  height: 100%;
+  width: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--primary), var(--accent-text));
+  transform-origin: left;
+}
+.timer-bar.low { background: linear-gradient(90deg, var(--arcade), var(--danger)); }
+
+.question { display: grid; justify-items: center; gap: .5rem; margin: 1.25rem 0 1rem; text-align: center; }
+.flag {
+  font-family: "Twemoji Country Flags", "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
+  font-size: clamp(6rem, 26vw, 9.5rem);
+  line-height: 1.05;
+  filter: drop-shadow(0 10px 18px rgba(5, 3, 21, .25));
+  animation: pop .35s var(--ease);
+}
+.flag.small { font-size: clamp(3.5rem, 14vw, 5rem); }
+.flag:empty { display: none; }
+@keyframes pop { from { transform: scale(.8); opacity: 0; } }
+.prompt { font-size: clamp(1.1rem, 3vw, 1.35rem); font-weight: 800; }
+.prompt strong { color: var(--primary-text); }
+
+.options { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+@media (max-width: 480px) { .options { grid-template-columns: 1fr; } }
+.option {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  min-height: 3.4rem;
+  padding: .6rem .8rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  box-shadow: 0 3px 0 var(--border);
+  color: var(--text);
+  font: inherit;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+  transition: transform .15s var(--ease), border-color .15s, background-color .15s;
+}
+.option:hover:not(:disabled) { border-color: var(--accent-text); transform: translateY(-2px); }
+.option:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 1px 0 var(--border); }
+.option:disabled { cursor: default; }
+.option .key {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 8px;
+  background: var(--secondary);
+  color: var(--primary-text);
+  font-size: .85rem;
+  font-weight: 900;
+}
+.option.right { border-color: var(--success); background: var(--success-soft); color: var(--success); box-shadow: 0 3px 0 var(--success); }
+.option.right .key { background: var(--success); color: #fff; }
+.option.wrong { border-color: var(--danger); background: color-mix(in srgb, var(--danger) 12%, var(--panel)); color: var(--danger); box-shadow: 0 3px 0 var(--danger); animation: shake .35s; }
+.option.wrong .key { background: var(--danger); color: #fff; }
+.option.faded { opacity: .5; }
+@keyframes shake { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+
+.feedback { min-height: 1.5rem; margin-top: .9rem; text-align: center; font-weight: 800; }
+.feedback.ok { color: var(--success); }
+.feedback.bad { color: var(--danger); }
+
+/* Resultado */
+.end-title { margin-top: .35rem; font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 900; letter-spacing: -.01em; }
+.end-detail { margin-top: .3rem; color: var(--muted); font-weight: 600; }
+.end-detail .new { display: block; margin-top: .3rem; color: var(--arcade); font-weight: 900; }
+.end-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem; margin-top: 1.25rem; }
+.counter {
+  display: flex;
+  flex-direction: column;
+  gap: .15rem;
+  padding: .55rem .8rem;
+  border-radius: var(--radius-sm);
+  background: var(--led-bg);
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, .45);
+}
+.counter-label { font-size: .64rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: #a6a3c8; }
+.counter-value {
+  font-size: 1.5rem;
+  font-weight: 900;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--led-text);
+  text-shadow: 0 0 10px color-mix(in srgb, var(--led-text) 55%, transparent);
+}
+.review { list-style: none; display: grid; gap: .35rem; }
+.review li {
+  display: flex;
+  align-items: center;
+  gap: .7rem;
+  padding: .45rem .7rem;
+  border-radius: 10px;
+  background: var(--background);
+  font-size: .92rem;
+}
+.review .mini { font-family: "Twemoji Country Flags", "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif; font-size: 1.6rem; line-height: 1; }
+.review .you { margin-left: auto; color: var(--danger); font-size: .82rem; font-weight: 700; text-align: right; }
+
+.credits { padding-bottom: 1.5rem; text-align: center; font-size: .78rem; color: var(--muted); }
+.credits a { color: inherit; }
+
+@media (max-width: 520px) {
+  .game-panel { padding: .9rem; }
+  .counter-value { font-size: 1.2rem; }
+}

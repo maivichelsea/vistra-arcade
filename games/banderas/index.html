@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <title>Banderas y Capitales · Vistra Arcade</title>
+  <link rel="icon" href="../../img/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../../css/style.css">
+  <link rel="stylesheet" href="banderas.css">
+</head>
+<body class="arcade-bg">
+  <header class="site-nav game-nav">
+    <div class="container nav-inner">
+      <a class="brand" href="../../index.html" aria-label="Volver a Vistra Arcade">
+        <img class="brand-logo" src="../../img/logo.svg" alt="" width="36" height="36">
+        <span class="brand-text"><strong>VISTRA</strong><span>ARCADE</span></span>
+      </a>
+      <span class="nav-sep" aria-hidden="true"></span>
+      <div class="game-title">
+        <span class="eyebrow">Geografía</span>
+        <h1>Banderas y Capitales</h1>
+      </div>
+      <div class="nav-actions">
+        <span class="kbd-hint"><kbd>1</kbd>–<kbd>4</kbd> responder</span>
+        <a class="btn btn-ghost btn-sm" href="../../index.html#juegos">← Juegos</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container game-main">
+    <!-- Menú -->
+    <section id="screen-menu" class="panel game-panel">
+      <p class="eyebrow">Nueva partida</p>
+      <h2 class="menu-title">¿Cuánto sabes del mundo?</h2>
+      <p class="menu-lead">10 preguntas contra el reloj. Cuanto antes respondas, más puntos.</p>
+
+      <h3>Preguntas</h3>
+      <div class="chip-group" role="radiogroup" aria-label="Tipo de preguntas">
+        <label><input type="radio" name="mode" value="banderas" checked><span class="chip">🏳️ Banderas</span></label>
+        <label><input type="radio" name="mode" value="capitales"><span class="chip">🏛️ Capitales</span></label>
+        <label><input type="radio" name="mode" value="mezcla"><span class="chip">🔀 Mezcla</span></label>
+      </div>
+
+      <h3>Continente</h3>
+      <div class="chip-group" id="continents" role="radiogroup" aria-label="Continente">
+        <label><input type="radio" name="continent" value="mundo" checked><span class="chip">🌍 Todo el mundo</span></label>
+      </div>
+
+      <h3>Tiempo por pregunta</h3>
+      <div class="chip-group" role="radiogroup" aria-label="Tiempo por pregunta">
+        <label><input type="radio" name="time" value="20"><span class="chip">🐢 20 s</span></label>
+        <label><input type="radio" name="time" value="12" checked><span class="chip">⏱ 12 s</span></label>
+        <label><input type="radio" name="time" value="6"><span class="chip">⚡ 6 s</span></label>
+      </div>
+
+      <div class="menu-actions">
+        <button id="play" class="btn btn-lg" type="button">Jugar <span aria-hidden="true">▶</span></button>
+        <span class="record-chip">🏆 Récord: <strong id="menu-record">0</strong></span>
+      </div>
+
+      <details class="help">
+        <summary>Cómo jugar</summary>
+        <ul>
+          <li><strong>Banderas:</strong> ves una bandera y eliges de qué país es.</li>
+          <li><strong>Capitales:</strong> eliges la capital del país que aparece.</li>
+          <li>Responde con clic o con las teclas <kbd>1</kbd> a <kbd>4</kbd>.</li>
+          <li>Cada acierto da 100 puntos más un extra según el tiempo que te sobre. Las rachas de aciertos suman más.</li>
+          <li>Hay un récord distinto para cada combinación de preguntas, continente y tiempo.</li>
+        </ul>
+      </details>
+    </section>
+
+    <!-- Pregunta -->
+    <section id="screen-quiz" class="panel game-panel" hidden>
+      <div class="quiz-top">
+        <span class="quiz-count">Pregunta <strong id="q-num">1</strong> de <span id="q-total">10</span></span>
+        <span class="quiz-streak" id="streak" hidden></span>
+        <span class="quiz-score">★ <strong id="score">0</strong></span>
+      </div>
+      <div class="timer" aria-hidden="true"><div id="timer-bar" class="timer-bar"></div></div>
+
+      <div class="question">
+        <div id="flag" class="flag" role="img"></div>
+        <p id="prompt" class="prompt"></p>
+      </div>
+
+      <div id="options" class="options"></div>
+      <p id="feedback" class="feedback" aria-live="polite"></p>
+    </section>
+
+    <!-- Resultado -->
+    <section id="screen-end" class="panel game-panel" hidden>
+      <p class="eyebrow" id="end-eyebrow">Resultado</p>
+      <h2 id="end-title" class="end-title"></h2>
+      <p id="end-detail" class="end-detail"></p>
+      <div class="end-stats">
+        <div class="counter"><span class="counter-label">✔ Aciertos</span><span id="end-hits" class="counter-value">0</span></div>
+        <div class="counter"><span class="counter-label">🔥 Mejor racha</span><span id="end-streak" class="counter-value">0</span></div>
+        <div class="counter"><span class="counter-label">🏆 Récord</span><span id="end-record" class="counter-value">0</span></div>
+      </div>
+      <div id="review-wrap" hidden>
+        <h3>Para repasar</h3>
+        <ul id="review" class="review"></ul>
+      </div>
+      <div class="menu-actions">
+        <button id="again" class="btn" type="button">Jugar otra vez</button>
+        <button id="to-menu" class="btn ghost" type="button">Cambiar opciones</button>
+      </div>
+    </section>
+  </main>
+
+  <footer class="credits container">Banderas: <a href="https://github.com/jdecked/twemoji" target="_blank" rel="noopener">Twemoji</a> (CC BY 4.0), vía la fuente Twemoji Country Flags de TalkJS.</footer>
+
+  <script src="paises.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>
