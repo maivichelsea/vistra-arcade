@@ -1,0 +1,180 @@
+/* =========================================================
+   Páginas permitidas (paginas.html)
+   Reutiliza las tarjetas de css/home.css (.game-card, .game-art, .game-body…).
+   ========================================================= */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* ---------- Cabecera ---------- */
+.pages-hero { padding-block: clamp(2.25rem, 5vw, 3.75rem) clamp(.5rem, 2vw, 1rem); }
+.pages-hero .eyebrow {
+  padding: .35rem .8rem;
+  border-radius: 999px;
+  background: var(--arcade-soft);
+  border: 1px solid color-mix(in srgb, var(--arcade) 30%, transparent);
+}
+.pages-hero h1 {
+  margin-top: 1rem;
+  font-size: clamp(2rem, 4.4vw, 3.25rem);
+  line-height: 1.08;
+  font-weight: 900;
+  letter-spacing: -.02em;
+}
+.pages-hero h1 span {
+  background: linear-gradient(90deg, var(--primary-text), var(--accent-text) 55%, var(--arcade));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.pages-hero .lead { max-width: 40rem; }
+.pages-hero .hero-stats { max-width: 40rem; }
+
+/* ---------- Herramientas: búsqueda, copiar, leyenda ---------- */
+.pages-tools { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; }
+.search-box {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  min-width: min(100%, 260px);
+  padding: .55rem .9rem;
+  border-radius: 12px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  box-shadow: var(--card-shadow);
+  transition: border-color .2s;
+}
+.search-box:focus-within { border-color: var(--accent-text); }
+.search-box input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  font-size: .95rem;
+}
+.pages-filters { margin-bottom: 1.25rem; }
+
+.pages-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .3rem 1.25rem;
+  margin-top: .5rem;
+  list-style: none;
+  font-size: .85rem;
+  color: var(--muted);
+}
+.pages-legend li { display: flex; align-items: center; gap: .4rem; }
+.legend-dot { width: .55rem; height: .55rem; border-radius: 50%; }
+.legend-dot.is-ok { background: var(--success); }
+.legend-dot.is-pending { background: var(--warning); }
+
+.pages-empty { padding: 2.5rem 1rem; text-align: center; color: var(--muted); font-weight: 600; }
+.pages-empty[hidden] { display: none; }
+
+/* ---------- Portada de cada página ---------- */
+:root { --warning: #b7791f; --warning-soft: #fdf1dc; }
+@media (prefers-color-scheme: dark) {
+  :root { --warning: #f6c05c; --warning-soft: rgba(246, 192, 92, .12); }
+}
+
+.page-art {
+  display: grid;
+  place-items: center;
+  padding-top: 1.75rem;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(255, 255, 255, .18), transparent 55%),
+    linear-gradient(135deg, var(--from), var(--to));
+}
+.page-deco {
+  position: absolute;
+  font-size: 7rem;
+  line-height: 1;
+  right: -.75rem;
+  bottom: -1.25rem;
+  opacity: .22;
+  transform: rotate(-12deg);
+  filter: saturate(.6);
+  transition: transform .6s var(--ease);
+  pointer-events: none;
+}
+.page-cover {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .6rem;
+  transition: transform .6s var(--ease);
+}
+.site-logo {
+  display: grid;
+  place-items: center;
+  width: 76px;
+  height: 76px;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 10px 24px rgba(5, 3, 21, .35), inset 0 -3px 0 rgba(5, 3, 21, .08);
+  overflow: hidden;
+}
+.game-art .site-logo img { width: 50px; height: 50px; object-fit: contain; transform: none; transition: none; }
+.site-logo.is-letter { font-size: 2.4rem; font-weight: 900; color: #1a1546; }
+.page-host {
+  padding: .25rem .65rem;
+  border-radius: 999px;
+  background: rgba(5, 3, 21, .35);
+  color: #fff;
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .01em;
+  backdrop-filter: blur(4px);
+}
+.page-card:hover .page-cover, .page-card:focus-visible .page-cover { transform: translateY(-4px) scale(1.05); }
+.page-card:hover .page-deco, .page-card:focus-visible .page-deco { transform: rotate(-4deg) scale(1.08); }
+
+/* Estados */
+.status-probada { background: rgba(227, 246, 234, .95); color: #17803f; }
+.status-por-probar { background: rgba(253, 241, 220, .95); color: #8a5a00; }
+
+/* Aviso de la tarjeta */
+.tags .tag-note {
+  background: var(--warning-soft);
+  border-color: color-mix(in srgb, var(--warning) 35%, transparent);
+  color: var(--text);
+}
+.page-card .game-body p { -webkit-line-clamp: 3; }
+
+.open-icon { padding-left: 0; font-size: 1rem; font-weight: 900; }
+
+/* ---------- Aviso "Lista copiada" ---------- */
+.toast {
+  position: fixed;
+  left: 50%;
+  bottom: 1.25rem;
+  z-index: 50;
+  padding: .7rem 1.1rem;
+  border-radius: 12px;
+  background: var(--success);
+  color: #fff;
+  font-weight: 800;
+  box-shadow: var(--card-shadow-hover);
+  transform: translate(-50%, 1rem);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .25s, transform .25s var(--ease);
+}
+.toast.is-shown { opacity: 1; transform: translate(-50%, 0); }
+@media (prefers-color-scheme: dark) { .toast { color: #04170c; } }
+
+@media (max-width: 720px) {
+  .pages-tools { width: 100%; }
+  .search-box { flex: 1; }
+}

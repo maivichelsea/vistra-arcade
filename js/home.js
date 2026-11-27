@@ -179,7 +179,7 @@
 
   // Marca en el menú la sección que se está viendo.
   function setupActiveNav() {
-    const links = [...document.querySelectorAll(".nav-links a")];
+    const links = [...document.querySelectorAll('.nav-links a[href^="#"]')];
     const sections = links.map((a) => document.querySelector(a.getAttribute("href"))).filter(Boolean);
     if (!("IntersectionObserver" in window) || !sections.length) return;
     const observer = new IntersectionObserver((entries) => {

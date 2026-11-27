@@ -42,6 +42,7 @@ En el mismo archivo están `VISTRA_PROXIMOS` (próximos lanzamientos) y `VISTRA_
 
 - `index.html`, `css/home.css`, `js/home.js`: portada del arcade.
 - `js/catalogo.js`: juegos, próximos lanzamientos y novedades.
+- `paginas.html`, `css/paginas.css`, `js/paginas.js`: páginas permitidas en el trabajo (sin cuenta). La lista está en `js/paginas-datos.js`.
 - `css/style.css`: colores (modo claro y oscuro) y estilos compartidos con los juegos.
 - `img/`: logotipo e ilustraciones (SVG locales, sin depender de internet).
 - `games/`: cada juego en su carpeta.

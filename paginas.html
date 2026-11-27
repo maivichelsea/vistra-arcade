@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Páginas que abren en la red del trabajo y se pueden usar sin iniciar sesión.">
+  <title>Páginas permitidas · Vistra Arcade</title>
+  <link rel="icon" href="img/logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/home.css">
+  <link rel="stylesheet" href="css/paginas.css">
+</head>
+<body class="home arcade-bg" id="top">
+  <a class="skip-link" href="#paginas">Saltar a las páginas</a>
+
+  <header class="site-nav">
+    <div class="container nav-inner">
+      <a class="brand" href="index.html" aria-label="Vistra Arcade, inicio">
+        <img class="brand-logo" src="img/logo.svg" alt="" width="36" height="36">
+        <span class="brand-text"><strong>VISTRA</strong><span>ARCADE</span></span>
+      </a>
+      <nav aria-label="Principal">
+        <ul class="nav-links">
+          <li><a href="index.html#juegos">Juegos</a></li>
+          <li><a href="paginas.html" class="active" aria-current="page">Páginas</a></li>
+          <li><a href="index.html#novedades">Novedades</a></li>
+        </ul>
+      </nav>
+      <a class="btn btn-primary nav-cta" href="index.html#juegos">Jugar</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="pages-hero container" aria-labelledby="paginas-title">
+      <p class="eyebrow"><span class="pulse" aria-hidden="true"></span> En el trabajo</p>
+      <h1 id="paginas-title">Páginas <span>permitidas</span></h1>
+      <p class="lead">
+        Páginas que abren en la red del trabajo y se pueden usar <strong>sin iniciar sesión</strong>.
+        Elige una y ábrela en una pestaña nueva.
+      </p>
+      <ul class="hero-stats">
+        <li><strong id="stat-pages">0</strong><span>páginas</span></li>
+        <li><strong id="stat-tested">0</strong><span>probadas</span></li>
+        <li><strong>0</strong><span>cuentas necesarias</span></li>
+      </ul>
+    </section>
+
+    <section id="paginas" class="section container" aria-labelledby="lista-title">
+      <div class="section-head">
+        <div>
+          <p class="eyebrow">Directorio</p>
+          <h2 id="lista-title">Todas las páginas</h2>
+          <ul class="pages-legend">
+            <li><span class="legend-dot is-ok" aria-hidden="true"></span>Probada: abrió en la red del trabajo</li>
+            <li><span class="legend-dot is-pending" aria-hidden="true"></span>Por probar: de Google o Microsoft, debería abrir</li>
+          </ul>
+        </div>
+        <div class="pages-tools">
+          <label class="search-box">
+            <span class="visually-hidden">Buscar página</span>
+            <span aria-hidden="true">🔍</span>
+            <input type="search" id="q" placeholder="Buscar página…" autocomplete="off">
+          </label>
+          <button type="button" class="btn btn-ghost" id="copy">📋 Copiar lista</button>
+        </div>
+      </div>
+      <div id="filters" class="filters pages-filters" role="group" aria-label="Filtrar por categoría"></div>
+      <div id="page-grid" class="game-grid" aria-live="polite">
+        <noscript><p class="noscript">Activa JavaScript para ver la lista de páginas.</p></noscript>
+      </div>
+      <p id="empty" class="pages-empty" hidden>No hay páginas con ese nombre.</p>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-grid">
+      <div class="footer-brand">
+        <a class="brand" href="index.html" aria-label="Vistra Arcade, inicio">
+          <img class="brand-logo" src="img/logo.svg" alt="" width="32" height="32">
+          <span class="brand-text"><strong>VISTRA</strong><span>ARCADE</span></span>
+        </a>
+        <p>Minijuegos originales para el navegador, hechos con HTML, CSS y JavaScript.</p>
+      </div>
+      <nav class="footer-col" aria-label="Arcade">
+        <h2>Arcade</h2>
+        <ul>
+          <li><a href="index.html#juegos">Juegos</a></li>
+          <li><a href="index.html#proximamente">Próximamente</a></li>
+          <li><a href="index.html#novedades">Novedades</a></li>
+        </ul>
+      </nav>
+      <nav class="footer-col" aria-label="Trabajo">
+        <h2>Trabajo</h2>
+        <ul>
+          <li><a href="paginas.html">Páginas permitidas</a></li>
+        </ul>
+      </nav>
+      <nav class="footer-col" aria-label="Proyecto">
+        <h2>Proyecto</h2>
+        <ul>
+          <li><a href="https://github.com/maivichelsea/vistra-arcade" target="_blank" rel="noopener">Código en GitHub</a></li>
+          <li><a href="#top">Volver arriba ↑</a></li>
+        </ul>
+      </nav>
+    </div>
+    <div class="container footer-bottom">
+      <span>© <span id="year">2026</span> Vistra Arcade</span>
+      <span>Se adapta al modo claro u oscuro de tu sistema.</span>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="js/paginas-datos.js"></script>
+  <script src="js/paginas.js"></script>
+</body>
+</html>
